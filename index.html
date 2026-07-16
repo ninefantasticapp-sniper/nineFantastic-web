@@ -1,0 +1,2842 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>IXF - Kelas 9</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== VARIABEL GLOBAL ===== */
+        :root {
+            --hero-height: 700px;
+            --curve-height: 70px;
+            --bottom-nav-height: 64px;
+            --primary: #0a1e3c;
+            --primary-light: #1a3a6a;
+            --accent: #2d7d46;
+            --accent-light: #e6f4ea;
+            --bg-card: #f8fafc;
+            --border-radius: 16px;
+        }
+
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        *:focus,
+        *:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        html,
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== LOADING ===== */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .center-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            width: 100%;
+        }
+        .logo-img {
+            width: 135px;
+            height: 135px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+        }
+        .brand-text {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 500;
+            margin-top: 12px;
+            letter-spacing: 1.5px;
+            user-select: none;
+        }
+        .version-text {
+            color: #ffffff;
+            font-size: 12px;
+            opacity: 0.3;
+            padding-bottom: 20px;
+            user-select: none;
+            width: 100%;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        /* ===== OVERLAY INPUT NAMA ===== */
+        #name-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+        #name-overlay.active {
+            display: flex;
+        }
+        .name-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeUp 0.4s ease;
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .name-card h2 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+        .name-card p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+        .name-card input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #ddd;
+            border-radius: 14px;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 1px;
+            transition: border 0.2s;
+            font-family: 'Roboto', sans-serif;
+            background: #f9f9f9;
+        }
+        .name-card input:focus {
+            border-color: #000000;
+            background: #ffffff;
+        }
+        .name-card input.error {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+        .name-card .error-msg {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 8px;
+            min-height: 20px;
+            font-weight: 400;
+        }
+        .name-card button {
+            width: 100%;
+            padding: 14px;
+            background: #000000;
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 500;
+            margin-top: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Roboto', sans-serif;
+        }
+        .name-card button:hover {
+            background: #333;
+        }
+        .name-card button:active {
+            transform: scale(0.97);
+        }
+        .name-card .char-count {
+            font-size: 13px;
+            color: #999;
+            margin-top: 6px;
+            text-align: right;
+            padding-right: 4px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        #main-content {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            background-color: #ffffff;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: var(--bottom-nav-height);
+        }
+        #main-content.visible {
+            display: flex;
+        }
+
+        /* ===== TOP NAVBAR ===== */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            background: transparent;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 64px;
+            border-bottom: none;
+        }
+        .top-nav .nav-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: #ffffff;
+            letter-spacing: 0.2px;
+            user-select: none;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.2s;
+        }
+        .top-nav .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-nav .nav-actions .report-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.15s;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+            font-family: 'Roboto', sans-serif;
+            line-height: 1;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            position: relative;
+        }
+        .top-nav .nav-actions .report-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+        .top-nav .nav-actions .report-btn:active {
+            transform: scale(0.88);
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .top-nav .nav-actions .report-btn .badge-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background: #e74c3c;
+            border-radius: 50%;
+            border: 2px solid rgba(10, 30, 60, 0.6);
+            animation: pulse-badge 1.8s ease-in-out infinite;
+        }
+        @keyframes pulse-badge {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.25);
+                opacity: 0.6;
+            }
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--hero-height);
+            background-image: url('a301c484ed53b62966ca4d1341eccb3b.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-drag: none;
+            -webkit-touch-callout: none;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        .hero-text {
+            position: relative;
+            z-index: 3;
+            color: #ffffff;
+            text-align: center;
+            padding: 0 20px;
+            font-weight: 700;
+            font-size: 2.8rem;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            letter-spacing: 1px;
+            line-height: 1.2;
+            min-height: 1.4em;
+            margin-top: 20px;
+        }
+        .hero-text .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background-color: #ffffff;
+            margin-left: 4px;
+            vertical-align: text-bottom;
+            animation: blink 0.8s step-end infinite;
+        }
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+        .hero-subtitle {
+            position: relative;
+            z-index: 3;
+            color: #ffffff;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+            padding: 0 20px;
+            pointer-events: none;
+        }
+
+        /* ===== KONTEN UTAMA ===== */
+        .main-body {
+            margin-top: var(--hero-height);
+            background-color: #ffffff;
+            position: relative;
+            z-index: 2;
+        }
+        .curve {
+            height: var(--curve-height);
+            background: #ffffff;
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+            margin-top: calc(-1 * var(--curve-height));
+            position: relative;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* ===== PAGE BERANDA ===== */
+        .photo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 20px 10px;
+            background: #ffffff;
+        }
+        .photo-wrapper {
+            display: inline-block;
+            position: relative;
+            cursor: default;
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+            border-radius: 8px;
+            background: #f0f0f0;
+            transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1);
+            will-change: transform;
+            pointer-events: none;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+        .photo-wrapper.active .profile-photo {
+            transform: scale(1.08);
+        }
+        .photo-text {
+            margin-top: 14px;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+        }
+        .teacher-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: 0.3px;
+            min-height: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .teacher-name .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.1em;
+            background-color: #1a1a1a;
+            margin-left: 3px;
+            vertical-align: text-bottom;
+            animation: blink 0.8s step-end infinite;
+        }
+        .teacher-role {
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: #888;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            margin-top: 2px;
+            min-height: 1.4em;
+        }
+        .teacher-role.visible {
+            opacity: 1;
+        }
+
+        /* ===== SEARCH ===== */
+        .search-section {
+            position: sticky;
+            top: 64px;
+            z-index: 20;
+            background: #ffffff;
+            padding: 16px 20px 16px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 30px;
+            padding: 4px 18px;
+            border: 2px solid #e0e0e0;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        .search-box:focus-within {
+            border-color: #000000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+        }
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 0;
+            font-size: 16px;
+            font-family: 'Roboto', sans-serif;
+            color: #1a1a1a;
+            min-width: 0;
+        }
+        .search-box input::placeholder {
+            color: #aaa;
+        }
+        .search-results {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 4px;
+        }
+        .search-results .result-item {
+            background: #f9f9f9;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            border-left: 4px solid #000000;
+            transition: background 0.2s;
+            animation: slideIn 0.25s ease;
+        }
+        .search-results .result-item:hover {
+            background: #f0f0f0;
+        }
+        .search-results .no-result {
+            text-align: center;
+            color: #999;
+            padding: 20px 0;
+            font-size: 15px;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================
+                   PAGE JADWAL — VERTIKAL 1 KOLOM
+                   ============================================================ */
+        .page-schedule-wrapper {
+            padding: 16px 12px 30px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .schedule-now {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 14px 18px;
+            margin-bottom: 18px;
+            border-left: 5px solid var(--primary);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+        }
+        .schedule-now span {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin-right: 10px;
+            letter-spacing: 0.5px;
+        }
+        .schedule-now .now-text {
+            flex: 1;
+        }
+
+        .schedule-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .day-card {
+            background: #ffffff;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #eee;
+            transition: border 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        .day-card.active-day {
+            border-color: var(--accent);
+            box-shadow: 0 4px 16px rgba(45, 125, 70, 0.15);
+            background: var(--accent-light);
+        }
+        .day-header {
+            background: var(--primary);
+            color: #fff;
+            padding: 10px 14px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+        }
+        .day-card.active-day .day-header {
+            background: var(--accent);
+        }
+        .day-body {
+            padding: 12px 14px 14px;
+            min-height: 60px;
+        }
+        .subject-item {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            background: #f5f7fa;
+            line-height: 1.4;
+            position: relative;
+            padding-left: 20px;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .subject-item .mapel {
+            flex: 1;
+        }
+        .subject-item .guru {
+            font-weight: 400;
+            color: #555;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        .subject-item .dot-active {
+            display: none;
+            width: 10px;
+            height: 10px;
+            min-width: 10px;
+            background: #e74c3c;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+            animation: pulse-dot 1.2s ease-in-out infinite;
+        }
+        .subject-item.active-now .dot-active {
+            display: inline-block;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.6;
+            }
+        }
+
+        .day-card .no-class {
+            font-size: 0.85rem;
+            color: #999;
+            text-align: center;
+            padding: 12px 0;
+        }
+
+        /* ============================================================
+                   PAGE GALERI — COVERFLOW 3D
+                   ============================================================ */
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px 0 30px;
+            overflow: hidden;
+            touch-action: pan-y;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .gallery-slider {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .gallery-card {
+            position: absolute;
+            width: 180px;
+            height: 240px;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            background: #f0f0f0;
+            transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.5s ease, box-shadow 0.5s ease;
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .gallery-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+            -webkit-user-drag: none;
+        }
+
+        .gallery-card.center {
+            transform: translateX(0px) translateY(-20px) scale(1.15) rotateY(0deg);
+            opacity: 1;
+            z-index: 10;
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.25);
+            border-color: #ffffff;
+        }
+
+        .gallery-card.left-1 {
+            transform: translateX(-160px) translateY(0px) scale(0.85) rotateY(18deg);
+            opacity: 0.7;
+            z-index: 5;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        .gallery-card.right-1 {
+            transform: translateX(160px) translateY(0px) scale(0.85) rotateY(-18deg);
+            opacity: 0.7;
+            z-index: 5;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .gallery-card.left-2 {
+            transform: translateX(-280px) translateY(10px) scale(0.7) rotateY(30deg);
+            opacity: 0.4;
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .gallery-card.right-2 {
+            transform: translateX(280px) translateY(10px) scale(0.7) rotateY(-30deg);
+            opacity: 0.4;
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .gallery-card.hidden {
+            transform: translateX(0px) scale(0.5);
+            opacity: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .gallery-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 18px;
+            padding: 0 10px;
+            flex-wrap: wrap;
+        }
+
+        .gallery-indicator .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ccc;
+            transition: background 0.3s, transform 0.3s;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .gallery-indicator .dot.active {
+            background: var(--primary);
+            transform: scale(1.25);
+        }
+
+        .gallery-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.7);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 24px;
+            color: #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.1s;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .gallery-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .gallery-nav-btn:active {
+            transform: translateY(-50%) scale(0.92);
+        }
+        .gallery-nav-btn.prev {
+            left: 8px;
+        }
+        .gallery-nav-btn.next {
+            right: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .gallery-slider {
+                height: 260px;
+            }
+            .gallery-card {
+                width: 140px;
+                height: 190px;
+                border-radius: 14px;
+            }
+            .gallery-card.center {
+                transform: translateX(0px) translateY(-15px) scale(1.1) rotateY(0deg);
+            }
+            .gallery-card.left-1 {
+                transform: translateX(-120px) translateY(0px) scale(0.8) rotateY(16deg);
+            }
+            .gallery-card.right-1 {
+                transform: translateX(120px) translateY(0px) scale(0.8) rotateY(-16deg);
+            }
+            .gallery-card.left-2 {
+                transform: translateX(-210px) translateY(8px) scale(0.65) rotateY(28deg);
+            }
+            .gallery-card.right-2 {
+                transform: translateX(210px) translateY(8px) scale(0.65) rotateY(-28deg);
+            }
+            .gallery-nav-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .gallery-nav-btn.prev {
+                left: 4px;
+            }
+            .gallery-nav-btn.next {
+                right: 4px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .gallery-slider {
+                height: 220px;
+            }
+            .gallery-card {
+                width: 110px;
+                height: 150px;
+                border-radius: 12px;
+            }
+            .gallery-card.center {
+                transform: translateX(0px) translateY(-12px) scale(1.05) rotateY(0deg);
+            }
+            .gallery-card.left-1 {
+                transform: translateX(-90px) translateY(0px) scale(0.75) rotateY(14deg);
+            }
+            .gallery-card.right-1 {
+                transform: translateX(90px) translateY(0px) scale(0.75) rotateY(-14deg);
+            }
+            .gallery-card.left-2 {
+                transform: translateX(-160px) translateY(6px) scale(0.6) rotateY(24deg);
+            }
+            .gallery-card.right-2 {
+                transform: translateX(160px) translateY(6px) scale(0.6) rotateY(-24deg);
+            }
+            .gallery-nav-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 15px;
+            }
+        }
+
+        /* ===== PAGE LAIN ===== */
+        .page-content {
+            display: none;
+            padding: 24px 20px 30px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+            min-height: 60vh;
+        }
+        .page-content.active {
+            display: block;
+        }
+        .page-content h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+        .page-content p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* ===== PAGE SETTINGS ===== */
+        .settings-group {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 18px 16px;
+            margin-top: 12px;
+            border: 1px solid #eee;
+        }
+        .settings-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            color: #1a1a1a;
+        }
+        .settings-group .desc {
+            font-size: 0.85rem;
+            color: #777;
+            margin-bottom: 12px;
+        }
+        .settings-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #fff;
+            font-family: 'Roboto', sans-serif;
+            transition: border 0.2s;
+        }
+        .settings-group select:focus {
+            border-color: var(--primary);
+        }
+        .settings-group .notif-status {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #555;
+            padding: 8px 12px;
+            background: #f0f4f8;
+            border-radius: 8px;
+        }
+        .settings-group .notif-status .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 20px;
+            padding: 0 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            line-height: 1.8;
+        }
+
+        .name-change-group .name-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .name-change-group .name-input-wrapper input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Roboto', sans-serif;
+            transition: border 0.2s;
+            background: #f9f9f9;
+            min-width: 140px;
+        }
+        .name-change-group .name-input-wrapper input:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+        }
+        .name-change-group .name-input-wrapper input.error {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+        .name-change-group .name-input-wrapper button {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        .name-change-group .name-input-wrapper button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+        .name-change-group .name-input-wrapper button:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+        .name-change-group .name-change-info {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #555;
+            padding: 8px 12px;
+            background: #f0f4f8;
+            border-radius: 8px;
+        }
+        .name-change-group .name-change-info .highlight {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .name-change-group .char-count-change {
+            font-size: 0.8rem;
+            color: #999;
+            text-align: right;
+            margin-top: 4px;
+            padding-right: 4px;
+        }
+        .name-change-group .error-msg-change {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            min-height: 1.4em;
+            margin-top: 4px;
+        }
+
+        /* ============================================================
+                   FIREFOX PROMO SECTION
+                   ============================================================ */
+        .firefox-promo {
+            max-width: 500px;
+            margin: 8px auto 12px;
+            padding: 14px 18px;
+            background: #fff7ed;
+            border-radius: var(--border-radius);
+            border: 1px solid #fde4c8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .promo-inner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            justify-content: center;
+        }
+        .promo-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #eee;
+            border: 2px solid #e07b2b;
+        }
+        .promo-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #8a4a1a;
+            line-height: 1.3;
+            text-align: left;
+            flex: 1;
+        }
+        .promo-btn {
+            background: transparent;
+            border: none;
+            color: #d4691a;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            background: #fff0e0;
+            transition: background 0.2s, transform 0.1s;
+            font-family: 'Roboto', sans-serif;
+            border: 1px solid #f5d6b8;
+            width: 100%;
+            max-width: 260px;
+            text-align: center;
+        }
+        .promo-btn:hover {
+            background: #fde4c8;
+        }
+        .promo-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ===== MODAL OVERLAY ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 32px 28px 28px;
+            max-width: 440px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: fadeUp 0.35s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        }
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 28px;
+            font-weight: 300;
+            color: #999;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+        .modal-close:hover {
+            color: #1a1a1a;
+            background: #f0f0f0;
+        }
+        .modal-content h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            padding-right: 32px;
+        }
+        .modal-content p {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #444;
+            margin-bottom: 10px;
+            white-space: normal;
+            word-break: break-word;
+        }
+        .modal-content .highlight {
+            display: block;
+            margin-top: 14px;
+            padding: 10px 14px;
+            background: #fef3e9;
+            border-radius: 12px;
+            border-left: 4px solid #e07b2b;
+            font-size: 0.85rem;
+            color: #6a3a1a;
+        }
+
+        /* ===== MODAL LAPORAN ===== */
+        .modal-content.report-modal {
+            max-width: 560px;
+            padding: 20px 16px 16px;
+        }
+        .modal-content.report-modal h3 {
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+            padding-right: 36px;
+        }
+        .modal-content.report-modal .sub {
+            font-size: 0.85rem;
+            color: #777;
+            margin-bottom: 14px;
+        }
+        .modal-content.report-modal .form-wrapper {
+            width: 100%;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #f5f7fa;
+            border: 1px solid #e8eaed;
+            position: relative;
+            height: 500px;
+        }
+        .modal-content.report-modal .form-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            background: #ffffff;
+        }
+        .modal-content.report-modal .form-wrapper .loading-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            pointer-events: none;
+        }
+        .modal-content.report-modal .form-wrapper .loading-placeholder .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e8eaed;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--bottom-nav-height);
+            background: #ffffff;
+            border-top: 1px solid #eaeaea;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 200;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            height: 100%;
+            cursor: pointer;
+            transition: color 0.2s;
+            color: #999;
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            border: none;
+            background: transparent;
+            font-family: 'Roboto', sans-serif;
+            padding: 4px 0;
+            position: relative;
+        }
+        .nav-item .nav-icon {
+            font-size: 24px;
+            line-height: 1.2;
+            transition: transform 0.2s;
+        }
+        .nav-item .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 2px;
+            letter-spacing: 0.3px;
+        }
+        .nav-item.active {
+            color: #000000;
+        }
+        .nav-item.active .nav-icon {
+            transform: scale(1.05);
+        }
+        .nav-item:active {
+            opacity: 0.6;
+        }
+
+        /* ============================================================
+                   RESPONSIF
+                   ============================================================ */
+        @media (max-width: 480px) {
+            :root {
+                --hero-height: 500px;
+                --curve-height: 50px;
+                --bottom-nav-height: 56px;
+            }
+            .top-nav {
+                padding: 10px 16px;
+                min-height: 56px;
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+            }
+            .top-nav .nav-title {
+                font-size: 17px;
+            }
+            .top-nav .nav-actions .report-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 19px;
+            }
+            .top-nav .nav-actions .report-btn .badge-dot {
+                width: 10px;
+                height: 10px;
+                top: -1px;
+                right: -1px;
+            }
+            .logo-img {
+                width: 100px;
+                height: 100px;
+            }
+            .brand-text {
+                font-size: 17px;
+            }
+            .hero-text {
+                font-size: 2rem;
+                margin-top: 16px;
+            }
+            .hero-subtitle {
+                font-size: 1rem;
+                margin-top: 6px;
+            }
+            .photo-section {
+                padding: 12px 16px 8px;
+            }
+            .profile-photo {
+                width: 120px;
+                height: 120px;
+            }
+            .teacher-name {
+                font-size: 1.05rem;
+            }
+            .teacher-role {
+                font-size: 0.85rem;
+            }
+            .search-section {
+                padding: 12px 16px 12px;
+                top: 56px;
+            }
+            .search-box {
+                padding: 4px 14px;
+            }
+            .search-box input {
+                font-size: 15px;
+                padding: 10px 0;
+            }
+            .search-results .result-item {
+                font-size: 14px;
+                padding: 10px 14px;
+            }
+            .nav-item .nav-icon {
+                font-size: 22px;
+            }
+            .nav-item .nav-label {
+                font-size: 10px;
+            }
+            .name-card {
+                padding: 30px 20px;
+            }
+            .name-card h2 {
+                font-size: 20px;
+            }
+            .page-content {
+                padding: 20px 16px 24px;
+            }
+            .page-content h2 {
+                font-size: 1.3rem;
+            }
+
+            .page-schedule-wrapper {
+                padding: 12px 8px 20px;
+            }
+            .schedule-grid {
+                gap: 10px;
+            }
+            .day-header {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+            .day-body {
+                padding: 10px 12px 12px;
+                min-height: 50px;
+            }
+            .subject-item {
+                font-size: 0.8rem;
+                padding: 6px 10px 6px 16px;
+                gap: 6px;
+            }
+            .subject-item .guru {
+                font-size: 0.7rem;
+            }
+            .subject-item .dot-active {
+                width: 8px;
+                height: 8px;
+                min-width: 8px;
+            }
+            .schedule-now {
+                font-size: 0.85rem;
+                padding: 10px 14px;
+            }
+            .schedule-now span {
+                font-size: 0.65rem;
+                padding: 1px 10px;
+            }
+
+            .firefox-promo {
+                padding: 12px 14px;
+                margin: 6px 10px 10px;
+            }
+            .promo-icon {
+                width: 38px;
+                height: 38px;
+            }
+            .promo-text {
+                font-size: 0.8rem;
+            }
+            .promo-btn {
+                font-size: 0.75rem;
+                max-width: 220px;
+                padding: 5px 12px;
+            }
+            .modal-content {
+                padding: 24px 18px 20px;
+            }
+            .modal-content h3 {
+                font-size: 1.1rem;
+            }
+            .modal-content p {
+                font-size: 0.85rem;
+            }
+            .modal-content.report-modal {
+                padding: 16px 12px 12px;
+            }
+            .modal-content.report-modal .form-wrapper {
+                height: 420px;
+            }
+
+            .name-change-group .name-input-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .name-change-group .name-input-wrapper button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 380px) {
+            :root {
+                --hero-height: 400px;
+                --curve-height: 40px;
+                --bottom-nav-height: 50px;
+            }
+            .top-nav {
+                padding: 8px 12px;
+                min-height: 48px;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            .top-nav .nav-title {
+                font-size: 15px;
+            }
+            .top-nav .nav-actions .report-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 17px;
+            }
+            .top-nav .nav-actions .report-btn .badge-dot {
+                width: 8px;
+                height: 8px;
+                top: -1px;
+                right: -1px;
+            }
+            .logo-img {
+                width: 80px;
+                height: 80px;
+            }
+            .brand-text {
+                font-size: 15px;
+            }
+            .hero-text {
+                font-size: 1.5rem;
+                margin-top: 12px;
+            }
+            .hero-subtitle {
+                font-size: 0.9rem;
+                margin-top: 4px;
+            }
+            .profile-photo {
+                width: 100px;
+                height: 100px;
+            }
+            .teacher-name {
+                font-size: 0.95rem;
+            }
+            .teacher-role {
+                font-size: 0.8rem;
+            }
+            .search-section {
+                padding: 8px 12px 8px;
+                top: 48px;
+            }
+            .search-box {
+                padding: 4px 12px;
+            }
+            .search-box input {
+                font-size: 14px;
+                padding: 8px 0;
+            }
+            .search-results .result-item {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            .nav-item .nav-icon {
+                font-size: 20px;
+            }
+            .nav-item .nav-label {
+                font-size: 9px;
+            }
+            .name-card {
+                padding: 24px 16px;
+            }
+            .name-card h2 {
+                font-size: 18px;
+            }
+            .name-card input {
+                font-size: 16px;
+                padding: 12px;
+            }
+            .page-content {
+                padding: 16px 12px 20px;
+            }
+            .page-content h2 {
+                font-size: 1.1rem;
+            }
+
+            .schedule-grid {
+                gap: 8px;
+            }
+            .day-header {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            .day-body {
+                padding: 8px 10px 10px;
+                min-height: 40px;
+            }
+            .subject-item {
+                font-size: 0.7rem;
+                padding: 5px 8px 5px 14px;
+                gap: 4px;
+            }
+            .subject-item .guru {
+                font-size: 0.6rem;
+            }
+            .subject-item .dot-active {
+                width: 6px;
+                height: 6px;
+                min-width: 6px;
+            }
+            .schedule-now {
+                font-size: 0.75rem;
+                padding: 8px 10px;
+            }
+
+            .firefox-promo {
+                padding: 10px 12px;
+                margin: 4px 6px 8px;
+                gap: 6px;
+            }
+            .promo-icon {
+                width: 32px;
+                height: 32px;
+            }
+            .promo-text {
+                font-size: 0.7rem;
+            }
+            .promo-btn {
+                font-size: 0.7rem;
+                max-width: 180px;
+                padding: 4px 10px;
+            }
+            .modal-content {
+                padding: 20px 14px 16px;
+            }
+            .modal-content h3 {
+                font-size: 1rem;
+            }
+            .modal-content p {
+                font-size: 0.8rem;
+            }
+            .modal-content.report-modal {
+                padding: 12px 10px 10px;
+            }
+            .modal-content.report-modal .form-wrapper {
+                height: 360px;
+            }
+
+            .name-change-group .name-input-wrapper input {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+            .name-change-group .name-input-wrapper button {
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LOADING ===== -->
+    <div id="loading-screen">
+        <div class="center-content">
+            <img src="logokelas.png" alt="Logo" class="logo-img" />
+            <div class="brand-text">IXF</div>
+        </div>
+        <div class="version-text">Versi 26.0</div>
+    </div>
+
+    <!-- ===== OVERLAY INPUT NAMA ===== -->
+    <div id="name-overlay">
+        <div class="name-card">
+            <h2>Masukkan Nama</h2>
+            <p>Hanya huruf, maksimal 9 karakter</p>
+            <input type="text" id="name-input" placeholder="Nama kamu" maxlength="9" autocomplete="off" />
+            <div class="char-count" id="char-count">0 / 9</div>
+            <div class="error-msg" id="error-msg"></div>
+            <button id="submit-name">Lanjutkan</button>
+        </div>
+    </div>
+
+    <!-- ===== HALAMAN UTAMA ===== -->
+    <div id="main-content">
+        <nav class="top-nav">
+            <span class="nav-title" id="navTitle">Beranda</span>
+            <div class="nav-actions">
+                <button class="report-btn" id="reportBtn" aria-label="Laporkan bug">
+                    <span>!</span>
+                    <span class="badge-dot"></span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- ===== HERO ===== -->
+        <div class="hero">
+            <div class="hero-text" id="heroText">
+                <span id="typewriter-content"></span><span class="cursor"></span>
+            </div>
+            <div class="hero-subtitle">Website Kelas IX F</div>
+        </div>
+
+        <div class="main-body">
+            <!-- ===== LENGKUNGAN ===== -->
+            <div class="curve"></div>
+
+            <!-- ===== PAGE BERANDA ===== -->
+            <div id="page-home" class="page-content active">
+                <div class="photo-section">
+                    <div class="photo-wrapper" id="photoWrapper">
+                        <img src="Picsart_26-07-13_18-17-11-957.jpg"
+                        alt="Foto Profil"
+                        class="profile-photo"
+                        draggable="false"
+                        oncontextmenu="return false"
+                        />
+                    </div>
+                    <div class="photo-text">
+                        <div class="teacher-name" id="teacherName"></div>
+                        <div class="teacher-role" id="teacherRole">Wali kelas IX F</div>
+                    </div>
+                </div>
+
+                <div class="search-section">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Cari siswa..." autocomplete="off" />
+                    </div>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+
+            <!-- ===== PAGE JADWAL ===== -->
+            <div id="page-schedule" class="page-content">
+                <div class="page-schedule-wrapper">
+                    <div class="schedule-now" id="scheduleNow">
+                        <span>⏳</span>
+                        <span class="now-text" id="nowText">Memuat jadwal...</span>
+                    </div>
+                    <div class="schedule-grid" id="scheduleGrid"></div>
+                </div>
+            </div>
+
+            <!-- ===== PAGE PENGATURAN ===== -->
+            <div id="page-settings" class="page-content">
+                <h2>⚙️ Pengaturan</h2>
+
+                <div class="settings-group">
+                    <label for="notifTime">⏰ Pengingat Jadwal Besok</label>
+                    <div class="desc">Pilih jam notifikasi harian. Notifikasi akan muncul setiap hari pada jam yang dipilih.</div>
+                    <select id="notifTime">
+                        <option value="">-- Pilih Jam --</option>
+                        <option value="18:56">18.56</option>
+                        <option value="20:26">20.26</option>
+                        <option value="05:30">05.30</option>
+                    </select>
+                    <div class="notif-status" id="notifStatus">
+                        <span class="badge" id="notifBadge">⏸ Tidak aktif</span>
+                        <span id="notifInfo">Pilih jam di atas untuk mengaktifkan.</span>
+                    </div>
+                </div>
+
+                <div class="settings-group name-change-group">
+                    <label for="changeNameInput">✏️ Ganti Nama</label>
+                    <div class="desc">Hanya huruf, maksimal 9 karakter. Hanya bisa diganti setiap 30 hari sekali.</div>
+                    <div class="name-input-wrapper">
+                        <input type="text" id="changeNameInput" placeholder="Nama baru" maxlength="9" autocomplete="off" />
+                        <button id="changeNameBtn">Ganti Nama</button>
+                    </div>
+                    <div class="char-count-change" id="charCountChange">0 / 9</div>
+                    <div class="error-msg-change" id="errorMsgChange"></div>
+                    <div class="name-change-info" id="nameChangeInfo">
+                        <span class="highlight">⏳</span> <span id="nameChangeStatus">Memuat...</span>
+                    </div>
+                </div>
+
+                <p style="margin-top: 20px; color: #999; font-size: 14px;">Pengaturan lainnya (tema, notifikasi) dalam pengembangan.</p>
+            </div>
+
+            <!-- ============================================================
+            PAGE GALERI — COVERFLOW 3D
+            ============================================================ -->
+            <div id="page-gallery" class="page-content">
+                <div class="gallery-container" id="galleryContainer">
+                    <div class="gallery-slider" id="gallerySlider"></div>
+                    <div class="gallery-indicator" id="galleryIndicator"></div>
+                    <button class="gallery-nav-btn prev" id="galleryPrev">‹</button>
+                    <button class="gallery-nav-btn next" id="galleryNext">›</button>
+                </div>
+            </div>
+
+            <!-- ============================================================
+            FIREFOX PROMO SECTION
+            ============================================================ -->
+            <div class="firefox-promo" id="firefoxPromo">
+                <div class="promo-inner">
+                    <img src="firefox-icon.png" alt="Firefox" class="promo-icon" id="promoIcon"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.marginLeft='0';" />
+                    <span class="promo-text">Aktifkan fitur notifikasi pelajaran di Firefox</span>
+                </div>
+                <button class="promo-btn" id="firefoxInfoBtn">Mengapa harus browser Firefox?</button>
+            </div>
+
+        </div>
+        <!-- /main-body -->
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <nav class="bottom-nav" id="bottomNav">
+            <button class="nav-item active" data-page="home">
+                <span class="nav-icon">⌂</span>
+                <span class="nav-label">Beranda</span>
+            </button>
+            <button class="nav-item" data-page="schedule">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">Jadwal</span>
+            </button>
+            <button class="nav-item" data-page="gallery">
+                <span class="nav-icon">🖼️</span>
+                <span class="nav-label">Galeri</span>
+            </button>
+            <button class="nav-item" data-page="settings">
+                <span class="nav-icon">⚙</span>
+                <span class="nav-label">Pengaturan</span>
+            </button>
+        </nav>
+    </div>
+    <!-- /main-content -->
+
+    <!-- ===== MODAL FIREFOX (teks sudah diperbaiki menjadi paragraf rapi) ===== -->
+    <div class="modal-overlay" id="firefoxModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h3>🦊 Mengapa harus browser Firefox?</h3>
+
+            <p>
+                Google atau Google Chrome tidak mengizinkan website untuk mengirimkan notifikasi demi keamanan ponsel kamu.
+                Oleh karena itu, saya menyarankan menggunakan aplikasi browser Firefox untuk mengaktifkan fitur notifikasi,
+                karena sebagian fitur web ini mungkin tidak berfungsi tanpa izin dari sistem Google.
+            </p>
+
+            <p>
+                Website ini <strong>aman</strong> untuk digunakan — saya tidak menggunakan server online,
+                sehingga tidak ada orang yang bisa masuk ke halaman website ini, termasuk developer sekalipun
+                tidak bisa mengontrol kamu.
+            </p>
+
+            <div class="highlight">
+                💡 Jika ada kejanggalan, silahkan laporkan saja ke Developer.
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL LAPORAN ===== -->
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal-content report-modal">
+            <button class="modal-close" id="reportModalClose">&times;</button>
+            <h3>📋 Laporkan Bug kepada tim dukungan kami</h3>
+            <p class="sub">Isi formulir di bawah untuk melaporkan kendala atau saran perbaikan kami akan membalas dalam maksimal 48 jam.</p>
+            <div class="form-wrapper">
+                <div class="loading-placeholder" id="formLoading">
+                    <div class="spinner"></div>
+                    <span>Memuat formulir...</span>
+                </div>
+                <iframe
+                src="https://docs.google.com/forms/d/e/1FAIpQLScY5qHOxLrt1_TwdHfzmXJO1gA8nMsW_NZ0f8cn2LJxrrPDxA/viewform?embedded=true"
+                id="reportFrame"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                loading="lazy"
+                onload="document.getElementById('formLoading').style.display='none'"
+                ></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ============================================================
+            // 1. ELEMEN & STATE
+            // ============================================================
+            const loadingScreen = document.getElementById('loading-screen');
+            const mainContent = document.getElementById('main-content');
+            const nameOverlay = document.getElementById('name-overlay');
+            const nameInput = document.getElementById('name-input');
+            const charCount = document.getElementById('char-count');
+            const errorMsg = document.getElementById('error-msg');
+            const submitBtn = document.getElementById('submit-name');
+            const typewriterContent = document.getElementById('typewriter-content');
+
+            const photoWrapper = document.getElementById('photoWrapper');
+            const teacherNameEl = document.getElementById('teacherName');
+            const teacherRoleEl = document.getElementById('teacherRole');
+
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+
+            const navItems = document.querySelectorAll('.nav-item');
+            const navTitle = document.getElementById('navTitle');
+            const pages = {
+                home: document.getElementById('page-home'),
+                schedule: document.getElementById('page-schedule'),
+                gallery: document.getElementById('page-gallery'),
+                settings: document.getElementById('page-settings')
+            };
+
+            const scheduleGrid = document.getElementById('scheduleGrid');
+            const nowText = document.getElementById('nowText');
+
+            const notifTimeSelect = document.getElementById('notifTime');
+            const notifBadge = document.getElementById('notifBadge');
+            const notifInfo = document.getElementById('notifInfo');
+
+            const changeNameInput = document.getElementById('changeNameInput');
+            const changeNameBtn = document.getElementById('changeNameBtn');
+            const charCountChange = document.getElementById('charCountChange');
+            const errorMsgChange = document.getElementById('errorMsgChange');
+            const nameChangeStatus = document.getElementById('nameChangeStatus');
+
+            const gallerySlider = document.getElementById('gallerySlider');
+            const galleryIndicator = document.getElementById('galleryIndicator');
+            const galleryPrev = document.getElementById('galleryPrev');
+            const galleryNext = document.getElementById('galleryNext');
+
+            const firefoxInfoBtn = document.getElementById('firefoxInfoBtn');
+            const firefoxModal = document.getElementById('firefoxModal');
+            const modalClose = document.getElementById('modalClose');
+
+            const reportBtn = document.getElementById('reportBtn');
+            const reportModal = document.getElementById('reportModal');
+            const reportModalClose = document.getElementById('reportModalClose');
+
+            let savedName = localStorage.getItem('ixf_user_name');
+            let longPressTimer = null;
+            let isLongPress = false;
+            let typewriterTimeout = null;
+            const NAME_TEXT = 'Umar Adi Susanto, S.Pd.M.Ling.Gr';
+            const ROLE_TEXT = 'Wali kelas';
+
+            // ============================================================
+            // 2. DATA JADWAL KELAS 9F
+            // ============================================================
+            const scheduleData = {
+                'Senin': [
+                    { jam: [2, 3, 4], mapel: 'Ilmu Pengetahuan Sosial', guru: 'Pak Ali' },
+                    { jam: [5], mapel: 'Pendidikan Agama Islam dan Budi Pekerti', guru: 'Pak Misbah' },
+                    { jam: [6, 7], mapel: 'Matematika', guru: 'Bu Elok' }
+                ],
+                'Selasa': [
+                    { jam: [1], mapel: 'Bahasa Daerah', guru: 'Bu Ika' },
+                    { jam: [2, 3], mapel: 'Pendidikan Jasmani, Olahraga, dan Kesehatan', guru: 'Pak Yon' },
+                    { jam: [4, 5], mapel: 'Ilmu Pengetahuan Alam', guru: 'Pak Sohibi' },
+                    { jam: [6, 7], mapel: 'Pendidikan Pancasila dan Kewarganegaraan', guru: 'Bu Yanik' }
+                ],
+                'Rabu': [
+                    { jam: [1, 2], mapel: 'Pendidikan Agama Islam dan Budi Pekerti', guru: 'Pak Misbah' },
+                    { jam: [3, 4, 5], mapel: 'Prakarya', guru: 'Bu Yunita' },
+                    { jam: [6, 7], mapel: 'Bahasa Inggris', guru: 'Pak Agus' }
+                ],
+                'Kamis': [
+                    { jam: [2, 3], mapel: 'Bahasa Indonesia', guru: 'Pak Umar' },
+                    { jam: [4, 5], mapel: 'Informatika / Teknologi Informasi dan Komunikasi', guru: 'Bu Alfi' },
+                    { jam: [6, 7], mapel: 'Ilmu Pengetahuan Alam', guru: 'Pak Sohibi' }
+                ],
+                'Jumat': [
+                    { jam: [], mapel: 'kokulikuler', guru: '' }
+                ],
+                'Sabtu': [
+                    { jam: [1, 2], mapel: 'Matematika', guru: 'Bu Elok' },
+                    { jam: [3, 4, 5], mapel: 'Bahasa Indonesia', guru: 'Pak Umar' }
+                ]
+            };
+
+            const dayNames = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+            const jamRange = {
+                1: { start: 7 * 60 + 0, end: 7 * 60 + 40 },
+                2: { start: 7 * 60 + 40, end: 8 * 60 + 20 },
+                3: { start: 8 * 60 + 20, end: 9 * 60 + 0 },
+                4: { start: 9 * 60 + 0, end: 9 * 60 + 40 },
+                5: { start: 9 * 60 + 55, end: 10 * 60 + 35 },
+                6: { start: 10 * 60 + 35, end: 11 * 60 + 15 },
+                7: { start: 11 * 60 + 15, end: 11 * 60 + 55 }
+            };
+
+            // ============================================================
+            // 3. FUNGSI JADWAL
+            // ============================================================
+            function getTodayIndex() {
+                const d = new Date();
+                let idx = d.getDay() - 1;
+                if (idx < 0) idx = 6;
+                return idx;
+            }
+
+            function getNowMinutes() {
+                const d = new Date();
+                return d.getHours() * 60 + d.getMinutes();
+            }
+
+            function isJamActive(jamNumber) {
+                const range = jamRange[jamNumber];
+                if (!range) return false;
+                const now = getNowMinutes();
+                return now >= range.start && now < range.end;
+            }
+
+            function getCurrentLesson() {
+                const today = dayNames[getTodayIndex()];
+                const lessons = scheduleData[today] || [];
+                const now = getNowMinutes();
+
+                for (let les of lessons) {
+                    for (let j of les.jam) {
+                        const range = jamRange[j];
+                        if (range && now >= range.start && now < range.end) {
+                            return { mapel: les.mapel, guru: les.guru, jam: j };
+                        }
+                    }
+                }
+                if (now < 7 * 60) return { mapel: 'Belum masuk sekolah', guru: '', jam: null };
+                if (now >= 11 * 60 + 55) return { mapel: 'Pulang sekolah', guru: '', jam: null };
+                if (now >= 9 * 60 + 40 && now < 9 * 60 + 55) return { mapel: 'Istirahat', guru: '', jam: null };
+                return { mapel: 'Istirahat / Kosong', guru: '', jam: null };
+            }
+
+            function renderSchedule() {
+                const todayIdx = getTodayIndex();
+                let html = '';
+
+                for (let i = 0; i < dayNames.length; i++) {
+                    const day = dayNames[i];
+                    const lessons = scheduleData[day] || [];
+                    const isActive = (i === todayIdx);
+                    const isToday = isActive;
+
+                    html += `<div class="day-card ${isActive ? 'active-day' : ''}">`;
+                    html += `<div class="day-header">${day}</div>`;
+                    html += `<div class="day-body">`;
+
+                    if (day === 'Jumat') {
+                        const p5 = lessons[0];
+                        if (p5) {
+                            html += `<div class="subject-item">`;
+                            html += `<span class="mapel">${p5.mapel}</span>`;
+                            html += `<span class="dot-active"></span>`;
+                            html += `</div>`;
+                        }
+                    } else {
+                        if (lessons.length === 0) {
+                            html += `<div class="no-class">Tidak ada pelajaran</div>`;
+                        } else {
+                            for (let les of lessons) {
+                                let hasActive = false;
+                                if (isToday) {
+                                    for (let j of les.jam) {
+                                        if (isJamActive(j)) { hasActive = true; break; }
+                                    }
+                                }
+                                const displayText = les.guru ?
+                                    `${les.mapel} (${les.guru})` :
+                                    les.mapel;
+                                html += `<div class="subject-item ${hasActive ? 'active-now' : ''}">`;
+                                html += `<span class="mapel">${displayText}</span>`;
+                                html += `<span class="dot-active"></span>`;
+                                html += `</div>`;
+                            }
+                        }
+                    }
+
+                    html += `</div></div>`;
+                }
+
+                scheduleGrid.innerHTML = html;
+                updateNowText();
+            }
+
+            function updateNowText() {
+                const current = getCurrentLesson();
+                const userName = savedName || 'Teman';
+
+                if (current.guru && current.mapel !== 'Istirahat' && current.mapel !== 'Pulang sekolah' && current.mapel !==
+                    'Belum masuk sekolah' && current.mapel !== 'Istirahat / Kosong') {
+                    nowText.textContent = `Sekarang pelajarannya ${current.guru}`;
+                } else if (current.mapel === 'Istirahat' || current.mapel === 'Istirahat / Kosong') {
+                    nowText.textContent = `⏳ Waktunya Istirahat, ${userName}`;
+                } else if (current.mapel === 'Pulang sekolah') {
+                    nowText.textContent = `🏠 Waktunya Pulang, ${userName}`;
+                } else if (current.mapel === 'Belum masuk sekolah') {
+                    nowText.textContent = `🌅 Belum masuk sekolah, ${userName}`;
+                } else {
+                    nowText.textContent = `📖 ${current.mapel}`;
+                }
+            }
+
+            // ============================================================
+            // 4. FUNGSI NOTIFIKASI
+            // ============================================================
+            function requestNotifPermission() {
+                if (!('Notification' in window)) {
+                    console.warn('Browser tidak mendukung Notification API');
+                    return false;
+                }
+                if (Notification.permission === 'granted') return true;
+                if (Notification.permission === 'denied') {
+                    notifBadge.textContent = '⛔ Diblokir';
+                    notifInfo.textContent = 'Izin notifikasi ditolak. Ubah di pengaturan browser.';
+                    return false;
+                }
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted') {
+                        notifBadge.textContent = '✅ Aktif';
+                        notifInfo.textContent = 'Notifikasi akan muncul pada jam yang dipilih.';
+                    } else {
+                        notifBadge.textContent = '⛔ Diblokir';
+                        notifInfo.textContent = 'Izin notifikasi ditolak.';
+                    }
+                });
+                return false;
+            }
+
+            function getMapelListForDay(dayName) {
+                const lessons = scheduleData[dayName] || [];
+                if (dayName === 'Jumat') {
+                    const p5 = lessons[0];
+                    return p5 ? [p5.mapel] : ['P5'];
+                }
+                return lessons.map(l => l.mapel);
+            }
+
+            function sendNotification() {
+                if (!('Notification' in window) || Notification.permission !== 'granted') {
+                    return;
+                }
+
+                const userName = savedName || 'Teman';
+                const todayIdx = getTodayIndex();
+                let tomorrowIdx = todayIdx + 1;
+                let tomorrowName;
+                if (tomorrowIdx > 5) {
+                    tomorrowName = 'Minggu';
+                } else {
+                    tomorrowName = dayNames[tomorrowIdx];
+                }
+
+                let title = `📚 IXF - Pengingat Jadwal`;
+                let body = '';
+
+                if (tomorrowName === 'Minggu') {
+                    body = `Hai ${userName} selamat berlibur ya, istirahat terlebih dahulu agar Senin besok semangat buat belajar lagi di 9F ♥️`;
+                } else {
+                    const mapels = getMapelListForDay(tomorrowName);
+                    const listMapel = mapels.length > 0 ? mapels.join(', ') : 'Tidak ada pelajaran';
+                    body = `Hai ${userName} udah siap buat menyambut pelajaran baru?\n${listMapel}`;
+                }
+
+                try {
+                    const notif = new Notification(title, {
+                        body: body,
+                        icon: 'logokelas.png',
+                        tag: 'ixf-schedule-reminder',
+                        requireInteraction: true
+                    });
+                    setTimeout(() => notif.close(), 30000);
+                } catch (e) {
+                    console.warn('Gagal mengirim notifikasi:', e);
+                }
+            }
+
+            let lastNotifDate = null;
+
+            function checkNotificationTime() {
+                const savedTime = localStorage.getItem('ixf_notif_time');
+                if (!savedTime) return;
+
+                const now = new Date();
+                const nowStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+                if (nowStr === savedTime) {
+                    const todayStr = now.toDateString();
+                    if (lastNotifDate !== todayStr) {
+                        sendNotification();
+                        lastNotifDate = todayStr;
+                    }
+                }
+            }
+
+            function updateNotifUI() {
+                const savedTime = localStorage.getItem('ixf_notif_time');
+                if (savedTime) {
+                    notifTimeSelect.value = savedTime;
+                    notifBadge.textContent = '🔔 Aktif';
+                    notifInfo.textContent = `Notifikasi setiap hari pukul ${savedTime}`;
+                } else {
+                    notifTimeSelect.value = '';
+                    notifBadge.textContent = '⏸ Tidak aktif';
+                    notifInfo.textContent = 'Pilih jam di atas untuk mengaktifkan.';
+                }
+            }
+
+            function setNotifTime(time) {
+                if (time) {
+                    localStorage.setItem('ixf_notif_time', time);
+                    lastNotifDate = null;
+                } else {
+                    localStorage.removeItem('ixf_notif_time');
+                }
+                updateNotifUI();
+                if (time) {
+                    requestNotifPermission();
+                }
+            }
+
+            // ============================================================
+            // 5. TYPEWRITER & LONG PRESS
+            // ============================================================
+            function typeWriter(text, element, speed = 55, callback) {
+                let i = 0;
+                element.textContent = '';
+
+                function typing() {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                        typewriterTimeout = setTimeout(typing, speed);
+                    } else {
+                        if (callback) callback();
+                    }
+                }
+                typing();
+            }
+
+            function stopTypewriter() {
+                if (typewriterTimeout) {
+                    clearTimeout(typewriterTimeout);
+                    typewriterTimeout = null;
+                }
+            }
+
+            function resetTeacherText() {
+                stopTypewriter();
+                teacherNameEl.textContent = '';
+                teacherRoleEl.classList.remove('visible');
+                photoWrapper.classList.remove('active');
+                isLongPress = false;
+            }
+
+            function startLongPress(e) {
+                if (e.type === 'touchstart' && e.touches.length > 1) return;
+                if (e.type === 'mousedown' && e.button !== 0) return;
+
+                longPressTimer = setTimeout(() => {
+                    isLongPress = true;
+                    photoWrapper.classList.add('active');
+                    stopTypewriter();
+                    teacherNameEl.textContent = '';
+                    typeWriter(NAME_TEXT, teacherNameEl, 45, () => {
+                        teacherRoleEl.classList.add('visible');
+                    });
+                }, 500);
+            }
+
+            function endLongPress(e) {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+                if (isLongPress) {
+                    stopTypewriter();
+                    teacherNameEl.textContent = '';
+                    teacherRoleEl.classList.remove('visible');
+                    photoWrapper.classList.remove('active');
+                    isLongPress = false;
+                }
+            }
+
+            photoWrapper.addEventListener('touchstart', startLongPress, { passive: true });
+            photoWrapper.addEventListener('touchend', endLongPress, { passive: true });
+            photoWrapper.addEventListener('touchcancel', endLongPress, { passive: true });
+            photoWrapper.addEventListener('mousedown', startLongPress);
+            photoWrapper.addEventListener('mouseup', endLongPress);
+            photoWrapper.addEventListener('mouseleave', endLongPress);
+
+            // ============================================================
+            // 6. PENCARIAN
+            // ============================================================
+            const studentData = [
+                { no: 1, name: 'AFFLAH INTAN NOOR IZZAH' },
+                { no: 2, name: 'AHMAD RENO KHOIDOR MAULANA' },
+                { no: 3, name: 'AMELIA AYU SAFIRA' },
+                { no: 4, name: 'ANGGUN KHAIRUNNISA AZZAHRA' },
+                { no: 5, name: 'ARIFFI KHOIRUN NIZAR' },
+                { no: 6, name: 'ATHALIA WIDYA PRAMESWARI' },
+                { no: 7, name: 'AYU NOVITA DIUSTIRA' },
+                { no: 8, name: 'BISMA NARENDRA AZKA LAKSANA' },
+                { no: 9, name: 'CALLISTA MICHEILS NATHANIA' },
+                { no: 10, name: 'CYNTHA LIALATUL QUR\'AN' },
+                { no: 11, name: 'DEVARA RAKHA ADWIJAYA' },
+                { no: 12, name: 'DHIA AULIA NUR MAKAILA' },
+                { no: 13, name: 'DINI ANGGRAINI' },
+                { no: 14, name: 'FAIRIS ZALFA HERDIANI' },
+                { no: 15, name: 'FIRMAN MAULANA PUTRA' },
+                { no: 16, name: 'GHISTA FELIYANA FAIRIN' },
+                { no: 17, name: 'IBNU SAWQISYAH' },
+                { no: 18, name: 'JULIA PRICILIA TUNGGAL DEWI' },
+                { no: 19, name: 'M. RAFY HANIF ASLAM' },
+                { no: 20, name: 'MOCH ARIEF RAHMAN HAKIM' },
+                { no: 21, name: 'MUHAMMAD CAESAR FAHREZY' },
+                { no: 22, name: 'MUHAMMAD NAUFAL PUTRA RADITYA' },
+                { no: 23, name: 'MUHAMMAD RIZAL TRISANTOSO' },
+                { no: 24, name: 'NAFITA DWI LESTARI' },
+                { no: 25, name: 'NINDIYA CALLISTA PRIMALIA SARI' },
+                { no: 26, name: 'PRADANA RAHADIAN NUGROHO' },
+                { no: 27, name: 'QANIAH SHAKIRAH PULUNGAN' },
+                { no: 28, name: 'SATRIO ANDI BRAMANTIO' },
+                { no: 29, name: 'SAZKIA AULIA PUTRI' },
+                { no: 30, name: 'YANJARTA AINUN NADZAR' },
+                { no: 31, name: 'YULIANA NUR CAHYA' }
+            ];
+
+            function performSearch(query) {
+                const q = query.trim().toLowerCase();
+                let filtered = [];
+                if (q === '') {
+                    filtered = studentData;
+                } else {
+                    filtered = studentData.filter(item => item.name.toLowerCase().includes(q));
+                }
+                renderResults(filtered, q);
+            }
+
+            function renderResults(items, query) {
+                if (items.length === 0) {
+                    searchResults.innerHTML =
+                        `<div class="no-result">Tidak ada siswa dengan nama "${query}"</div>`;
+                    return;
+                }
+                let html = '';
+                items.forEach(item => {
+                    html += `<div class="result-item">${item.no}. ${item.name}</div>`;
+                });
+                searchResults.innerHTML = html;
+            }
+
+            searchInput.addEventListener('input', function() {
+                performSearch(this.value);
+            });
+
+            // ============================================================
+            // 7. NAVIGASI
+            // ============================================================
+            const pageTitles = {
+                home: 'Beranda',
+                schedule: 'Jadwal',
+                gallery: 'Galeri',
+                settings: 'Pengaturan'
+            };
+
+            function navigateTo(pageId) {
+                Object.keys(pages).forEach(key => {
+                    pages[key].classList.remove('active');
+                });
+                if (pages[pageId]) {
+                    pages[pageId].classList.add('active');
+                }
+                navTitle.textContent = pageTitles[pageId] || 'IXF';
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.page === pageId) {
+                        item.classList.add('active');
+                    }
+                });
+
+                if (pageId === 'schedule') {
+                    renderSchedule();
+                }
+                if (pageId === 'gallery') {
+                    updateGallery();
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.dataset.page;
+                    navigateTo(page);
+                });
+            });
+            navTitle.textContent = 'Beranda';
+
+            // ============================================================
+            // 8. ENTER APP & NAMA
+            // ============================================================
+            function enterApp() {
+                loadingScreen.classList.add('hidden');
+                mainContent.classList.add('visible');
+                nameOverlay.classList.remove('active');
+
+                const displayName = savedName || 'Teman';
+                const fullText = `Hai ${displayName}, Selamat datang`;
+
+                setTimeout(() => {
+                    typeWriter(fullText, typewriterContent, 50);
+                }, 300);
+
+                renderResults(studentData, '');
+                renderSchedule();
+                updateNotifUI();
+                updateNameChangeUI();
+                initGallery();
+
+                if ('Notification' in window && Notification.permission === 'default') {
+                    setTimeout(() => {
+                        Notification.requestPermission().then(perm => {
+                            if (perm === 'granted') {
+                                updateNotifUI();
+                            }
+                        });
+                    }, 4000);
+                }
+
+                console.log('✅ Selamat datang, ' + displayName + '!');
+            }
+
+            if (savedName) {
+                setTimeout(function() {
+                    enterApp();
+                }, 3000);
+            } else {
+                setTimeout(function() {
+                    loadingScreen.classList.add('hidden');
+                    nameOverlay.classList.add('active');
+                    nameInput.focus();
+                }, 3000);
+            }
+
+            // ============================================================
+            // 9. INPUT NAMA (awal)
+            // ============================================================
+            nameInput.addEventListener('input', function() {
+                const val = this.value;
+                charCount.textContent = val.length + ' / 9';
+                if (errorMsg.textContent) {
+                    errorMsg.textContent = '';
+                    this.classList.remove('error');
+                }
+                this.value = this.value.replace(/[^A-Za-z]/g, '');
+                charCount.textContent = this.value.length + ' / 9';
+            });
+
+            function submitName() {
+                const raw = nameInput.value.trim();
+                const isValid = /^[A-Za-z]+$/.test(raw);
+                const len = raw.length;
+
+                if (len === 0) {
+                    errorMsg.textContent = 'Nama tidak boleh kosong.';
+                    nameInput.classList.add('error');
+                    return;
+                }
+                if (len > 9) {
+                    errorMsg.textContent = 'Maksimal 9 karakter.';
+                    nameInput.classList.add('error');
+                    return;
+                }
+                if (!isValid) {
+                    errorMsg.textContent = 'Hanya huruf yang diperbolehkan.';
+                    nameInput.classList.add('error');
+                    return;
+                }
+
+                localStorage.setItem('ixf_user_name', raw);
+                savedName = raw;
+                errorMsg.textContent = '';
+                nameInput.classList.remove('error');
+                enterApp();
+            }
+
+            submitBtn.addEventListener('click', submitName);
+            nameInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submitName();
+                }
+            });
+
+            // ============================================================
+            // 10. NOTIFIKASI
+            // ============================================================
+            notifTimeSelect.addEventListener('change', function() {
+                const val = this.value;
+                setNotifTime(val);
+            });
+
+            setInterval(checkNotificationTime, 30000);
+            setTimeout(checkNotificationTime, 5000);
+
+            setInterval(() => {
+                if (document.getElementById('page-schedule').classList.contains('active')) {
+                    renderSchedule();
+                }
+                updateNowText();
+            }, 30000);
+
+            // ============================================================
+            // 11. GANTI NAMA (30 hari)
+            // ============================================================
+            function updateNameChangeUI() {
+                const lastChange = localStorage.getItem('ixf_name_change_date');
+                const currentName = localStorage.getItem('ixf_user_name') || 'Belum diisi';
+
+                if (!lastChange) {
+                    nameChangeStatus.innerHTML =
+                        `Nama saat ini: <strong>${currentName}</strong>. Kamu bisa langsung mengganti nama.`;
+                    changeNameBtn.disabled = false;
+                    changeNameInput.disabled = false;
+                    return;
+                }
+
+                const lastDate = new Date(lastChange);
+                const now = new Date();
+                const diffTime = now - lastDate;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays >= 30) {
+                    nameChangeStatus.innerHTML =
+                        `Nama saat ini: <strong>${currentName}</strong>. Sudah melewati 30 hari, kamu bisa ganti nama lagi.`;
+                    changeNameBtn.disabled = false;
+                    changeNameInput.disabled = false;
+                } else {
+                    const remaining = 30 - diffDays;
+                    nameChangeStatus.innerHTML =
+                        `Nama saat ini: <strong>${currentName}</strong>. Tunggu <strong>${remaining} hari</strong> lagi untuk bisa mengganti nama.`;
+                    changeNameBtn.disabled = true;
+                    changeNameInput.disabled = true;
+                }
+            }
+
+            changeNameInput.addEventListener('input', function() {
+                const val = this.value;
+                charCountChange.textContent = val.length + ' / 9';
+                errorMsgChange.textContent = '';
+                this.classList.remove('error');
+                this.value = this.value.replace(/[^A-Za-z]/g, '');
+                charCountChange.textContent = this.value.length + ' / 9';
+            });
+
+            changeNameBtn.addEventListener('click', function() {
+                const raw = changeNameInput.value.trim();
+                const isValid = /^[A-Za-z]+$/.test(raw);
+                const len = raw.length;
+
+                if (len === 0) {
+                    errorMsgChange.textContent = 'Nama tidak boleh kosong.';
+                    changeNameInput.classList.add('error');
+                    return;
+                }
+                if (len > 9) {
+                    errorMsgChange.textContent = 'Maksimal 9 karakter.';
+                    changeNameInput.classList.add('error');
+                    return;
+                }
+                if (!isValid) {
+                    errorMsgChange.textContent = 'Hanya huruf yang diperbolehkan.';
+                    changeNameInput.classList.add('error');
+                    return;
+                }
+
+                localStorage.setItem('ixf_user_name', raw);
+                localStorage.setItem('ixf_name_change_date', new Date().toISOString());
+                savedName = raw;
+
+                changeNameInput.value = '';
+                charCountChange.textContent = '0 / 9';
+                errorMsgChange.textContent = '';
+                changeNameInput.classList.remove('error');
+
+                updateNameChangeUI();
+                alert('✅ Nama berhasil diganti menjadi "' + raw + '".');
+                updateNowText();
+            });
+
+            updateNameChangeUI();
+
+            // ============================================================
+            // 12. GALERI FOTO — COVERFLOW 3D
+            // ============================================================
+            const TOTAL_IMAGES = 43;
+            let galleryIndex = 0;
+            let galleryCards = [];
+            let isDragging = false;
+            let startX = 0;
+            let currentX = 0;
+            let isSwiping = false;
+
+            const imageFileNames = [
+                'IMG-20250324-WA0064.jpg',
+                'IMG-20241121-WA0090.jpg',
+                'IMG-20250416-WA0020.jpg',
+                'IMG-20241121-WA0086.jpg',
+                'IMG-20250216-WA0006.jpg',
+                'IMG-20250216-WA0005.jpg',
+                'IMG-20241121-WA0077.jpg',
+                'IMG-20240816-WA0006.jpg',
+                'IMG-20240812_160956_228.jpg',
+                'IMG-20240816-WA0006 (1).jpg',
+                'IMG-20240816-WA0010.jpg',
+                'IMG-20250416-WA0018.jpg',
+                '1732272881190586-0.jpg',
+                'IMG-20240921-WA0014.jpg',
+                'IMG-20240921-WA0015.jpg',
+                'IMG-20241121-WA0084.jpg',
+                'IMG-20250416-WA0022.jpg',
+                'IMG-20240816-WA0009.jpg',
+                'download.png',
+                'IMG-20250324-WA0066.jpg',
+                'IMG-20240816-WA0007 (1).jpg',
+                '1732272872295330-2.jpg',
+                'b7a33b005e9841429aa90b3a80fe7775.jpg',
+                'IMG-20240816-WA0008.jpg',
+                'IMG-20241121-WA0092.jpg',
+                'IMG-20250416-WA0026.jpg',
+                'IMG-20250324-WA0067.jpg',
+                'IMG-20241121-WA0080.jpg',
+                '1732272876081645-1.jpg',
+                '1732272862960891-3.jpg',
+                'IMG-20241005-WA0022.jpg',
+                'IMG-20241121-WA0078.jpg',
+                'IMG-20250216-WA0003.jpg',
+                'IMG-20241121-WA0088.jpg',
+                'IMG-20240816-WA0003.jpg',
+                'IMG-20241121-WA0082.jpg',
+                'IMG-20250216-WA0007.jpg',
+                'IMG-20240816-WA0008 (1).jpg',
+                'IMG-20250416-WA0028.jpg',
+                'IMG-20240816-WA0007.jpg',
+                'IMG-20250416-WA0016.jpg',
+                'IMG-20240816-WA0010 (1).jpg',
+                'IMG-20250416-WA0024.jpg'
+            ];
+
+            function initGallery() {
+                const imageUrls = imageFileNames.map(name => name);
+                gallerySlider.innerHTML = '';
+                galleryCards = [];
+
+                imageUrls.forEach((url, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'gallery-card';
+                    card.dataset.index = index;
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.alt = `Gambar ${index+1}`;
+                    img.onerror = function() {
+                        console.warn(`Gagal memuat gambar: ${url}`);
+                        this.src =
+                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="260" viewBox="0 0 200 260"%3E%3Crect width="200" height="260" fill="%23e0e0e0"/%3E%3Ctext x="50%25" y="50%25" font-family="sans-serif" font-size="16" fill="%23999" text-anchor="middle" dy=".3em"%3EGambar Tidak Ditemukan%3C/text%3E%3C/svg%3E';
+                    };
+                    card.appendChild(img);
+                    gallerySlider.appendChild(card);
+                    galleryCards.push(card);
+                });
+
+                galleryIndicator.innerHTML = '';
+                for (let i = 0; i < TOTAL_IMAGES; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'dot';
+                    dot.dataset.index = i;
+                    dot.addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.index);
+                        goToImage(idx);
+                    });
+                    galleryIndicator.appendChild(dot);
+                }
+
+                galleryIndex = Math.floor(TOTAL_IMAGES / 2);
+                updateGallery();
+                attachGalleryEvents();
+
+                console.log('✅ Galeri siap dengan ' + TOTAL_IMAGES + ' gambar');
+            }
+
+            function attachGalleryEvents() {
+                const container = document.getElementById('galleryContainer');
+
+                container.addEventListener('touchstart', onTouchStart, { passive: true });
+                container.addEventListener('touchmove', onTouchMove, { passive: true });
+                container.addEventListener('touchend', onTouchEnd, { passive: true });
+
+                container.addEventListener('mousedown', onMouseDown);
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+
+                galleryPrev.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    goToImage(galleryIndex - 1);
+                });
+                galleryNext.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    goToImage(galleryIndex + 1);
+                });
+
+                document.addEventListener('keydown', function(e) {
+                    if (document.getElementById('page-gallery').classList.contains('active')) {
+                        if (e.key === 'ArrowLeft') {
+                            e.preventDefault();
+                            goToImage(galleryIndex - 1);
+                        } else if (e.key === 'ArrowRight') {
+                            e.preventDefault();
+                            goToImage(galleryIndex + 1);
+                        }
+                    }
+                });
+            }
+
+            function onTouchStart(e) {
+                if (e.touches.length === 1) {
+                    isDragging = true;
+                    startX = e.touches[0].clientX;
+                    currentX = startX;
+                    isSwiping = false;
+                }
+            }
+
+            function onTouchMove(e) {
+                if (!isDragging || e.touches.length !== 1) return;
+                const touch = e.touches[0];
+                currentX = touch.clientX;
+                const delta = currentX - startX;
+                if (Math.abs(delta) > 10) {
+                    isSwiping = true;
+                }
+            }
+
+            function onTouchEnd(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                if (isSwiping) {
+                    const delta = currentX - startX;
+                    if (delta < -30) {
+                        goToImage(galleryIndex + 1);
+                    } else if (delta > 30) {
+                        goToImage(galleryIndex - 1);
+                    }
+                }
+                isSwiping = false;
+            }
+
+            function onMouseDown(e) {
+                if (e.button !== 0) return;
+                isDragging = true;
+                startX = e.clientX;
+                currentX = startX;
+                isSwiping = false;
+                e.preventDefault();
+            }
+
+            function onMouseMove(e) {
+                if (!isDragging) return;
+                currentX = e.clientX;
+                const delta = currentX - startX;
+                if (Math.abs(delta) > 10) {
+                    isSwiping = true;
+                }
+            }
+
+            function onMouseUp(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                if (isSwiping) {
+                    const delta = currentX - startX;
+                    if (delta < -30) {
+                        goToImage(galleryIndex + 1);
+                    } else if (delta > 30) {
+                        goToImage(galleryIndex - 1);
+                    }
+                }
+                isSwiping = false;
+            }
+
+            function goToImage(newIndex) {
+                if (newIndex < 0 || newIndex >= TOTAL_IMAGES) return;
+                galleryIndex = newIndex;
+                updateGallery();
+            }
+
+            function updateGallery() {
+                const centerIndex = galleryIndex;
+                const cards = galleryCards;
+
+                cards.forEach((card, idx) => {
+                    const diff = idx - centerIndex;
+                    card.classList.remove('center', 'left-1', 'right-1', 'left-2', 'right-2', 'hidden');
+
+                    if (diff === 0) {
+                        card.classList.add('center');
+                    } else if (diff === -1) {
+                        card.classList.add('left-1');
+                    } else if (diff === 1) {
+                        card.classList.add('right-1');
+                    } else if (diff === -2) {
+                        card.classList.add('left-2');
+                    } else if (diff === 2) {
+                        card.classList.add('right-2');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                const dots = galleryIndicator.querySelectorAll('.dot');
+                dots.forEach((dot, idx) => {
+                    dot.classList.toggle('active', idx === centerIndex);
+                });
+            }
+
+            // ============================================================
+            // 13. FIREFOX PROMO - MODAL
+            // ============================================================
+            function openModal() {
+                firefoxModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                firefoxModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            firefoxInfoBtn.addEventListener('click', openModal);
+            modalClose.addEventListener('click', closeModal);
+
+            firefoxModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && firefoxModal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+
+            // ============================================================
+            // 14. REPORT / LAPORAN BUG
+            // ============================================================
+            function openReportModal() {
+                reportModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                document.getElementById('formLoading').style.display = 'flex';
+                const iframe = document.getElementById('reportFrame');
+                const src = iframe.src;
+                iframe.src = '';
+                setTimeout(() => {
+                    iframe.src = src;
+                }, 100);
+            }
+
+            function closeReportModal() {
+                reportModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            reportBtn.addEventListener('click', openReportModal);
+            reportModalClose.addEventListener('click', closeReportModal);
+
+            reportModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeReportModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && reportModal.classList.contains('active')) {
+                    closeReportModal();
+                }
+            });
+
+            console.log('✅ IXF SPA siap!');
+        });
+    </script>
+</body>
+</html>
