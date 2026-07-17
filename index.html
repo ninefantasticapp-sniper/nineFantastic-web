@@ -1767,7 +1767,7 @@
                 <!-- NOTIFIKASI -->
                 <div class="settings-group">
                     <label for="notifTimeInput">⏰ Pengingat Jadwal Besok</label>
-                    <div class="desc">Pilih jam notifikasi harian. Notifikasi akan muncul setiap hari pada jam yang dipilih.</div>
+                    <div class="desc">Pilih jam notifikasi harian. Notifikasi akan muncul otomatis setiap hari (Senin–Sabtu) pada jam yang dipilih.</div>
                     <input type="time" id="notifTimeInput" value="18:00" />
                     <div class="notif-actions">
                         <button class="btn-activate" id="notifActivateNow">Aktifkan Sekarang</button>
@@ -2114,7 +2114,7 @@
             }
 
             // ============================================================
-            // 4. FUNGSI NOTIFIKASI (DIPERBAIKI)
+            // 4. FUNGSI NOTIFIKASI (DIPERBAIKI - HARI SENIN–SABTU)
             // ============================================================
             function requestNotifPermission() {
                 if (!('Notification' in window)) {
@@ -2128,12 +2128,11 @@
                     notifInfo.textContent = 'Izin notifikasi ditolak. Ubah di pengaturan browser.';
                     return false;
                 }
-                // Minta izin
                 Notification.requestPermission().then(perm => {
                     if (perm === 'granted') {
                         notifBadge.textContent = '✅ Aktif';
                         notifBadge.className = 'badge';
-                        notifInfo.textContent = `Notifikasi akan muncul pada jam yang dipilih.`;
+                        notifInfo.textContent = `Notifikasi akan muncul pada jam yang dipilih (Senin–Sabtu).`;
                     } else {
                         notifBadge.textContent = '⛔ Diblokir';
                         notifBadge.className = 'badge inactive';
@@ -2152,9 +2151,23 @@
                 return lessons.map(l => l.mapel);
             }
 
+            // Cek apakah besok adalah hari Minggu
+            function isTomorrowSunday() {
+                const today = new Date();
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                return tomorrow.getDay() === 0; // 0 = Minggu
+            }
+
             function sendNotification() {
                 if (!('Notification' in window) || Notification.permission !== 'granted') {
                     console.warn('Notifikasi tidak diizinkan.');
+                    return;
+                }
+
+                // Jangan kirim jika besok Minggu
+                if (isTomorrowSunday()) {
+                    console.log('Besok Minggu, notifikasi tidak dikirim.');
                     return;
                 }
 
@@ -2172,6 +2185,7 @@
                 let body = '';
 
                 if (tomorrowName === 'Minggu') {
+                    // Ini seharusnya tidak terjadi karena sudah dicek di atas, tapi tetap jaga-jaga
                     body = `Hai ${userName}, selamat berlibur ya, istirahat terlebih dahulu agar Senin besok semangat buat belajar lagi di 9F ♥️`;
                 } else {
                     const mapels = getMapelListForDay(tomorrowName);
@@ -2197,12 +2211,10 @@
             let notifInterval = null;
             let lastNotifDate = null;
 
-            // Fungsi untuk memulai pengecekan notifikasi setiap menit
             function startNotificationChecker() {
                 if (notifInterval) clearInterval(notifInterval);
                 notifInterval = setInterval(checkNotificationTime, 60000); // cek setiap menit
-                // Cek langsung saat diaktifkan
-                checkNotificationTime();
+                checkNotificationTime(); // cek langsung
             }
 
             function stopNotificationChecker() {
@@ -2219,10 +2231,8 @@
                 const now = new Date();
                 const nowStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
-                // Cek apakah waktu sekarang sama dengan waktu yang disimpan
                 if (nowStr === savedTime) {
                     const todayStr = now.toDateString();
-                    // Cek apakah notifikasi sudah dikirim hari ini
                     if (lastNotifDate !== todayStr) {
                         sendNotification();
                         lastNotifDate = todayStr;
@@ -2231,44 +2241,34 @@
                 }
             }
 
-            // Fungsi untuk mengaktifkan notifikasi dengan waktu tertentu
             function activateNotification(time, startToday = true) {
                 if (!time) {
                     alert('Silakan pilih jam terlebih dahulu.');
                     return;
                 }
 
-                // Minta izin jika belum
                 const perm = requestNotifPermission();
                 if (!perm && Notification.permission !== 'granted') {
-                    // Jika belum granted, kita tetap lanjutkan tapi notifikasi mungkin tidak muncul
-                    // Tapi kita simpan pengaturan
+                    // Tetap simpan pengaturan
                 }
 
-                // Simpan waktu
                 localStorage.setItem('ixf_notif_time', time);
-                // Reset lastNotifDate agar notifikasi bisa dikirim hari ini jika startToday = true
                 if (startToday) {
-                    lastNotifDate = null; // biarkan notifikasi bisa dikirim hari ini jika waktunya belum lewat
+                    lastNotifDate = null;
                 } else {
-                    // Aktifkan nanti: kita set lastNotifDate ke hari ini agar tidak mengirim hari ini
                     lastNotifDate = new Date().toDateString();
                 }
 
-                // Update UI
                 updateNotifUI();
-                // Mulai pengecekan
                 startNotificationChecker();
 
-                // Beri feedback
                 const msg = startToday ?
                     `Notifikasi diaktifkan untuk pukul ${time} (mulai hari ini).` :
                     `Notifikasi diaktifkan untuk pukul ${time} (mulai besok).`;
-                notifInfo.textContent = msg;
+                notifInfo.textContent = msg + ' (Senin–Sabtu)';
                 notifBadge.textContent = '🔔 Aktif';
                 notifBadge.className = 'badge';
 
-                // Jika izin belum granted, beri tahu
                 if (Notification.permission !== 'granted') {
                     notifInfo.textContent += ' Namun izin notifikasi belum diberikan, notifikasi mungkin tidak muncul.';
                 }
@@ -2290,7 +2290,7 @@
                     notifTimeInput.value = savedTime;
                     notifBadge.textContent = '🔔 Aktif';
                     notifBadge.className = 'badge';
-                    notifInfo.textContent = `Notifikasi setiap hari pukul ${savedTime}`;
+                    notifInfo.textContent = `Notifikasi setiap hari pukul ${savedTime} (Senin–Sabtu)`;
                 } else {
                     notifTimeInput.value = '';
                     notifBadge.textContent = '⏸ Tidak aktif';
@@ -2299,7 +2299,7 @@
                 }
             }
 
-            // Event listener untuk tombol notifikasi
+            // Event listener notifikasi
             notifActivateNow.addEventListener('click', function() {
                 const time = notifTimeInput.value;
                 if (!time) {
@@ -2322,12 +2322,10 @@
                 deactivateNotification();
             });
 
-            // Inisialisasi UI notifikasi dan cek jika sudah ada pengaturan
+            // Inisialisasi
             updateNotifUI();
-            // Jika ada waktu tersimpan, mulai pengecekan
             if (localStorage.getItem('ixf_notif_time')) {
                 startNotificationChecker();
-                // Set lastNotifDate berdasarkan hari ini agar tidak mengirim notifikasi ganda
                 lastNotifDate = new Date().toDateString();
             }
 
@@ -2530,7 +2528,6 @@
                 updateNameChangeUI();
                 initGallery();
 
-                // Minta izin notifikasi secara otomatis setelah masuk (jika default)
                 if ('Notification' in window && Notification.permission === 'default') {
                     setTimeout(() => {
                         Notification.requestPermission().then(perm => {
@@ -2541,7 +2538,6 @@
                     }, 4000);
                 }
 
-                // Jika ada waktu notifikasi tersimpan, mulai pengecekan
                 if (localStorage.getItem('ixf_notif_time')) {
                     startNotificationChecker();
                     lastNotifDate = new Date().toDateString();
