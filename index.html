@@ -929,7 +929,7 @@
             color: #777;
             margin-bottom: 12px;
         }
-        .settings-group select {
+        .settings-group input[type="time"] {
             width: 100%;
             padding: 12px 14px;
             border: 2px solid #ddd;
@@ -938,9 +938,53 @@
             background: #fff;
             font-family: 'Roboto', sans-serif;
             transition: border 0.2s;
+            color: #1a1a1a;
         }
-        .settings-group select:focus {
+        .settings-group input[type="time"]:focus {
             border-color: var(--primary);
+        }
+        .settings-group .notif-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .settings-group .notif-actions button {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            min-width: 80px;
+            white-space: nowrap;
+        }
+        .settings-group .notif-actions button:active {
+            transform: scale(0.97);
+        }
+        .settings-group .notif-actions .btn-activate {
+            background: var(--primary);
+            color: #fff;
+        }
+        .settings-group .notif-actions .btn-activate:hover {
+            background: var(--primary-light);
+        }
+        .settings-group .notif-actions .btn-later {
+            background: #6c757d;
+            color: #fff;
+        }
+        .settings-group .notif-actions .btn-later:hover {
+            background: #5a6268;
+        }
+        .settings-group .notif-actions .btn-deactivate {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .settings-group .notif-actions .btn-deactivate:hover {
+            background: #c0392b;
         }
         .settings-group .notif-status {
             margin-top: 12px;
@@ -959,6 +1003,9 @@
             font-size: 0.7rem;
             font-weight: 600;
             line-height: 1.8;
+        }
+        .settings-group .notif-status .badge.inactive {
+            background: #999;
         }
 
         .name-change-group .name-input-wrapper {
@@ -1454,6 +1501,12 @@
                 width: 100%;
                 text-align: center;
             }
+
+            .settings-group .notif-actions button {
+                font-size: 0.8rem;
+                padding: 8px 6px;
+                min-width: 60px;
+            }
         }
 
         @media (max-width: 380px) {
@@ -1615,6 +1668,12 @@
                 font-size: 0.85rem;
                 padding: 8px 12px;
             }
+
+            .settings-group .notif-actions button {
+                font-size: 0.7rem;
+                padding: 6px 4px;
+                min-width: 50px;
+            }
         }
     </style>
 </head>
@@ -1705,21 +1764,23 @@
             <div id="page-settings" class="page-content">
                 <h2>⚙️ Pengaturan</h2>
 
+                <!-- NOTIFIKASI -->
                 <div class="settings-group">
-                    <label for="notifTime">⏰ Pengingat Jadwal Besok</label>
+                    <label for="notifTimeInput">⏰ Pengingat Jadwal Besok</label>
                     <div class="desc">Pilih jam notifikasi harian. Notifikasi akan muncul setiap hari pada jam yang dipilih.</div>
-                    <select id="notifTime">
-                        <option value="">-- Pilih Jam --</option>
-                        <option value="18:56">18.56</option>
-                        <option value="20:26">20.26</option>
-                        <option value="05:30">05.30</option>
-                    </select>
+                    <input type="time" id="notifTimeInput" value="18:00" />
+                    <div class="notif-actions">
+                        <button class="btn-activate" id="notifActivateNow">Aktifkan Sekarang</button>
+                        <button class="btn-later" id="notifActivateLater">Aktifkan Nanti</button>
+                        <button class="btn-deactivate" id="notifDeactivate">Nonaktifkan</button>
+                    </div>
                     <div class="notif-status" id="notifStatus">
-                        <span class="badge" id="notifBadge">⏸ Tidak aktif</span>
-                        <span id="notifInfo">Pilih jam di atas untuk mengaktifkan.</span>
+                        <span class="badge inactive" id="notifBadge">⏸ Tidak aktif</span>
+                        <span id="notifInfo">Pilih jam dan klik "Aktifkan Sekarang" untuk mengaktifkan.</span>
                     </div>
                 </div>
 
+                <!-- GANTI NAMA -->
                 <div class="settings-group name-change-group">
                     <label for="changeNameInput">✏️ Ganti Nama</label>
                     <div class="desc">Hanya huruf, maksimal 9 karakter. Hanya bisa diganti setiap 30 hari sekali.</div>
@@ -1786,24 +1847,21 @@
     </div>
     <!-- /main-content -->
 
-    <!-- ===== MODAL FIREFOX (teks sudah diperbaiki menjadi paragraf rapi) ===== -->
+    <!-- ===== MODAL FIREFOX ===== -->
     <div class="modal-overlay" id="firefoxModal">
         <div class="modal-content">
             <button class="modal-close" id="modalClose">&times;</button>
             <h3>🦊 Mengapa harus browser Firefox?</h3>
-
             <p>
                 Google atau Google Chrome tidak mengizinkan website untuk mengirimkan notifikasi demi keamanan ponsel kamu.
                 Oleh karena itu, saya menyarankan menggunakan aplikasi browser Firefox untuk mengaktifkan fitur notifikasi,
                 karena sebagian fitur web ini mungkin tidak berfungsi tanpa izin dari sistem Google.
             </p>
-
             <p>
                 Website ini <strong>aman</strong> untuk digunakan — saya tidak menggunakan server online,
                 sehingga tidak ada orang yang bisa masuk ke halaman website ini, termasuk developer sekalipun
                 tidak bisa mengontrol kamu.
             </p>
-
             <div class="highlight">
                 💡 Jika ada kejanggalan, silahkan laporkan saja ke Developer.
             </div>
@@ -1865,7 +1923,11 @@
             const scheduleGrid = document.getElementById('scheduleGrid');
             const nowText = document.getElementById('nowText');
 
-            const notifTimeSelect = document.getElementById('notifTime');
+            // Elemen notifikasi
+            const notifTimeInput = document.getElementById('notifTimeInput');
+            const notifActivateNow = document.getElementById('notifActivateNow');
+            const notifActivateLater = document.getElementById('notifActivateLater');
+            const notifDeactivate = document.getElementById('notifDeactivate');
             const notifBadge = document.getElementById('notifBadge');
             const notifInfo = document.getElementById('notifInfo');
 
@@ -2052,7 +2114,7 @@
             }
 
             // ============================================================
-            // 4. FUNGSI NOTIFIKASI
+            // 4. FUNGSI NOTIFIKASI (DIPERBAIKI)
             // ============================================================
             function requestNotifPermission() {
                 if (!('Notification' in window)) {
@@ -2062,15 +2124,19 @@
                 if (Notification.permission === 'granted') return true;
                 if (Notification.permission === 'denied') {
                     notifBadge.textContent = '⛔ Diblokir';
+                    notifBadge.className = 'badge inactive';
                     notifInfo.textContent = 'Izin notifikasi ditolak. Ubah di pengaturan browser.';
                     return false;
                 }
+                // Minta izin
                 Notification.requestPermission().then(perm => {
                     if (perm === 'granted') {
                         notifBadge.textContent = '✅ Aktif';
-                        notifInfo.textContent = 'Notifikasi akan muncul pada jam yang dipilih.';
+                        notifBadge.className = 'badge';
+                        notifInfo.textContent = `Notifikasi akan muncul pada jam yang dipilih.`;
                     } else {
                         notifBadge.textContent = '⛔ Diblokir';
+                        notifBadge.className = 'badge inactive';
                         notifInfo.textContent = 'Izin notifikasi ditolak.';
                     }
                 });
@@ -2088,6 +2154,7 @@
 
             function sendNotification() {
                 if (!('Notification' in window) || Notification.permission !== 'granted') {
+                    console.warn('Notifikasi tidak diizinkan.');
                     return;
                 }
 
@@ -2105,11 +2172,11 @@
                 let body = '';
 
                 if (tomorrowName === 'Minggu') {
-                    body = `Hai ${userName} selamat berlibur ya, istirahat terlebih dahulu agar Senin besok semangat buat belajar lagi di 9F ♥️`;
+                    body = `Hai ${userName}, selamat berlibur ya, istirahat terlebih dahulu agar Senin besok semangat buat belajar lagi di 9F ♥️`;
                 } else {
                     const mapels = getMapelListForDay(tomorrowName);
                     const listMapel = mapels.length > 0 ? mapels.join(', ') : 'Tidak ada pelajaran';
-                    body = `Hai ${userName} udah siap buat menyambut pelajaran baru?\n${listMapel}`;
+                    body = `Hai ${userName}, udah siap buat menyambut pelajaran baru besok? 📖\n${listMapel}`;
                 }
 
                 try {
@@ -2120,12 +2187,30 @@
                         requireInteraction: true
                     });
                     setTimeout(() => notif.close(), 30000);
+                    console.log('✅ Notifikasi dikirim:', body);
                 } catch (e) {
                     console.warn('Gagal mengirim notifikasi:', e);
                 }
             }
 
+            // State notifikasi
+            let notifInterval = null;
             let lastNotifDate = null;
+
+            // Fungsi untuk memulai pengecekan notifikasi setiap menit
+            function startNotificationChecker() {
+                if (notifInterval) clearInterval(notifInterval);
+                notifInterval = setInterval(checkNotificationTime, 60000); // cek setiap menit
+                // Cek langsung saat diaktifkan
+                checkNotificationTime();
+            }
+
+            function stopNotificationChecker() {
+                if (notifInterval) {
+                    clearInterval(notifInterval);
+                    notifInterval = null;
+                }
+            }
 
             function checkNotificationTime() {
                 const savedTime = localStorage.getItem('ixf_notif_time');
@@ -2134,39 +2219,116 @@
                 const now = new Date();
                 const nowStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
+                // Cek apakah waktu sekarang sama dengan waktu yang disimpan
                 if (nowStr === savedTime) {
                     const todayStr = now.toDateString();
+                    // Cek apakah notifikasi sudah dikirim hari ini
                     if (lastNotifDate !== todayStr) {
                         sendNotification();
                         lastNotifDate = todayStr;
+                        console.log(`Notifikasi dikirim pada ${nowStr}`);
                     }
                 }
+            }
+
+            // Fungsi untuk mengaktifkan notifikasi dengan waktu tertentu
+            function activateNotification(time, startToday = true) {
+                if (!time) {
+                    alert('Silakan pilih jam terlebih dahulu.');
+                    return;
+                }
+
+                // Minta izin jika belum
+                const perm = requestNotifPermission();
+                if (!perm && Notification.permission !== 'granted') {
+                    // Jika belum granted, kita tetap lanjutkan tapi notifikasi mungkin tidak muncul
+                    // Tapi kita simpan pengaturan
+                }
+
+                // Simpan waktu
+                localStorage.setItem('ixf_notif_time', time);
+                // Reset lastNotifDate agar notifikasi bisa dikirim hari ini jika startToday = true
+                if (startToday) {
+                    lastNotifDate = null; // biarkan notifikasi bisa dikirim hari ini jika waktunya belum lewat
+                } else {
+                    // Aktifkan nanti: kita set lastNotifDate ke hari ini agar tidak mengirim hari ini
+                    lastNotifDate = new Date().toDateString();
+                }
+
+                // Update UI
+                updateNotifUI();
+                // Mulai pengecekan
+                startNotificationChecker();
+
+                // Beri feedback
+                const msg = startToday ?
+                    `Notifikasi diaktifkan untuk pukul ${time} (mulai hari ini).` :
+                    `Notifikasi diaktifkan untuk pukul ${time} (mulai besok).`;
+                notifInfo.textContent = msg;
+                notifBadge.textContent = '🔔 Aktif';
+                notifBadge.className = 'badge';
+
+                // Jika izin belum granted, beri tahu
+                if (Notification.permission !== 'granted') {
+                    notifInfo.textContent += ' Namun izin notifikasi belum diberikan, notifikasi mungkin tidak muncul.';
+                }
+            }
+
+            function deactivateNotification() {
+                localStorage.removeItem('ixf_notif_time');
+                lastNotifDate = null;
+                stopNotificationChecker();
+                updateNotifUI();
+                notifInfo.textContent = 'Notifikasi dinonaktifkan.';
+                notifBadge.textContent = '⏸ Tidak aktif';
+                notifBadge.className = 'badge inactive';
             }
 
             function updateNotifUI() {
                 const savedTime = localStorage.getItem('ixf_notif_time');
                 if (savedTime) {
-                    notifTimeSelect.value = savedTime;
+                    notifTimeInput.value = savedTime;
                     notifBadge.textContent = '🔔 Aktif';
+                    notifBadge.className = 'badge';
                     notifInfo.textContent = `Notifikasi setiap hari pukul ${savedTime}`;
                 } else {
-                    notifTimeSelect.value = '';
+                    notifTimeInput.value = '';
                     notifBadge.textContent = '⏸ Tidak aktif';
-                    notifInfo.textContent = 'Pilih jam di atas untuk mengaktifkan.';
+                    notifBadge.className = 'badge inactive';
+                    notifInfo.textContent = 'Pilih jam dan klik "Aktifkan Sekarang" untuk mengaktifkan.';
                 }
             }
 
-            function setNotifTime(time) {
-                if (time) {
-                    localStorage.setItem('ixf_notif_time', time);
-                    lastNotifDate = null;
-                } else {
-                    localStorage.removeItem('ixf_notif_time');
+            // Event listener untuk tombol notifikasi
+            notifActivateNow.addEventListener('click', function() {
+                const time = notifTimeInput.value;
+                if (!time) {
+                    alert('Silakan pilih jam terlebih dahulu.');
+                    return;
                 }
-                updateNotifUI();
-                if (time) {
-                    requestNotifPermission();
+                activateNotification(time, true);
+            });
+
+            notifActivateLater.addEventListener('click', function() {
+                const time = notifTimeInput.value;
+                if (!time) {
+                    alert('Silakan pilih jam terlebih dahulu.');
+                    return;
                 }
+                activateNotification(time, false);
+            });
+
+            notifDeactivate.addEventListener('click', function() {
+                deactivateNotification();
+            });
+
+            // Inisialisasi UI notifikasi dan cek jika sudah ada pengaturan
+            updateNotifUI();
+            // Jika ada waktu tersimpan, mulai pengecekan
+            if (localStorage.getItem('ixf_notif_time')) {
+                startNotificationChecker();
+                // Set lastNotifDate berdasarkan hari ini agar tidak mengirim notifikasi ganda
+                lastNotifDate = new Date().toDateString();
             }
 
             // ============================================================
@@ -2368,6 +2530,7 @@
                 updateNameChangeUI();
                 initGallery();
 
+                // Minta izin notifikasi secara otomatis setelah masuk (jika default)
                 if ('Notification' in window && Notification.permission === 'default') {
                     setTimeout(() => {
                         Notification.requestPermission().then(perm => {
@@ -2376,6 +2539,12 @@
                             }
                         });
                     }, 4000);
+                }
+
+                // Jika ada waktu notifikasi tersimpan, mulai pengecekan
+                if (localStorage.getItem('ixf_notif_time')) {
+                    startNotificationChecker();
+                    lastNotifDate = new Date().toDateString();
                 }
 
                 console.log('✅ Selamat datang, ' + displayName + '!');
@@ -2444,25 +2613,7 @@
             });
 
             // ============================================================
-            // 10. NOTIFIKASI
-            // ============================================================
-            notifTimeSelect.addEventListener('change', function() {
-                const val = this.value;
-                setNotifTime(val);
-            });
-
-            setInterval(checkNotificationTime, 30000);
-            setTimeout(checkNotificationTime, 5000);
-
-            setInterval(() => {
-                if (document.getElementById('page-schedule').classList.contains('active')) {
-                    renderSchedule();
-                }
-                updateNowText();
-            }, 30000);
-
-            // ============================================================
-            // 11. GANTI NAMA (30 hari)
+            // 10. GANTI NAMA (30 hari)
             // ============================================================
             function updateNameChangeUI() {
                 const lastChange = localStorage.getItem('ixf_name_change_date');
@@ -2542,7 +2693,7 @@
             updateNameChangeUI();
 
             // ============================================================
-            // 12. GALERI FOTO — COVERFLOW 3D
+            // 11. GALERI FOTO — COVERFLOW 3D
             // ============================================================
             const TOTAL_IMAGES = 43;
             let galleryIndex = 0;
@@ -2773,7 +2924,7 @@
             }
 
             // ============================================================
-            // 13. FIREFOX PROMO - MODAL
+            // 12. FIREFOX PROMO - MODAL
             // ============================================================
             function openModal() {
                 firefoxModal.classList.add('active');
@@ -2801,7 +2952,7 @@
             });
 
             // ============================================================
-            // 14. REPORT / LAPORAN BUG
+            // 13. REPORT / LAPORAN BUG
             // ============================================================
             function openReportModal() {
                 reportModal.classList.add('active');
@@ -2834,6 +2985,16 @@
                     closeReportModal();
                 }
             });
+
+            // ============================================================
+            // 14. UPDATE JADWAL DAN NOTIFIKASI PERIODIK
+            // ============================================================
+            setInterval(() => {
+                if (document.getElementById('page-schedule').classList.contains('active')) {
+                    renderSchedule();
+                }
+                updateNowText();
+            }, 30000);
 
             console.log('✅ IXF SPA siap!');
         });
