@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
+    <!-- ===== MANIFEST UNTUK PWA & PERIODIC SYNC ===== -->
+    <link rel="manifest" href="manifest.json">
+
     <style>
         /* ===== VARIABEL GLOBAL ===== */
         :root {
@@ -1958,7 +1961,74 @@
             const ROLE_TEXT = 'Wali kelas';
 
             // ============================================================
-            // 2. DATA JADWAL KELAS 9F
+            // 1A. REGISTRASI SERVICE WORKER
+            // ============================================================
+            async function registerServiceWorker() {
+                try {
+                    if ('serviceWorker' in navigator) {
+                        const registration = await navigator.serviceWorker.register('sw.js', {
+                            scope: './'
+                        });
+                        console.log('✅ Service Worker berhasil didaftarkan:', registration);
+
+                        // Kirim data nama pengguna ke SW setelah register
+                        if (savedName) {
+                            await sendMessageToSW({ type: 'SET_NAME', name: savedName });
+                        }
+
+                        // Cek apakah periodic sync didukung
+                        if ('periodicSync' in registration) {
+                            try {
+                                const status = await navigator.permissions.query({
+                                    name: 'periodic-background-sync'
+                                });
+                                console.log('✅ Periodic sync permission:', status.state);
+                                if (status.state === 'granted') {
+                                    await registration.periodicSync.register('ixf-schedule-check', {
+                                        minInterval: 3600000 // 1 jam
+                                    });
+                                    console.log('✅ Periodic sync terdaftar (interval 1 jam)');
+                                }
+                            } catch (syncErr) {
+                                console.warn('⚠️ Periodic sync tidak tersedia atau gagal:', syncErr);
+                            }
+                        } else {
+                            console.log('ℹ️ Periodic sync tidak didukung browser ini.');
+                        }
+
+                        return registration;
+                    } else {
+                        console.warn('⚠️ Service Worker tidak didukung browser ini.');
+                        return null;
+                    }
+                } catch (err) {
+                    console.error('❌ Gagal registrasi Service Worker:', err);
+                    return null;
+                }
+            }
+
+            // Fungsi kirim pesan ke Service Worker
+            async function sendMessageToSW(message) {
+                try {
+                    if (navigator.serviceWorker.controller) {
+                        navigator.serviceWorker.controller.postMessage(message);
+                        console.log('📨 Pesan terkirim ke SW:', message);
+                    } else {
+                        // Jika SW belum aktif, kirim saat ready
+                        navigator.serviceWorker.ready.then(reg => {
+                            if (reg.active) {
+                                reg.active.postMessage(message);
+                                console.log('📨 Pesan terkirim ke SW (ready):', message);
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.warn('⚠️ Gagal kirim pesan ke SW:', err);
+                }
+            }
+
+            // ============================================================
+            // 2. DATA JADWAL KELAS 9F (sama seperti sebelumnya)
             // ============================================================
             const scheduleData = {
                 'Senin': [
@@ -2114,7 +2184,7 @@
             }
 
             // ============================================================
-            // 4. FUNGSI NOTIFIKASI (DIPERBAIKI - HARI SENIN–SABTU)
+            // 4. FUNGSI NOTIFIKASI (DIPERBAIKI - HARI SENIN–SABTU + SW)
             // ============================================================
             function requestNotifPermission() {
                 if (!('Notification' in window)) {
@@ -2133,6 +2203,8 @@
                         notifBadge.textContent = '✅ Aktif';
                         notifBadge.className = 'badge';
                         notifInfo.textContent = `Notifikasi akan muncul pada jam yang dipilih (Senin–Sabtu).`;
+                        // Kirim ke SW bahwa izin diberikan
+                        sendMessageToSW({ type: 'PERMISSION_GRANTED' });
                     } else {
                         notifBadge.textContent = '⛔ Diblokir';
                         notifBadge.className = 'badge inactive';
@@ -2151,17 +2223,45 @@
                 return lessons.map(l => l.mapel);
             }
 
-            // Cek apakah besok adalah hari Minggu
             function isTomorrowSunday() {
                 const today = new Date();
                 const tomorrow = new Date(today);
                 tomorrow.setDate(today.getDate() + 1);
-                return tomorrow.getDay() === 0; // 0 = Minggu
+                return tomorrow.getDay() === 0;
+            }
+
+            // Kirim notifikasi via Service Worker (background)
+            async function sendNotificationViaSW(title, body, icon) {
+                try {
+                    await sendMessageToSW({
+                        type: 'SHOW_NOTIFICATION',
+                        title: title,
+                        body: body,
+                        icon: icon || 'logokelas.png'
+                    });
+                    console.log('📨 Notifikasi dikirim via SW:', title);
+                } catch (err) {
+                    console.warn('⚠️ Gagal kirim notifikasi via SW, fallback ke Notification API:', err);
+                    // Fallback ke Notification API biasa
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        try {
+                            const notif = new Notification(title, {
+                                body: body,
+                                icon: icon || 'logokelas.png',
+                                tag: 'ixf-schedule-reminder',
+                                requireInteraction: true
+                            });
+                            setTimeout(() => notif.close(), 30000);
+                        } catch (e) {
+                            console.warn('Fallback notifikasi gagal:', e);
+                        }
+                    }
+                }
             }
 
             function sendNotification() {
-                if (!('Notification' in window) || Notification.permission !== 'granted') {
-                    console.warn('Notifikasi tidak diizinkan.');
+                if (!('Notification' in window) && !('serviceWorker' in navigator)) {
+                    console.warn('Notifikasi tidak didukung.');
                     return;
                 }
 
@@ -2185,7 +2285,6 @@
                 let body = '';
 
                 if (tomorrowName === 'Minggu') {
-                    // Ini seharusnya tidak terjadi karena sudah dicek di atas, tapi tetap jaga-jaga
                     body = `Hai ${userName}, selamat berlibur ya, istirahat terlebih dahulu agar Senin besok semangat buat belajar lagi di 9F ♥️`;
                 } else {
                     const mapels = getMapelListForDay(tomorrowName);
@@ -2193,28 +2292,36 @@
                     body = `Hai ${userName}, udah siap buat menyambut pelajaran baru besok? 📖\n${listMapel}`;
                 }
 
-                try {
-                    const notif = new Notification(title, {
-                        body: body,
-                        icon: 'logokelas.png',
-                        tag: 'ixf-schedule-reminder',
-                        requireInteraction: true
-                    });
-                    setTimeout(() => notif.close(), 30000);
-                    console.log('✅ Notifikasi dikirim:', body);
-                } catch (e) {
-                    console.warn('Gagal mengirim notifikasi:', e);
+                // Kirim via Service Worker jika tersedia
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    sendNotificationViaSW(title, body, 'logokelas.png');
+                } else if ('Notification' in window && Notification.permission === 'granted') {
+                    try {
+                        const notif = new Notification(title, {
+                            body: body,
+                            icon: 'logokelas.png',
+                            tag: 'ixf-schedule-reminder',
+                            requireInteraction: true
+                        });
+                        setTimeout(() => notif.close(), 30000);
+                    } catch (e) {
+                        console.warn('Gagal menampilkan notifikasi:', e);
+                    }
+                } else {
+                    console.log('ℹ️ Notifikasi tidak dapat ditampilkan (izin belum diberikan).');
                 }
             }
 
-            // State notifikasi
+            // ============================================================
+            // 5. STATE NOTIFIKASI (PAGE-BASED + SW)
+            // ============================================================
             let notifInterval = null;
             let lastNotifDate = null;
 
             function startNotificationChecker() {
                 if (notifInterval) clearInterval(notifInterval);
-                notifInterval = setInterval(checkNotificationTime, 60000); // cek setiap menit
-                checkNotificationTime(); // cek langsung
+                notifInterval = setInterval(checkNotificationTime, 60000);
+                checkNotificationTime();
             }
 
             function stopNotificationChecker() {
@@ -2236,28 +2343,43 @@
                     if (lastNotifDate !== todayStr) {
                         sendNotification();
                         lastNotifDate = todayStr;
-                        console.log(`Notifikasi dikirim pada ${nowStr}`);
+                        console.log(`✅ Notifikasi dikirim pada ${nowStr} (page-based)`);
                     }
                 }
             }
 
-            function activateNotification(time, startToday = true) {
+            // ============================================================
+            // 6. AKTIVASI / NONAKTIVASI NOTIFIKASI (dengan SW sync)
+            // ============================================================
+            async function activateNotification(time, startToday = true) {
                 if (!time) {
                     alert('Silakan pilih jam terlebih dahulu.');
                     return;
                 }
 
+                // Minta izin notifikasi
                 const perm = requestNotifPermission();
-                if (!perm && Notification.permission !== 'granted') {
-                    // Tetap simpan pengaturan
-                }
 
+                // Simpan di localStorage
                 localStorage.setItem('ixf_notif_time', time);
                 if (startToday) {
                     lastNotifDate = null;
                 } else {
                     lastNotifDate = new Date().toDateString();
                 }
+
+                // Kirim ke Service Worker
+                await sendMessageToSW({
+                    type: 'SET_NOTIF_TIME',
+                    time: time,
+                    userName: savedName || 'Teman'
+                });
+
+                // Kirim juga data jadwal ke SW agar bisa generate notifikasi
+                await sendMessageToSW({
+                    type: 'SET_SCHEDULE_DATA',
+                    data: scheduleData
+                });
 
                 updateNotifUI();
                 startNotificationChecker();
@@ -2272,6 +2394,21 @@
                 if (Notification.permission !== 'granted') {
                     notifInfo.textContent += ' Namun izin notifikasi belum diberikan, notifikasi mungkin tidak muncul.';
                 }
+
+                // Daftarkan periodic sync ulang
+                try {
+                    if ('serviceWorker' in navigator && 'periodicSync' in await navigator.serviceWorker.ready) {
+                        const reg = await navigator.serviceWorker.ready;
+                        if (reg.periodicSync) {
+                            await reg.periodicSync.register('ixf-schedule-check', {
+                                minInterval: 3600000
+                            });
+                            console.log('✅ Periodic sync diperbarui');
+                        }
+                    }
+                } catch (syncErr) {
+                    console.warn('⚠️ Gagal mendaftarkan periodic sync:', syncErr);
+                }
             }
 
             function deactivateNotification() {
@@ -2282,6 +2419,20 @@
                 notifInfo.textContent = 'Notifikasi dinonaktifkan.';
                 notifBadge.textContent = '⏸ Tidak aktif';
                 notifBadge.className = 'badge inactive';
+
+                // Kirim ke SW
+                sendMessageToSW({ type: 'DEACTIVATE_NOTIF' });
+
+                // Hapus periodic sync
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.ready.then(reg => {
+                        if (reg.periodicSync) {
+                            reg.periodicSync.unregister('ixf-schedule-check')
+                                .then(() => console.log('✅ Periodic sync dihapus'))
+                                .catch(err => console.warn('⚠️ Gagal hapus periodic sync:', err));
+                        }
+                    });
+                }
             }
 
             function updateNotifUI() {
@@ -2327,10 +2478,25 @@
             if (localStorage.getItem('ixf_notif_time')) {
                 startNotificationChecker();
                 lastNotifDate = new Date().toDateString();
+                // Kirim data ke SW setelah registrasi
+                setTimeout(() => {
+                    const time = localStorage.getItem('ixf_notif_time');
+                    if (time) {
+                        sendMessageToSW({
+                            type: 'SET_NOTIF_TIME',
+                            time: time,
+                            userName: savedName || 'Teman'
+                        });
+                        sendMessageToSW({
+                            type: 'SET_SCHEDULE_DATA',
+                            data: scheduleData
+                        });
+                    }
+                }, 2000);
             }
 
             // ============================================================
-            // 5. TYPEWRITER & LONG PRESS
+            // 7. TYPEWRITER & LONG PRESS (sama seperti sebelumnya)
             // ============================================================
             function typeWriter(text, element, speed = 55, callback) {
                 let i = 0;
@@ -2400,7 +2566,7 @@
             photoWrapper.addEventListener('mouseleave', endLongPress);
 
             // ============================================================
-            // 6. PENCARIAN
+            // 8. PENCARIAN (sama seperti sebelumnya)
             // ============================================================
             const studentData = [
                 { no: 1, name: 'AFFLAH INTAN NOOR IZZAH' },
@@ -2465,7 +2631,7 @@
             });
 
             // ============================================================
-            // 7. NAVIGASI
+            // 9. NAVIGASI
             // ============================================================
             const pageTitles = {
                 home: 'Beranda',
@@ -2508,9 +2674,9 @@
             navTitle.textContent = 'Beranda';
 
             // ============================================================
-            // 8. ENTER APP & NAMA
+            // 10. ENTER APP & NAMA
             // ============================================================
-            function enterApp() {
+            async function enterApp() {
                 loadingScreen.classList.add('hidden');
                 mainContent.classList.add('visible');
                 nameOverlay.classList.remove('active');
@@ -2528,11 +2694,34 @@
                 updateNameChangeUI();
                 initGallery();
 
+                // Registrasi Service Worker
+                await registerServiceWorker();
+
+                // Kirim data ke SW setelah registrasi
+                setTimeout(() => {
+                    const time = localStorage.getItem('ixf_notif_time');
+                    if (time) {
+                        sendMessageToSW({
+                            type: 'SET_NOTIF_TIME',
+                            time: time,
+                            userName: savedName || 'Teman'
+                        });
+                        sendMessageToSW({
+                            type: 'SET_SCHEDULE_DATA',
+                            data: scheduleData
+                        });
+                    }
+                    if (savedName) {
+                        sendMessageToSW({ type: 'SET_NAME', name: savedName });
+                    }
+                }, 1500);
+
                 if ('Notification' in window && Notification.permission === 'default') {
                     setTimeout(() => {
                         Notification.requestPermission().then(perm => {
                             if (perm === 'granted') {
                                 updateNotifUI();
+                                sendMessageToSW({ type: 'PERMISSION_GRANTED' });
                             }
                         });
                     }, 4000);
@@ -2559,7 +2748,7 @@
             }
 
             // ============================================================
-            // 9. INPUT NAMA (awal)
+            // 11. INPUT NAMA (awal)
             // ============================================================
             nameInput.addEventListener('input', function() {
                 const val = this.value;
@@ -2609,7 +2798,7 @@
             });
 
             // ============================================================
-            // 10. GANTI NAMA (30 hari)
+            // 12. GANTI NAMA (30 hari)
             // ============================================================
             function updateNameChangeUI() {
                 const lastChange = localStorage.getItem('ixf_name_change_date');
@@ -2681,6 +2870,9 @@
                 errorMsgChange.textContent = '';
                 changeNameInput.classList.remove('error');
 
+                // Kirim ke SW
+                sendMessageToSW({ type: 'SET_NAME', name: raw });
+
                 updateNameChangeUI();
                 alert('✅ Nama berhasil diganti menjadi "' + raw + '".');
                 updateNowText();
@@ -2689,7 +2881,7 @@
             updateNameChangeUI();
 
             // ============================================================
-            // 11. GALERI FOTO — COVERFLOW 3D
+            // 13. GALERI FOTO — COVERFLOW 3D (sama seperti sebelumnya)
             // ============================================================
             const TOTAL_IMAGES = 43;
             let galleryIndex = 0;
@@ -2920,7 +3112,7 @@
             }
 
             // ============================================================
-            // 12. FIREFOX PROMO - MODAL
+            // 14. FIREFOX PROMO - MODAL
             // ============================================================
             function openModal() {
                 firefoxModal.classList.add('active');
@@ -2948,7 +3140,7 @@
             });
 
             // ============================================================
-            // 13. REPORT / LAPORAN BUG
+            // 15. REPORT / LAPORAN BUG
             // ============================================================
             function openReportModal() {
                 reportModal.classList.add('active');
@@ -2983,7 +3175,7 @@
             });
 
             // ============================================================
-            // 14. UPDATE JADWAL DAN NOTIFIKASI PERIODIK
+            // 16. UPDATE JADWAL DAN NOTIFIKASI PERIODIK
             // ============================================================
             setInterval(() => {
                 if (document.getElementById('page-schedule').classList.contains('active')) {
@@ -2992,7 +3184,7 @@
                 updateNowText();
             }, 30000);
 
-            console.log('✅ IXF SPA siap!');
+            console.log('✅ IXF SPA dengan Service Worker siap!');
         });
     </script>
 </body>
