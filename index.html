@@ -12,6 +12,12 @@
     <!-- ===== MANIFEST UNTUK PWA & PERIODIC SYNC ===== -->
     <link rel="manifest" href="manifest.json">
 
+    <!-- ===== FIREBASE SDK (REALTIME DATABASE) ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
+    </script>
+
     <style>
         /* ===== VARIABEL GLOBAL ===== */
         :root {
@@ -24,6 +30,9 @@
             --accent-light: #e6f4ea;
             --bg-card: #f8fafc;
             --border-radius: 16px;
+            --chat-bg-own: #d4f1d4;
+            --chat-bg-other: #f0f0f0;
+            --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.06);
         }
 
         /* ===== RESET ===== */
@@ -102,7 +111,7 @@
             font-weight: 300;
         }
 
-        /* ===== OVERLAY INPUT NAMA ===== */
+        /* ===== OVERLAY INPUT NAMA (AWAL) ===== */
         #name-overlay {
             position: fixed;
             top: 0;
@@ -206,6 +215,109 @@
             padding-right: 4px;
         }
 
+        /* ===== OVERLAY LOGIN CHAT ===== */
+        #chat-login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            padding: 20px;
+        }
+        #chat-login-overlay.active {
+            display: flex;
+        }
+        .chat-login-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 36px 28px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeUp 0.4s ease;
+        }
+        .chat-login-card h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .chat-login-card .sub {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        .chat-login-card .field-group {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+        .chat-login-card .field-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 4px;
+        }
+        .chat-login-card .field-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Roboto', sans-serif;
+            transition: border 0.2s;
+            background: #f9f9f9;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .chat-login-card .field-group input:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+        .chat-login-card .field-group input.error {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+        .chat-login-card .field-group .hint {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            text-align: right;
+        }
+        .chat-login-card .login-error {
+            color: #e74c3c;
+            font-size: 13px;
+            min-height: 20px;
+            margin-top: 4px;
+        }
+        .chat-login-card button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: 'Roboto', sans-serif;
+            margin-top: 8px;
+        }
+        .chat-login-card button:hover {
+            background: var(--primary-light);
+        }
+        .chat-login-card button:active {
+            transform: scale(0.97);
+        }
+
         /* ===== MAIN CONTENT ===== */
         #main-content {
             display: none;
@@ -281,28 +393,6 @@
         .top-nav .nav-actions .report-btn:active {
             transform: scale(0.88);
             background: rgba(255, 255, 255, 0.5);
-        }
-        .top-nav .nav-actions .report-btn .badge-dot {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 12px;
-            height: 12px;
-            background: #e74c3c;
-            border-radius: 50%;
-            border: 2px solid rgba(10, 30, 60, 0.6);
-            animation: pulse-badge 1.8s ease-in-out infinite;
-        }
-        @keyframes pulse-badge {
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.25);
-                opacity: 0.6;
-            }
         }
 
         /* ===== HERO ===== */
@@ -889,6 +979,237 @@
             }
         }
 
+        /* ============================================================
+                   PAGE CHAT — PRIVATE MESSAGING
+                   ============================================================ */
+        .page-chat-wrapper {
+            padding: 8px 12px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Chat header / contact info */
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            margin-bottom: 12px;
+            border: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+        .chat-header .chat-with-label {
+            font-weight: 500;
+            color: #444;
+            font-size: 0.9rem;
+            flex: 1;
+            min-width: 120px;
+        }
+        .chat-header .chat-with-label strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .chat-header .chat-status {
+            font-size: 0.75rem;
+            color: #999;
+            background: #f0f0f0;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+        .chat-header .chat-status.online {
+            color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        /* Contact input row */
+        .chat-contact-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .chat-contact-row input {
+            flex: 1;
+            min-width: 140px;
+            padding: 10px 14px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Roboto', sans-serif;
+            transition: border 0.2s;
+            background: #f9f9f9;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        .chat-contact-row input:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+        .chat-contact-row input.error {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+        .chat-contact-row button {
+            padding: 10px 18px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: 'Roboto', sans-serif;
+            white-space: nowrap;
+        }
+        .chat-contact-row button:hover {
+            background: var(--primary-light);
+        }
+        .chat-contact-row button:active {
+            transform: scale(0.96);
+        }
+        .chat-contact-row button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+        .chat-contact-row .contact-error {
+            width: 100%;
+            color: #e74c3c;
+            font-size: 13px;
+            min-height: 20px;
+            text-align: center;
+        }
+
+        /* Chat messages container */
+        .chat-messages {
+            background: #ffffff;
+            border-radius: var(--border-radius);
+            border: 1px solid #eee;
+            padding: 12px 10px;
+            height: 380px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+        .chat-messages .empty-chat {
+            text-align: center;
+            color: #aaa;
+            font-size: 0.9rem;
+            padding: 40px 10px;
+            line-height: 1.6;
+        }
+        .chat-messages .empty-chat .emoji {
+            font-size: 2.4rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .chat-msg {
+            max-width: 82%;
+            padding: 8px 14px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            word-break: break-word;
+            animation: msgSlide 0.2s ease;
+            position: relative;
+        }
+        @keyframes msgSlide {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .chat-msg.own {
+            align-self: flex-end;
+            background: var(--chat-bg-own);
+            border-bottom-right-radius: 4px;
+            color: #1a3a1a;
+        }
+        .chat-msg.other {
+            align-self: flex-start;
+            background: var(--chat-bg-other);
+            border-bottom-left-radius: 4px;
+            color: #1a1a1a;
+        }
+        .chat-msg .msg-sender {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 2px;
+        }
+        .chat-msg.own .msg-sender {
+            color: #2d6a2d;
+        }
+        .chat-msg .msg-time {
+            font-size: 0.6rem;
+            color: #999;
+            margin-top: 2px;
+            text-align: right;
+        }
+        .chat-msg.own .msg-time {
+            color: #6a8a6a;
+        }
+
+        /* Chat input row */
+        .chat-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .chat-input-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Roboto', sans-serif;
+            transition: border 0.2s;
+            background: #f9f9f9;
+        }
+        .chat-input-row input:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+        .chat-input-row input:disabled {
+            background: #f0f0f0;
+            color: #999;
+        }
+        .chat-input-row button {
+            padding: 10px 20px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: 'Roboto', sans-serif;
+            white-space: nowrap;
+        }
+        .chat-input-row button:hover {
+            background: #236b3a;
+        }
+        .chat-input-row button:active {
+            transform: scale(0.96);
+        }
+        .chat-input-row button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
         /* ===== PAGE LAIN ===== */
         .page-content {
             display: none;
@@ -912,7 +1233,7 @@
             line-height: 1.6;
         }
 
-        /* ===== PAGE SETTINGS ===== */
+        /* ===== PAGE SETTINGS (clean version, no notif) ===== */
         .settings-group {
             background: var(--bg-card);
             border-radius: var(--border-radius);
@@ -931,84 +1252,6 @@
             font-size: 0.85rem;
             color: #777;
             margin-bottom: 12px;
-        }
-        .settings-group input[type="time"] {
-            width: 100%;
-            padding: 12px 14px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 1rem;
-            background: #fff;
-            font-family: 'Roboto', sans-serif;
-            transition: border 0.2s;
-            color: #1a1a1a;
-        }
-        .settings-group input[type="time"]:focus {
-            border-color: var(--primary);
-        }
-        .settings-group .notif-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        .settings-group .notif-actions button {
-            flex: 1;
-            padding: 10px 12px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 500;
-            font-family: 'Roboto', sans-serif;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            min-width: 80px;
-            white-space: nowrap;
-        }
-        .settings-group .notif-actions button:active {
-            transform: scale(0.97);
-        }
-        .settings-group .notif-actions .btn-activate {
-            background: var(--primary);
-            color: #fff;
-        }
-        .settings-group .notif-actions .btn-activate:hover {
-            background: var(--primary-light);
-        }
-        .settings-group .notif-actions .btn-later {
-            background: #6c757d;
-            color: #fff;
-        }
-        .settings-group .notif-actions .btn-later:hover {
-            background: #5a6268;
-        }
-        .settings-group .notif-actions .btn-deactivate {
-            background: #e74c3c;
-            color: #fff;
-        }
-        .settings-group .notif-actions .btn-deactivate:hover {
-            background: #c0392b;
-        }
-        .settings-group .notif-status {
-            margin-top: 12px;
-            font-size: 0.85rem;
-            color: #555;
-            padding: 8px 12px;
-            background: #f0f4f8;
-            border-radius: 8px;
-        }
-        .settings-group .notif-status .badge {
-            display: inline-block;
-            background: var(--accent);
-            color: #fff;
-            border-radius: 20px;
-            padding: 0 10px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            line-height: 1.8;
-        }
-        .settings-group .notif-status .badge.inactive {
-            background: #999;
         }
 
         .name-change-group .name-input-wrapper {
@@ -1082,71 +1325,7 @@
             margin-top: 4px;
         }
 
-        /* ============================================================
-                   FIREFOX PROMO SECTION
-                   ============================================================ */
-        .firefox-promo {
-            max-width: 500px;
-            margin: 8px auto 12px;
-            padding: 14px 18px;
-            background: #fff7ed;
-            border-radius: var(--border-radius);
-            border: 1px solid #fde4c8;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        .promo-inner {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 100%;
-            justify-content: center;
-        }
-        .promo-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-            background: #eee;
-            border: 2px solid #e07b2b;
-        }
-        .promo-text {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #8a4a1a;
-            line-height: 1.3;
-            text-align: left;
-            flex: 1;
-        }
-        .promo-btn {
-            background: transparent;
-            border: none;
-            color: #d4691a;
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 6px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            background: #fff0e0;
-            transition: background 0.2s, transform 0.1s;
-            font-family: 'Roboto', sans-serif;
-            border: 1px solid #f5d6b8;
-            width: 100%;
-            max-width: 260px;
-            text-align: center;
-        }
-        .promo-btn:hover {
-            background: #fde4c8;
-        }
-        .promo-btn:active {
-            transform: scale(0.96);
-        }
-
-        /* ===== MODAL OVERLAY ===== */
+        /* ===== MODAL LAPORAN ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1360,12 +1539,6 @@
                 height: 34px;
                 font-size: 19px;
             }
-            .top-nav .nav-actions .report-btn .badge-dot {
-                width: 10px;
-                height: 10px;
-                top: -1px;
-                right: -1px;
-            }
             .logo-img {
                 width: 100px;
                 height: 100px;
@@ -1464,22 +1637,6 @@
                 padding: 1px 10px;
             }
 
-            .firefox-promo {
-                padding: 12px 14px;
-                margin: 6px 10px 10px;
-            }
-            .promo-icon {
-                width: 38px;
-                height: 38px;
-            }
-            .promo-text {
-                font-size: 0.8rem;
-            }
-            .promo-btn {
-                font-size: 0.75rem;
-                max-width: 220px;
-                padding: 5px 12px;
-            }
             .modal-content {
                 padding: 24px 18px 20px;
             }
@@ -1505,10 +1662,54 @@
                 text-align: center;
             }
 
-            .settings-group .notif-actions button {
+            /* Chat responsive */
+            .page-chat-wrapper {
+                padding: 6px 8px 16px;
+            }
+            .chat-messages {
+                height: 300px;
+                padding: 10px 8px;
+            }
+            .chat-msg {
+                max-width: 88%;
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+            .chat-header {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            .chat-contact-row input {
+                font-size: 14px;
+                padding: 8px 10px;
+                min-width: 100px;
+            }
+            .chat-contact-row button {
                 font-size: 0.8rem;
-                padding: 8px 6px;
-                min-width: 60px;
+                padding: 8px 14px;
+            }
+            .chat-input-row input {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+            .chat-input-row button {
+                font-size: 0.8rem;
+                padding: 8px 14px;
+            }
+
+            .chat-login-card {
+                padding: 28px 20px;
+            }
+            .chat-login-card h2 {
+                font-size: 19px;
+            }
+            .chat-login-card .field-group input {
+                font-size: 15px;
+                padding: 10px 12px;
+            }
+            .chat-login-card button {
+                font-size: 15px;
+                padding: 12px;
             }
         }
 
@@ -1531,12 +1732,6 @@
                 width: 30px;
                 height: 30px;
                 font-size: 17px;
-            }
-            .top-nav .nav-actions .report-btn .badge-dot {
-                width: 8px;
-                height: 8px;
-                top: -1px;
-                right: -1px;
             }
             .logo-img {
                 width: 80px;
@@ -1630,23 +1825,6 @@
                 padding: 8px 10px;
             }
 
-            .firefox-promo {
-                padding: 10px 12px;
-                margin: 4px 6px 8px;
-                gap: 6px;
-            }
-            .promo-icon {
-                width: 32px;
-                height: 32px;
-            }
-            .promo-text {
-                font-size: 0.7rem;
-            }
-            .promo-btn {
-                font-size: 0.7rem;
-                max-width: 180px;
-                padding: 4px 10px;
-            }
             .modal-content {
                 padding: 20px 14px 16px;
             }
@@ -1672,10 +1850,46 @@
                 padding: 8px 12px;
             }
 
-            .settings-group .notif-actions button {
+            /* Chat responsive 380 */
+            .chat-messages {
+                height: 250px;
+                padding: 8px 6px;
+            }
+            .chat-msg {
+                max-width: 92%;
+                font-size: 0.8rem;
+                padding: 5px 10px;
+            }
+            .chat-contact-row input {
+                font-size: 13px;
+                padding: 6px 8px;
+                min-width: 80px;
+            }
+            .chat-contact-row button {
                 font-size: 0.7rem;
-                padding: 6px 4px;
-                min-width: 50px;
+                padding: 6px 10px;
+            }
+            .chat-input-row input {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+            .chat-input-row button {
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+            .chat-login-card {
+                padding: 20px 16px;
+            }
+            .chat-login-card h2 {
+                font-size: 17px;
+            }
+            .chat-login-card .field-group input {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+            .chat-login-card button {
+                font-size: 14px;
+                padding: 10px;
             }
         }
     </style>
@@ -1691,7 +1905,7 @@
         <div class="version-text">Versi 26.0</div>
     </div>
 
-    <!-- ===== OVERLAY INPUT NAMA ===== -->
+    <!-- ===== OVERLAY INPUT NAMA (AWAL) ===== -->
     <div id="name-overlay">
         <div class="name-card">
             <h2>Masukkan Nama</h2>
@@ -1703,6 +1917,25 @@
         </div>
     </div>
 
+    <!-- ===== OVERLAY LOGIN CHAT ===== -->
+    <div id="chat-login-overlay">
+        <div class="chat-login-card">
+            <h2>💬 Chat IXF</h2>
+            <p class="sub">Masuk dengan Nama &amp; ID 5 digit</p>
+            <div class="field-group">
+                <label for="chat-login-name">Nama Kamu</label>
+                <input type="text" id="chat-login-name" placeholder="Nama panggilan" maxlength="20" autocomplete="off" />
+            </div>
+            <div class="field-group">
+                <label for="chat-login-id">ID Unik (5 digit angka)</label>
+                <input type="text" id="chat-login-id" placeholder="Contoh: 10542" maxlength="5" autocomplete="off" inputmode="numeric" />
+                <div class="hint">* Gunakan ID yang sama setiap kali masuk</div>
+            </div>
+            <div class="login-error" id="chat-login-error"></div>
+            <button id="chat-login-btn">Masuk Chat</button>
+        </div>
+    </div>
+
     <!-- ===== HALAMAN UTAMA ===== -->
     <div id="main-content">
         <nav class="top-nav">
@@ -1710,7 +1943,6 @@
             <div class="nav-actions">
                 <button class="report-btn" id="reportBtn" aria-label="Laporkan bug">
                     <span>!</span>
-                    <span class="badge-dot"></span>
                 </button>
             </div>
         </nav>
@@ -1763,25 +1995,51 @@
                 </div>
             </div>
 
-            <!-- ===== PAGE PENGATURAN ===== -->
-            <div id="page-settings" class="page-content">
-                <h2>⚙️ Pengaturan</h2>
+            <!-- ===== PAGE GALERI ===== -->
+            <div id="page-gallery" class="page-content">
+                <div class="gallery-container" id="galleryContainer">
+                    <div class="gallery-slider" id="gallerySlider"></div>
+                    <div class="gallery-indicator" id="galleryIndicator"></div>
+                    <button class="gallery-nav-btn prev" id="galleryPrev">‹</button>
+                    <button class="gallery-nav-btn next" id="galleryNext">›</button>
+                </div>
+            </div>
 
-                <!-- NOTIFIKASI -->
-                <div class="settings-group">
-                    <label for="notifTimeInput">⏰ Pengingat Jadwal Besok</label>
-                    <div class="desc">Pilih jam notifikasi harian. Notifikasi akan muncul otomatis setiap hari (Senin–Sabtu) pada jam yang dipilih.</div>
-                    <input type="time" id="notifTimeInput" value="18:00" />
-                    <div class="notif-actions">
-                        <button class="btn-activate" id="notifActivateNow">Aktifkan Sekarang</button>
-                        <button class="btn-later" id="notifActivateLater">Aktifkan Nanti</button>
-                        <button class="btn-deactivate" id="notifDeactivate">Nonaktifkan</button>
+            <!-- ===== PAGE CHAT ===== -->
+            <div id="page-chat" class="page-content">
+                <div class="page-chat-wrapper">
+                    <!-- Header info -->
+                    <div class="chat-header" id="chatHeader">
+                        <span class="chat-with-label">💬 <span id="chatContactLabel">Belum ada kontak</span></span>
+                        <span class="chat-status" id="chatStatus">⏸ offline</span>
                     </div>
-                    <div class="notif-status" id="notifStatus">
-                        <span class="badge inactive" id="notifBadge">⏸ Tidak aktif</span>
-                        <span id="notifInfo">Pilih jam dan klik "Aktifkan Sekarang" untuk mengaktifkan.</span>
+
+                    <!-- Contact input -->
+                    <div class="chat-contact-row">
+                        <input type="text" id="chatContactInput" placeholder="ID teman (5 digit)" maxlength="5" inputmode="numeric" autocomplete="off" />
+                        <button id="chatConnectBtn">Hubungi</button>
+                        <div class="contact-error" id="chatContactError"></div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="empty-chat">
+                            <span class="emoji">💬</span>
+                            Masukkan ID teman untuk mulai chatting
+                        </div>
+                    </div>
+
+                    <!-- Message input -->
+                    <div class="chat-input-row">
+                        <input type="text" id="chatMsgInput" placeholder="Ketik pesan..." autocomplete="off" disabled />
+                        <button id="chatSendBtn" disabled>Kirim</button>
                     </div>
                 </div>
+            </div>
+
+            <!-- ===== PAGE PENGATURAN (clean) ===== -->
+            <div id="page-settings" class="page-content">
+                <h2>⚙️ Pengaturan</h2>
 
                 <!-- GANTI NAMA -->
                 <div class="settings-group name-change-group">
@@ -1798,31 +2056,14 @@
                     </div>
                 </div>
 
+                <!-- CHAT LOGOUT -->
+                <div class="settings-group" style="margin-top:16px;">
+                    <label>🔐 Chat</label>
+                    <div class="desc">Keluar dari chat dan hapus data login lokal.</div>
+                    <button id="chatLogoutBtn" style="padding:10px 20px;background:#e74c3c;color:#fff;border:none;border-radius:12px;font-weight:500;font-size:0.95rem;cursor:pointer;font-family:'Roboto',sans-serif;width:100%;">Logout dari Chat</button>
+                </div>
+
                 <p style="margin-top: 20px; color: #999; font-size: 14px;">Pengaturan lainnya (tema, notifikasi) dalam pengembangan.</p>
-            </div>
-
-            <!-- ============================================================
-            PAGE GALERI — COVERFLOW 3D
-            ============================================================ -->
-            <div id="page-gallery" class="page-content">
-                <div class="gallery-container" id="galleryContainer">
-                    <div class="gallery-slider" id="gallerySlider"></div>
-                    <div class="gallery-indicator" id="galleryIndicator"></div>
-                    <button class="gallery-nav-btn prev" id="galleryPrev">‹</button>
-                    <button class="gallery-nav-btn next" id="galleryNext">›</button>
-                </div>
-            </div>
-
-            <!-- ============================================================
-            FIREFOX PROMO SECTION
-            ============================================================ -->
-            <div class="firefox-promo" id="firefoxPromo">
-                <div class="promo-inner">
-                    <img src="firefox-icon.png" alt="Firefox" class="promo-icon" id="promoIcon"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.marginLeft='0';" />
-                    <span class="promo-text">Aktifkan fitur notifikasi pelajaran di Firefox</span>
-                </div>
-                <button class="promo-btn" id="firefoxInfoBtn">Mengapa harus browser Firefox?</button>
             </div>
 
         </div>
@@ -1842,6 +2083,10 @@
                 <span class="nav-icon">🖼️</span>
                 <span class="nav-label">Galeri</span>
             </button>
+            <button class="nav-item" data-page="chat">
+                <span class="nav-icon">💬</span>
+                <span class="nav-label">Chat</span>
+            </button>
             <button class="nav-item" data-page="settings">
                 <span class="nav-icon">⚙</span>
                 <span class="nav-label">Pengaturan</span>
@@ -1849,27 +2094,6 @@
         </nav>
     </div>
     <!-- /main-content -->
-
-    <!-- ===== MODAL FIREFOX ===== -->
-    <div class="modal-overlay" id="firefoxModal">
-        <div class="modal-content">
-            <button class="modal-close" id="modalClose">&times;</button>
-            <h3>🦊 Mengapa harus browser Firefox?</h3>
-            <p>
-                Google atau Google Chrome tidak mengizinkan website untuk mengirimkan notifikasi demi keamanan ponsel kamu.
-                Oleh karena itu, saya menyarankan menggunakan aplikasi browser Firefox untuk mengaktifkan fitur notifikasi,
-                karena sebagian fitur web ini mungkin tidak berfungsi tanpa izin dari sistem Google.
-            </p>
-            <p>
-                Website ini <strong>aman</strong> untuk digunakan — saya tidak menggunakan server online,
-                sehingga tidak ada orang yang bisa masuk ke halaman website ini, termasuk developer sekalipun
-                tidak bisa mengontrol kamu.
-            </p>
-            <div class="highlight">
-                💡 Jika ada kejanggalan, silahkan laporkan saja ke Developer.
-            </div>
-        </div>
-    </div>
 
     <!-- ===== MODAL LAPORAN ===== -->
     <div class="modal-overlay" id="reportModal">
@@ -1896,6 +2120,34 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // ============================================================
+            // 0. KONFIGURASI FIREBASE (GANTI DENGAN MILIKMU)
+            // ============================================================
+            // ===== ISI DI BAWAH INI DENGAN KONFIGURASI FIREBASE KAMU =====
+            const firebaseConfig = {
+                apiKey: "AIzaSyDummyKeyGantiDenganMilikmu",
+                authDomain: "your-project.firebaseapp.com",
+                databaseURL: "https://your-project-default-rtdb.firebaseio.com",
+                projectId: "your-project",
+                storageBucket: "your-project.appspot.com",
+                messagingSenderId: "123456789",
+                appId: "1:123456789:web:abcdef"
+            };
+            // ============================================================
+
+            // Inisialisasi Firebase
+            let firebaseInitialized = false;
+            try {
+                firebase.initializeApp(firebaseConfig);
+                firebaseInitialized = true;
+                console.log('✅ Firebase initialized');
+            } catch (err) {
+                console.warn('⚠️ Firebase gagal diinisialisasi:', err);
+                // Tampilkan pesan di UI nanti
+            }
+
+            const database = firebaseInitialized ? firebase.database() : null;
+
+            // ============================================================
             // 1. ELEMEN & STATE
             // ============================================================
             const loadingScreen = document.getElementById('loading-screen');
@@ -1920,19 +2172,12 @@
                 home: document.getElementById('page-home'),
                 schedule: document.getElementById('page-schedule'),
                 gallery: document.getElementById('page-gallery'),
+                chat: document.getElementById('page-chat'),
                 settings: document.getElementById('page-settings')
             };
 
             const scheduleGrid = document.getElementById('scheduleGrid');
             const nowText = document.getElementById('nowText');
-
-            // Elemen notifikasi
-            const notifTimeInput = document.getElementById('notifTimeInput');
-            const notifActivateNow = document.getElementById('notifActivateNow');
-            const notifActivateLater = document.getElementById('notifActivateLater');
-            const notifDeactivate = document.getElementById('notifDeactivate');
-            const notifBadge = document.getElementById('notifBadge');
-            const notifInfo = document.getElementById('notifInfo');
 
             const changeNameInput = document.getElementById('changeNameInput');
             const changeNameBtn = document.getElementById('changeNameBtn');
@@ -1945,90 +2190,44 @@
             const galleryPrev = document.getElementById('galleryPrev');
             const galleryNext = document.getElementById('galleryNext');
 
-            const firefoxInfoBtn = document.getElementById('firefoxInfoBtn');
-            const firefoxModal = document.getElementById('firefoxModal');
-            const modalClose = document.getElementById('modalClose');
-
             const reportBtn = document.getElementById('reportBtn');
             const reportModal = document.getElementById('reportModal');
             const reportModalClose = document.getElementById('reportModalClose');
 
+            // --- CHAT ELEMENTS ---
+            const chatLoginOverlay = document.getElementById('chat-login-overlay');
+            const chatLoginName = document.getElementById('chat-login-name');
+            const chatLoginId = document.getElementById('chat-login-id');
+            const chatLoginError = document.getElementById('chat-login-error');
+            const chatLoginBtn = document.getElementById('chat-login-btn');
+
+            const chatContactInput = document.getElementById('chatContactInput');
+            const chatConnectBtn = document.getElementById('chatConnectBtn');
+            const chatContactError = document.getElementById('chatContactError');
+            const chatContactLabel = document.getElementById('chatContactLabel');
+            const chatStatus = document.getElementById('chatStatus');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatMsgInput = document.getElementById('chatMsgInput');
+            const chatSendBtn = document.getElementById('chatSendBtn');
+            const chatLogoutBtn = document.getElementById('chatLogoutBtn');
+
             let savedName = localStorage.getItem('ixf_user_name');
-            let longPressTimer = null;
-            let isLongPress = false;
-            let typewriterTimeout = null;
-            const NAME_TEXT = 'Umar Adi Susanto, S.Pd.M.Ling.Gr';
-            const ROLE_TEXT = 'Wali kelas';
+            let chatUser = null; // { name, id }
+            let chatRoomId = null;
+            let chatContactId = null;
+            let chatListener = null;
+            let chatTypingTimeout = null;
+
+            const pageTitles = {
+                home: 'Beranda',
+                schedule: 'Jadwal',
+                gallery: 'Galeri',
+                chat: 'Chat',
+                settings: 'Pengaturan'
+            };
 
             // ============================================================
-            // 1A. REGISTRASI SERVICE WORKER
-            // ============================================================
-            async function registerServiceWorker() {
-                try {
-                    if ('serviceWorker' in navigator) {
-                        const registration = await navigator.serviceWorker.register('sw.js', {
-                            scope: './'
-                        });
-                        console.log('✅ Service Worker berhasil didaftarkan:', registration);
-
-                        // Kirim data nama pengguna ke SW setelah register
-                        if (savedName) {
-                            await sendMessageToSW({ type: 'SET_NAME', name: savedName });
-                        }
-
-                        // Cek apakah periodic sync didukung
-                        if ('periodicSync' in registration) {
-                            try {
-                                const status = await navigator.permissions.query({
-                                    name: 'periodic-background-sync'
-                                });
-                                console.log('✅ Periodic sync permission:', status.state);
-                                if (status.state === 'granted') {
-                                    await registration.periodicSync.register('ixf-schedule-check', {
-                                        minInterval: 3600000 // 1 jam
-                                    });
-                                    console.log('✅ Periodic sync terdaftar (interval 1 jam)');
-                                }
-                            } catch (syncErr) {
-                                console.warn('⚠️ Periodic sync tidak tersedia atau gagal:', syncErr);
-                            }
-                        } else {
-                            console.log('ℹ️ Periodic sync tidak didukung browser ini.');
-                        }
-
-                        return registration;
-                    } else {
-                        console.warn('⚠️ Service Worker tidak didukung browser ini.');
-                        return null;
-                    }
-                } catch (err) {
-                    console.error('❌ Gagal registrasi Service Worker:', err);
-                    return null;
-                }
-            }
-
-            // Fungsi kirim pesan ke Service Worker
-            async function sendMessageToSW(message) {
-                try {
-                    if (navigator.serviceWorker.controller) {
-                        navigator.serviceWorker.controller.postMessage(message);
-                        console.log('📨 Pesan terkirim ke SW:', message);
-                    } else {
-                        // Jika SW belum aktif, kirim saat ready
-                        navigator.serviceWorker.ready.then(reg => {
-                            if (reg.active) {
-                                reg.active.postMessage(message);
-                                console.log('📨 Pesan terkirim ke SW (ready):', message);
-                            }
-                        });
-                    }
-                } catch (err) {
-                    console.warn('⚠️ Gagal kirim pesan ke SW:', err);
-                }
-            }
-
-            // ============================================================
-            // 2. DATA JADWAL KELAS 9F (sama seperti sebelumnya)
+            // 2. DATA JADWAL KELAS 9F
             // ============================================================
             const scheduleData = {
                 'Senin': [
@@ -2184,320 +2383,12 @@
             }
 
             // ============================================================
-            // 4. FUNGSI NOTIFIKASI (DIPERBAIKI - HARI SENIN–SABTU + SW)
+            // 4. TYPEWRITER & LONG PRESS
             // ============================================================
-            function requestNotifPermission() {
-                if (!('Notification' in window)) {
-                    console.warn('Browser tidak mendukung Notification API');
-                    return false;
-                }
-                if (Notification.permission === 'granted') return true;
-                if (Notification.permission === 'denied') {
-                    notifBadge.textContent = '⛔ Diblokir';
-                    notifBadge.className = 'badge inactive';
-                    notifInfo.textContent = 'Izin notifikasi ditolak. Ubah di pengaturan browser.';
-                    return false;
-                }
-                Notification.requestPermission().then(perm => {
-                    if (perm === 'granted') {
-                        notifBadge.textContent = '✅ Aktif';
-                        notifBadge.className = 'badge';
-                        notifInfo.textContent = `Notifikasi akan muncul pada jam yang dipilih (Senin–Sabtu).`;
-                        // Kirim ke SW bahwa izin diberikan
-                        sendMessageToSW({ type: 'PERMISSION_GRANTED' });
-                    } else {
-                        notifBadge.textContent = '⛔ Diblokir';
-                        notifBadge.className = 'badge inactive';
-                        notifInfo.textContent = 'Izin notifikasi ditolak.';
-                    }
-                });
-                return false;
-            }
+            let typewriterTimeout = null;
+            const NAME_TEXT = 'Umar Adi Susanto, S.Pd.M.Ling.Gr';
+            const ROLE_TEXT = 'Wali kelas';
 
-            function getMapelListForDay(dayName) {
-                const lessons = scheduleData[dayName] || [];
-                if (dayName === 'Jumat') {
-                    const p5 = lessons[0];
-                    return p5 ? [p5.mapel] : ['P5'];
-                }
-                return lessons.map(l => l.mapel);
-            }
-
-            function isTomorrowSunday() {
-                const today = new Date();
-                const tomorrow = new Date(today);
-                tomorrow.setDate(today.getDate() + 1);
-                return tomorrow.getDay() === 0;
-            }
-
-            // Kirim notifikasi via Service Worker (background)
-            async function sendNotificationViaSW(title, body, icon) {
-                try {
-                    await sendMessageToSW({
-                        type: 'SHOW_NOTIFICATION',
-                        title: title,
-                        body: body,
-                        icon: icon || 'logokelas.png'
-                    });
-                    console.log('📨 Notifikasi dikirim via SW:', title);
-                } catch (err) {
-                    console.warn('⚠️ Gagal kirim notifikasi via SW, fallback ke Notification API:', err);
-                    // Fallback ke Notification API biasa
-                    if ('Notification' in window && Notification.permission === 'granted') {
-                        try {
-                            const notif = new Notification(title, {
-                                body: body,
-                                icon: icon || 'logokelas.png',
-                                tag: 'ixf-schedule-reminder',
-                                requireInteraction: true
-                            });
-                            setTimeout(() => notif.close(), 30000);
-                        } catch (e) {
-                            console.warn('Fallback notifikasi gagal:', e);
-                        }
-                    }
-                }
-            }
-
-            function sendNotification() {
-                if (!('Notification' in window) && !('serviceWorker' in navigator)) {
-                    console.warn('Notifikasi tidak didukung.');
-                    return;
-                }
-
-                // Jangan kirim jika besok Minggu
-                if (isTomorrowSunday()) {
-                    console.log('Besok Minggu, notifikasi tidak dikirim.');
-                    return;
-                }
-
-                const userName = savedName || 'Teman';
-                const todayIdx = getTodayIndex();
-                let tomorrowIdx = todayIdx + 1;
-                let tomorrowName;
-                if (tomorrowIdx > 5) {
-                    tomorrowName = 'Minggu';
-                } else {
-                    tomorrowName = dayNames[tomorrowIdx];
-                }
-
-                let title = `📚 IXF - Pengingat Jadwal`;
-                let body = '';
-
-                if (tomorrowName === 'Minggu') {
-                    body = `Hai ${userName}, selamat berlibur ya, istirahat terlebih dahulu agar Senin besok semangat buat belajar lagi di 9F ♥️`;
-                } else {
-                    const mapels = getMapelListForDay(tomorrowName);
-                    const listMapel = mapels.length > 0 ? mapels.join(', ') : 'Tidak ada pelajaran';
-                    body = `Hai ${userName}, udah siap buat menyambut pelajaran baru besok? 📖\n${listMapel}`;
-                }
-
-                // Kirim via Service Worker jika tersedia
-                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                    sendNotificationViaSW(title, body, 'logokelas.png');
-                } else if ('Notification' in window && Notification.permission === 'granted') {
-                    try {
-                        const notif = new Notification(title, {
-                            body: body,
-                            icon: 'logokelas.png',
-                            tag: 'ixf-schedule-reminder',
-                            requireInteraction: true
-                        });
-                        setTimeout(() => notif.close(), 30000);
-                    } catch (e) {
-                        console.warn('Gagal menampilkan notifikasi:', e);
-                    }
-                } else {
-                    console.log('ℹ️ Notifikasi tidak dapat ditampilkan (izin belum diberikan).');
-                }
-            }
-
-            // ============================================================
-            // 5. STATE NOTIFIKASI (PAGE-BASED + SW)
-            // ============================================================
-            let notifInterval = null;
-            let lastNotifDate = null;
-
-            function startNotificationChecker() {
-                if (notifInterval) clearInterval(notifInterval);
-                notifInterval = setInterval(checkNotificationTime, 60000);
-                checkNotificationTime();
-            }
-
-            function stopNotificationChecker() {
-                if (notifInterval) {
-                    clearInterval(notifInterval);
-                    notifInterval = null;
-                }
-            }
-
-            function checkNotificationTime() {
-                const savedTime = localStorage.getItem('ixf_notif_time');
-                if (!savedTime) return;
-
-                const now = new Date();
-                const nowStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-
-                if (nowStr === savedTime) {
-                    const todayStr = now.toDateString();
-                    if (lastNotifDate !== todayStr) {
-                        sendNotification();
-                        lastNotifDate = todayStr;
-                        console.log(`✅ Notifikasi dikirim pada ${nowStr} (page-based)`);
-                    }
-                }
-            }
-
-            // ============================================================
-            // 6. AKTIVASI / NONAKTIVASI NOTIFIKASI (dengan SW sync)
-            // ============================================================
-            async function activateNotification(time, startToday = true) {
-                if (!time) {
-                    alert('Silakan pilih jam terlebih dahulu.');
-                    return;
-                }
-
-                // Minta izin notifikasi
-                const perm = requestNotifPermission();
-
-                // Simpan di localStorage
-                localStorage.setItem('ixf_notif_time', time);
-                if (startToday) {
-                    lastNotifDate = null;
-                } else {
-                    lastNotifDate = new Date().toDateString();
-                }
-
-                // Kirim ke Service Worker
-                await sendMessageToSW({
-                    type: 'SET_NOTIF_TIME',
-                    time: time,
-                    userName: savedName || 'Teman'
-                });
-
-                // Kirim juga data jadwal ke SW agar bisa generate notifikasi
-                await sendMessageToSW({
-                    type: 'SET_SCHEDULE_DATA',
-                    data: scheduleData
-                });
-
-                updateNotifUI();
-                startNotificationChecker();
-
-                const msg = startToday ?
-                    `Notifikasi diaktifkan untuk pukul ${time} (mulai hari ini).` :
-                    `Notifikasi diaktifkan untuk pukul ${time} (mulai besok).`;
-                notifInfo.textContent = msg + ' (Senin–Sabtu)';
-                notifBadge.textContent = '🔔 Aktif';
-                notifBadge.className = 'badge';
-
-                if (Notification.permission !== 'granted') {
-                    notifInfo.textContent += ' Namun izin notifikasi belum diberikan, notifikasi mungkin tidak muncul.';
-                }
-
-                // Daftarkan periodic sync ulang
-                try {
-                    if ('serviceWorker' in navigator && 'periodicSync' in await navigator.serviceWorker.ready) {
-                        const reg = await navigator.serviceWorker.ready;
-                        if (reg.periodicSync) {
-                            await reg.periodicSync.register('ixf-schedule-check', {
-                                minInterval: 3600000
-                            });
-                            console.log('✅ Periodic sync diperbarui');
-                        }
-                    }
-                } catch (syncErr) {
-                    console.warn('⚠️ Gagal mendaftarkan periodic sync:', syncErr);
-                }
-            }
-
-            function deactivateNotification() {
-                localStorage.removeItem('ixf_notif_time');
-                lastNotifDate = null;
-                stopNotificationChecker();
-                updateNotifUI();
-                notifInfo.textContent = 'Notifikasi dinonaktifkan.';
-                notifBadge.textContent = '⏸ Tidak aktif';
-                notifBadge.className = 'badge inactive';
-
-                // Kirim ke SW
-                sendMessageToSW({ type: 'DEACTIVATE_NOTIF' });
-
-                // Hapus periodic sync
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.ready.then(reg => {
-                        if (reg.periodicSync) {
-                            reg.periodicSync.unregister('ixf-schedule-check')
-                                .then(() => console.log('✅ Periodic sync dihapus'))
-                                .catch(err => console.warn('⚠️ Gagal hapus periodic sync:', err));
-                        }
-                    });
-                }
-            }
-
-            function updateNotifUI() {
-                const savedTime = localStorage.getItem('ixf_notif_time');
-                if (savedTime) {
-                    notifTimeInput.value = savedTime;
-                    notifBadge.textContent = '🔔 Aktif';
-                    notifBadge.className = 'badge';
-                    notifInfo.textContent = `Notifikasi setiap hari pukul ${savedTime} (Senin–Sabtu)`;
-                } else {
-                    notifTimeInput.value = '';
-                    notifBadge.textContent = '⏸ Tidak aktif';
-                    notifBadge.className = 'badge inactive';
-                    notifInfo.textContent = 'Pilih jam dan klik "Aktifkan Sekarang" untuk mengaktifkan.';
-                }
-            }
-
-            // Event listener notifikasi
-            notifActivateNow.addEventListener('click', function() {
-                const time = notifTimeInput.value;
-                if (!time) {
-                    alert('Silakan pilih jam terlebih dahulu.');
-                    return;
-                }
-                activateNotification(time, true);
-            });
-
-            notifActivateLater.addEventListener('click', function() {
-                const time = notifTimeInput.value;
-                if (!time) {
-                    alert('Silakan pilih jam terlebih dahulu.');
-                    return;
-                }
-                activateNotification(time, false);
-            });
-
-            notifDeactivate.addEventListener('click', function() {
-                deactivateNotification();
-            });
-
-            // Inisialisasi
-            updateNotifUI();
-            if (localStorage.getItem('ixf_notif_time')) {
-                startNotificationChecker();
-                lastNotifDate = new Date().toDateString();
-                // Kirim data ke SW setelah registrasi
-                setTimeout(() => {
-                    const time = localStorage.getItem('ixf_notif_time');
-                    if (time) {
-                        sendMessageToSW({
-                            type: 'SET_NOTIF_TIME',
-                            time: time,
-                            userName: savedName || 'Teman'
-                        });
-                        sendMessageToSW({
-                            type: 'SET_SCHEDULE_DATA',
-                            data: scheduleData
-                        });
-                    }
-                }, 2000);
-            }
-
-            // ============================================================
-            // 7. TYPEWRITER & LONG PRESS (sama seperti sebelumnya)
-            // ============================================================
             function typeWriter(text, element, speed = 55, callback) {
                 let i = 0;
                 element.textContent = '';
@@ -2526,8 +2417,10 @@
                 teacherNameEl.textContent = '';
                 teacherRoleEl.classList.remove('visible');
                 photoWrapper.classList.remove('active');
-                isLongPress = false;
             }
+
+            let longPressTimer = null;
+            let isLongPress = false;
 
             function startLongPress(e) {
                 if (e.type === 'touchstart' && e.touches.length > 1) return;
@@ -2566,7 +2459,7 @@
             photoWrapper.addEventListener('mouseleave', endLongPress);
 
             // ============================================================
-            // 8. PENCARIAN (sama seperti sebelumnya)
+            // 5. PENCARIAN SISWA
             // ============================================================
             const studentData = [
                 { no: 1, name: 'AFFLAH INTAN NOOR IZZAH' },
@@ -2631,15 +2524,8 @@
             });
 
             // ============================================================
-            // 9. NAVIGASI
+            // 6. NAVIGASI
             // ============================================================
-            const pageTitles = {
-                home: 'Beranda',
-                schedule: 'Jadwal',
-                gallery: 'Galeri',
-                settings: 'Pengaturan'
-            };
-
             function navigateTo(pageId) {
                 Object.keys(pages).forEach(key => {
                     pages[key].classList.remove('active');
@@ -2661,6 +2547,19 @@
                 if (pageId === 'gallery') {
                     updateGallery();
                 }
+                if (pageId === 'chat') {
+                    // Jika belum login chat, tampilkan overlay
+                    if (!chatUser) {
+                        chatLoginOverlay.classList.add('active');
+                    } else {
+                        chatLoginOverlay.classList.remove('active');
+                        // Refresh chat UI
+                        updateChatUI();
+                        if (chatRoomId) {
+                            listenMessages(chatRoomId);
+                        }
+                    }
+                }
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -2674,9 +2573,9 @@
             navTitle.textContent = 'Beranda';
 
             // ============================================================
-            // 10. ENTER APP & NAMA
+            // 7. ENTER APP & NAMA AWAL
             // ============================================================
-            async function enterApp() {
+            function enterApp() {
                 loadingScreen.classList.add('hidden');
                 mainContent.classList.add('visible');
                 nameOverlay.classList.remove('active');
@@ -2690,46 +2589,23 @@
 
                 renderResults(studentData, '');
                 renderSchedule();
-                updateNotifUI();
                 updateNameChangeUI();
                 initGallery();
 
-                // Registrasi Service Worker
-                await registerServiceWorker();
-
-                // Kirim data ke SW setelah registrasi
-                setTimeout(() => {
-                    const time = localStorage.getItem('ixf_notif_time');
-                    if (time) {
-                        sendMessageToSW({
-                            type: 'SET_NOTIF_TIME',
-                            time: time,
-                            userName: savedName || 'Teman'
-                        });
-                        sendMessageToSW({
-                            type: 'SET_SCHEDULE_DATA',
-                            data: scheduleData
-                        });
+                // Cek chat login tersimpan
+                const savedChat = localStorage.getItem('ixf_chat_user');
+                if (savedChat) {
+                    try {
+                        const parsed = JSON.parse(savedChat);
+                        if (parsed.name && parsed.id && /^\d{5}$/.test(parsed.id)) {
+                            chatUser = parsed;
+                            chatLoginOverlay.classList.remove('active');
+                            console.log('✅ Chat user restored:', chatUser);
+                            updateChatUI();
+                        }
+                    } catch (e) {
+                        localStorage.removeItem('ixf_chat_user');
                     }
-                    if (savedName) {
-                        sendMessageToSW({ type: 'SET_NAME', name: savedName });
-                    }
-                }, 1500);
-
-                if ('Notification' in window && Notification.permission === 'default') {
-                    setTimeout(() => {
-                        Notification.requestPermission().then(perm => {
-                            if (perm === 'granted') {
-                                updateNotifUI();
-                                sendMessageToSW({ type: 'PERMISSION_GRANTED' });
-                            }
-                        });
-                    }, 4000);
-                }
-
-                if (localStorage.getItem('ixf_notif_time')) {
-                    startNotificationChecker();
-                    lastNotifDate = new Date().toDateString();
                 }
 
                 console.log('✅ Selamat datang, ' + displayName + '!');
@@ -2748,7 +2624,7 @@
             }
 
             // ============================================================
-            // 11. INPUT NAMA (awal)
+            // 8. INPUT NAMA AWAL
             // ============================================================
             nameInput.addEventListener('input', function() {
                 const val = this.value;
@@ -2798,7 +2674,7 @@
             });
 
             // ============================================================
-            // 12. GANTI NAMA (30 hari)
+            // 9. GANTI NAMA (30 hari)
             // ============================================================
             function updateNameChangeUI() {
                 const lastChange = localStorage.getItem('ixf_name_change_date');
@@ -2870,9 +2746,6 @@
                 errorMsgChange.textContent = '';
                 changeNameInput.classList.remove('error');
 
-                // Kirim ke SW
-                sendMessageToSW({ type: 'SET_NAME', name: raw });
-
                 updateNameChangeUI();
                 alert('✅ Nama berhasil diganti menjadi "' + raw + '".');
                 updateNowText();
@@ -2881,15 +2754,15 @@
             updateNameChangeUI();
 
             // ============================================================
-            // 13. GALERI FOTO — COVERFLOW 3D (sama seperti sebelumnya)
+            // 10. GALERI FOTO
             // ============================================================
             const TOTAL_IMAGES = 43;
             let galleryIndex = 0;
             let galleryCards = [];
-            let isDragging = false;
-            let startX = 0;
-            let currentX = 0;
-            let isSwiping = false;
+            let isDraggingGallery = false;
+            let startXGallery = 0;
+            let currentXGallery = 0;
+            let isSwipingGallery = false;
 
             const imageFileNames = [
                 'IMG-20250324-WA0064.jpg',
@@ -2981,13 +2854,13 @@
             function attachGalleryEvents() {
                 const container = document.getElementById('galleryContainer');
 
-                container.addEventListener('touchstart', onTouchStart, { passive: true });
-                container.addEventListener('touchmove', onTouchMove, { passive: true });
-                container.addEventListener('touchend', onTouchEnd, { passive: true });
+                container.addEventListener('touchstart', onGalleryTouchStart, { passive: true });
+                container.addEventListener('touchmove', onGalleryTouchMove, { passive: true });
+                container.addEventListener('touchend', onGalleryTouchEnd, { passive: true });
 
-                container.addEventListener('mousedown', onMouseDown);
-                window.addEventListener('mousemove', onMouseMove);
-                window.addEventListener('mouseup', onMouseUp);
+                container.addEventListener('mousedown', onGalleryMouseDown);
+                window.addEventListener('mousemove', onGalleryMouseMove);
+                window.addEventListener('mouseup', onGalleryMouseUp);
 
                 galleryPrev.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -3011,69 +2884,69 @@
                 });
             }
 
-            function onTouchStart(e) {
+            function onGalleryTouchStart(e) {
                 if (e.touches.length === 1) {
-                    isDragging = true;
-                    startX = e.touches[0].clientX;
-                    currentX = startX;
-                    isSwiping = false;
+                    isDraggingGallery = true;
+                    startXGallery = e.touches[0].clientX;
+                    currentXGallery = startXGallery;
+                    isSwipingGallery = false;
                 }
             }
 
-            function onTouchMove(e) {
-                if (!isDragging || e.touches.length !== 1) return;
+            function onGalleryTouchMove(e) {
+                if (!isDraggingGallery || e.touches.length !== 1) return;
                 const touch = e.touches[0];
-                currentX = touch.clientX;
-                const delta = currentX - startX;
+                currentXGallery = touch.clientX;
+                const delta = currentXGallery - startXGallery;
                 if (Math.abs(delta) > 10) {
-                    isSwiping = true;
+                    isSwipingGallery = true;
                 }
             }
 
-            function onTouchEnd(e) {
-                if (!isDragging) return;
-                isDragging = false;
-                if (isSwiping) {
-                    const delta = currentX - startX;
+            function onGalleryTouchEnd(e) {
+                if (!isDraggingGallery) return;
+                isDraggingGallery = false;
+                if (isSwipingGallery) {
+                    const delta = currentXGallery - startXGallery;
                     if (delta < -30) {
                         goToImage(galleryIndex + 1);
                     } else if (delta > 30) {
                         goToImage(galleryIndex - 1);
                     }
                 }
-                isSwiping = false;
+                isSwipingGallery = false;
             }
 
-            function onMouseDown(e) {
+            function onGalleryMouseDown(e) {
                 if (e.button !== 0) return;
-                isDragging = true;
-                startX = e.clientX;
-                currentX = startX;
-                isSwiping = false;
+                isDraggingGallery = true;
+                startXGallery = e.clientX;
+                currentXGallery = startXGallery;
+                isSwipingGallery = false;
                 e.preventDefault();
             }
 
-            function onMouseMove(e) {
-                if (!isDragging) return;
-                currentX = e.clientX;
-                const delta = currentX - startX;
+            function onGalleryMouseMove(e) {
+                if (!isDraggingGallery) return;
+                currentXGallery = e.clientX;
+                const delta = currentXGallery - startXGallery;
                 if (Math.abs(delta) > 10) {
-                    isSwiping = true;
+                    isSwipingGallery = true;
                 }
             }
 
-            function onMouseUp(e) {
-                if (!isDragging) return;
-                isDragging = false;
-                if (isSwiping) {
-                    const delta = currentX - startX;
+            function onGalleryMouseUp(e) {
+                if (!isDraggingGallery) return;
+                isDraggingGallery = false;
+                if (isSwipingGallery) {
+                    const delta = currentXGallery - startXGallery;
                     if (delta < -30) {
                         goToImage(galleryIndex + 1);
                     } else if (delta > 30) {
                         goToImage(galleryIndex - 1);
                     }
                 }
-                isSwiping = false;
+                isSwipingGallery = false;
             }
 
             function goToImage(newIndex) {
@@ -3112,35 +2985,365 @@
             }
 
             // ============================================================
-            // 14. FIREFOX PROMO - MODAL
+            // 11. CHAT — LOGIN
             // ============================================================
-            function openModal() {
-                firefoxModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
+            function validateChatId(id) {
+                return /^\d{5}$/.test(id);
             }
 
-            function closeModal() {
-                firefoxModal.classList.remove('active');
-                document.body.style.overflow = '';
+            function showChatLoginError(msg) {
+                chatLoginError.textContent = msg;
             }
 
-            firefoxInfoBtn.addEventListener('click', openModal);
-            modalClose.addEventListener('click', closeModal);
+            function clearChatLoginError() {
+                chatLoginError.textContent = '';
+                chatLoginName.classList.remove('error');
+                chatLoginId.classList.remove('error');
+            }
 
-            firefoxModal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal();
+            chatLoginName.addEventListener('input', function() {
+                clearChatLoginError();
+            });
+            chatLoginId.addEventListener('input', function() {
+                clearChatLoginError();
+                // Hanya angka
+                this.value = this.value.replace(/\D/g, '');
+                if (this.value.length > 5) this.value = this.value.slice(0, 5);
+            });
+
+            chatLoginBtn.addEventListener('click', function() {
+                const name = chatLoginName.value.trim();
+                const id = chatLoginId.value.trim();
+
+                if (!name) {
+                    showChatLoginError('Masukkan nama kamu.');
+                    chatLoginName.classList.add('error');
+                    return;
+                }
+                if (!validateChatId(id)) {
+                    showChatLoginError('ID harus 5 digit angka (contoh: 10542).');
+                    chatLoginId.classList.add('error');
+                    return;
+                }
+
+                // Simpan
+                chatUser = { name: name, id: id };
+                localStorage.setItem('ixf_chat_user', JSON.stringify(chatUser));
+
+                chatLoginOverlay.classList.remove('active');
+                clearChatLoginError();
+                updateChatUI();
+
+                // Reset chat state
+                chatRoomId = null;
+                chatContactId = null;
+                chatContactInput.value = '';
+                chatMessages.innerHTML =
+                    `<div class="empty-chat"><span class="emoji">💬</span>Masukkan ID teman untuk mulai chatting</div>`;
+                chatContactLabel.textContent = 'Belum ada kontak';
+                chatStatus.textContent = '⏸ offline';
+                chatStatus.className = 'chat-status';
+                chatMsgInput.disabled = true;
+                chatSendBtn.disabled = true;
+
+                console.log('✅ Chat login sebagai:', chatUser);
+            });
+
+            // Enter key pada login
+            chatLoginId.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    chatLoginBtn.click();
+                }
+            });
+            chatLoginName.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    chatLoginId.focus();
                 }
             });
 
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && firefoxModal.classList.contains('active')) {
-                    closeModal();
+            // ============================================================
+            // 12. CHAT — KONEK KE KONTAK
+            // ============================================================
+            chatContactInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '');
+                if (this.value.length > 5) this.value = this.value.slice(0, 5);
+                chatContactError.textContent = '';
+                this.classList.remove('error');
+            });
+
+            chatConnectBtn.addEventListener('click', function() {
+                connectToContact();
+            });
+
+            chatContactInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    connectToContact();
+                }
+            });
+
+            function connectToContact() {
+                if (!chatUser) {
+                    chatLoginOverlay.classList.add('active');
+                    return;
+                }
+                if (!firebaseInitialized || !database) {
+                    chatContactError.textContent = '⚠️ Firebase tidak terhubung. Periksa konfigurasi.';
+                    return;
+                }
+
+                const contactId = chatContactInput.value.trim();
+
+                if (!validateChatId(contactId)) {
+                    chatContactError.textContent = 'ID teman harus 5 digit angka.';
+                    chatContactInput.classList.add('error');
+                    return;
+                }
+
+                if (contactId === chatUser.id) {
+                    chatContactError.textContent = 'Kamu tidak bisa chat dengan diri sendiri.';
+                    chatContactInput.classList.add('error');
+                    return;
+                }
+
+                chatContactError.textContent = '';
+                chatContactInput.classList.remove('error');
+
+                // Buat room ID: gabungan dua ID yang di-sort
+                const ids = [chatUser.id, contactId].sort();
+                const roomId = ids[0] + '_' + ids[1];
+
+                chatRoomId = roomId;
+                chatContactId = contactId;
+
+                // Update UI
+                chatContactLabel.textContent = 'Chat dengan ID ' + contactId;
+                chatStatus.textContent = '🟢 online';
+                chatStatus.className = 'chat-status online';
+                chatMsgInput.disabled = false;
+                chatSendBtn.disabled = false;
+                chatMsgInput.focus();
+
+                // Hentikan listener lama
+                if (chatListener) {
+                    database.ref('chats/' + chatRoomId + '/messages').off();
+                    chatListener = null;
+                }
+
+                // Mulai listen
+                listenMessages(roomId);
+
+                console.log('🔗 Terhubung ke room:', roomId);
+            }
+
+            // ============================================================
+            // 13. CHAT — LISTEN & SEND MESSAGES
+            // ============================================================
+            function listenMessages(roomId) {
+                if (!database) return;
+
+                const messagesRef = database.ref('chats/' + roomId + '/messages');
+
+                // Hentikan listener lama
+                if (chatListener) {
+                    messagesRef.off();
+                    chatListener = null;
+                }
+
+                chatListener = messagesRef.orderByChild('timestamp').limitToLast(100);
+
+                chatListener.on('value', function(snapshot) {
+                    const data = snapshot.val();
+                    renderMessages(data);
+                }, function(error) {
+                    console.warn('⚠️ Gagal listen messages:', error);
+                });
+
+                console.log('📡 Listening to room:', roomId);
+            }
+
+            function renderMessages(data) {
+                if (!data) {
+                    chatMessages.innerHTML =
+                        `<div class="empty-chat"><span class="emoji">💬</span>Belum ada pesan. Kirim pesan pertama!</div>`;
+                    return;
+                }
+
+                const keys = Object.keys(data);
+                if (keys.length === 0) {
+                    chatMessages.innerHTML =
+                        `<div class="empty-chat"><span class="emoji">💬</span>Belum ada pesan. Kirim pesan pertama!</div>`;
+                    return;
+                }
+
+                // Sort by timestamp
+                const sorted = keys.map(key => ({ key, ...data[key] }))
+                    .filter(msg => msg.text && msg.text.trim() !== '')
+                    .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+                if (sorted.length === 0) {
+                    chatMessages.innerHTML =
+                        `<div class="empty-chat"><span class="emoji">💬</span>Belum ada pesan. Kirim pesan pertama!</div>`;
+                    return;
+                }
+
+                let html = '';
+                for (let msg of sorted) {
+                    const isOwn = (msg.senderId === chatUser.id);
+                    const senderName = msg.senderName || 'Teman';
+                    const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) : '';
+
+                    html += `<div class="chat-msg ${isOwn ? 'own' : 'other'}">`;
+                    if (!isOwn) {
+                        html += `<div class="msg-sender">${senderName}</div>`;
+                    }
+                    html += `<div class="msg-text">${escapeHtml(msg.text)}</div>`;
+                    if (time) {
+                        html += `<div class="msg-time">${time}</div>`;
+                    }
+                    html += `</div>`;
+                }
+
+                chatMessages.innerHTML = html;
+                // Scroll ke bawah
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Kirim pesan
+            chatSendBtn.addEventListener('click', function() {
+                sendMessage();
+            });
+
+            chatMsgInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            function sendMessage() {
+                if (!chatUser || !chatRoomId || !database) {
+                    if (!chatUser) chatLoginOverlay.classList.add('active');
+                    return;
+                }
+
+                const text = chatMsgInput.value.trim();
+                if (!text) return;
+
+                // Disable tombol sementara
+                chatSendBtn.disabled = true;
+
+                const messagesRef = database.ref('chats/' + chatRoomId + '/messages');
+                const newMsg = {
+                    senderId: chatUser.id,
+                    senderName: chatUser.name,
+                    text: text,
+                    timestamp: Date.now()
+                };
+
+                messagesRef.push(newMsg)
+                    .then(() => {
+                        chatMsgInput.value = '';
+                        chatSendBtn.disabled = false;
+                        chatMsgInput.focus();
+                        // Scroll ke bawah akan otomatis lewat listener
+                    })
+                    .catch((err) => {
+                        console.error('❌ Gagal kirim pesan:', err);
+                        chatSendBtn.disabled = false;
+                        alert('Gagal mengirim pesan. Periksa koneksi internet.');
+                    });
+            }
+
+            // ============================================================
+            // 14. CHAT — UPDATE UI
+            // ============================================================
+            function updateChatUI() {
+                if (chatUser) {
+                    chatContactLabel.textContent = chatUser.name + ' (ID: ' + chatUser.id + ')';
+                    // Jika ada room aktif, tampilkan
+                    if (chatRoomId && chatContactId) {
+                        chatContactLabel.textContent = 'Chat dengan ID ' + chatContactId;
+                        chatStatus.textContent = '🟢 online';
+                        chatStatus.className = 'chat-status online';
+                        chatMsgInput.disabled = false;
+                        chatSendBtn.disabled = false;
+                    } else {
+                        chatStatus.textContent = '⏸ offline';
+                        chatStatus.className = 'chat-status';
+                        chatMsgInput.disabled = true;
+                        chatSendBtn.disabled = true;
+                    }
+                } else {
+                    chatContactLabel.textContent = 'Belum login';
+                    chatStatus.textContent = '⏸ offline';
+                    chatStatus.className = 'chat-status';
+                    chatMsgInput.disabled = true;
+                    chatSendBtn.disabled = true;
+                }
+            }
+
+            // ============================================================
+            // 15. CHAT — LOGOUT
+            // ============================================================
+            chatLogoutBtn.addEventListener('click', function() {
+                if (confirm('Yakin ingin logout dari chat?')) {
+                    // Hentikan listener
+                    if (chatListener && database && chatRoomId) {
+                        database.ref('chats/' + chatRoomId + '/messages').off();
+                        chatListener = null;
+                    }
+                    localStorage.removeItem('ixf_chat_user');
+                    chatUser = null;
+                    chatRoomId = null;
+                    chatContactId = null;
+                    chatContactInput.value = '';
+                    chatMessages.innerHTML =
+                        `<div class="empty-chat"><span class="emoji">💬</span>Masukkan ID teman untuk mulai chatting</div>`;
+                    chatContactLabel.textContent = 'Belum ada kontak';
+                    chatStatus.textContent = '⏸ offline';
+                    chatStatus.className = 'chat-status';
+                    chatMsgInput.disabled = true;
+                    chatSendBtn.disabled = true;
+                    chatLoginOverlay.classList.add('active');
+                    chatLoginName.value = '';
+                    chatLoginId.value = '';
+                    console.log('🔴 Chat logout');
                 }
             });
 
             // ============================================================
-            // 15. REPORT / LAPORAN BUG
+            // 16. CHAT — OVERLAY OTOMATIS
+            // ============================================================
+            // Jika klik chat tapi belum login, tampilkan overlay
+            document.querySelector('[data-page="chat"]').addEventListener('click', function() {
+                if (!chatUser) {
+                    setTimeout(() => {
+                        chatLoginOverlay.classList.add('active');
+                    }, 200);
+                }
+            });
+
+            // Tutup overlay jika klik di luar card
+            chatLoginOverlay.addEventListener('click', function(e) {
+                if (e.target === this && chatUser) {
+                    this.classList.remove('active');
+                }
+            });
+
+            // ============================================================
+            // 17. REPORT / LAPORAN BUG
             // ============================================================
             function openReportModal() {
                 reportModal.classList.add('active');
@@ -3175,7 +3378,7 @@
             });
 
             // ============================================================
-            // 16. UPDATE JADWAL DAN NOTIFIKASI PERIODIK
+            // 18. UPDATE JADWAL PERIODIK
             // ============================================================
             setInterval(() => {
                 if (document.getElementById('page-schedule').classList.contains('active')) {
@@ -3184,7 +3387,69 @@
                 updateNowText();
             }, 30000);
 
-            console.log('✅ IXF SPA dengan Service Worker siap!');
+            console.log('✅ IXF SPA dengan Chat & Firebase siap!');
+
+            // ============================================================
+            // 19. CEK FIREBASE INIT
+            // ============================================================
+            if (!firebaseInitialized) {
+                console.warn('⚠️ Firebase tidak terinisialisasi. Chat tidak akan berfungsi.');
+                // Tampilkan pesan di chat
+                setTimeout(() => {
+                    const chatPage = document.getElementById('page-chat');
+                    if (chatPage) {
+                        const wrapper = chatPage.querySelector('.page-chat-wrapper');
+                        if (wrapper) {
+                            const warn = document.createElement('div');
+                            warn.style.cssText =
+                                'background:#fff3cd;color:#856404;padding:12px 16px;border-radius:12px;margin-bottom:12px;font-size:0.9rem;border:1px solid #ffc107;';
+                            warn.textContent =
+                                '⚠️ Firebase belum dikonfigurasi. Chat tidak akan berfungsi. Edit firebaseConfig di bagian atas script.';
+                            wrapper.prepend(warn);
+                        }
+                    }
+                }, 1000);
+            }
+
+            // ============================================================
+            // 20. PANDUAN PEMBERSIHAN KODE LAMA (di console)
+            // ============================================================
+            console.log(`
+        ═══════════════════════════════════════════════════════════════
+        🧹  PANDUAN PEMBERSIHAN KODE LAMA (Notifikasi & Firefox)
+        ═══════════════════════════════════════════════════════════════
+
+        HAPUS bagian-bagian berikut dari file index.html:
+
+        1.  ELEMEN HTML:
+            - .settings-group yang berisi notifikasi (input time, tombol)
+            - .firefox-promo (seluruh div)
+            - #firefoxModal (seluruh modal)
+
+        2.  CSS:
+            - Aturan untuk .firefox-promo, .promo-*, .modal-content (kecuali report-modal)
+            - Aturan untuk .settings-group .notif-* (jika ada)
+
+        3.  JAVASCRIPT:
+            - requestNotifPermission()
+            - sendNotification()
+            - sendNotificationViaSW()
+            - checkNotificationTime()
+            - startNotificationChecker()
+            - stopNotificationChecker()
+            - activateNotification()
+            - deactivateNotification()
+            - updateNotifUI()
+            - Event listener notifikasi (notifActivateNow, etc)
+            - Variabel notifInterval, lastNotifDate
+            - Kode yang memanggil fungsi-fungsi di atas
+
+        4.  MANIFEST / SW (opsional):
+            - Jika tidak pakai notifikasi, hapus periodic sync di sw.js
+            - Atau biarkan saja, tidak mengganggu
+
+        ═══════════════════════════════════════════════════════════════
+        `);
         });
     </script>
 </body>
