@@ -9,33 +9,151 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-    <!-- ===== MANIFEST UNTUK PWA & PERIODIC SYNC ===== -->
     <link rel="manifest" href="manifest.json">
 
-    <!-- ===== FIREBASE SDK (REALTIME DATABASE) ===== -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
     </script>
 
     <style>
-        /* ===== VARIABEL GLOBAL ===== */
+        /* ===== ROOT VARIABLES (LIGHT MODE) ===== */
         :root {
-            --hero-height: 700px;
-            --curve-height: 70px;
             --bottom-nav-height: 64px;
-            --primary: #0a1e3c;
-            --primary-light: #1a3a6a;
+            --search-header-height: 64px;
+
+            /* Colors */
+            --primary: #a67c52;
+            --primary-light: #d4b896;
             --accent: #2d7d46;
             --accent-light: #e6f4ea;
             --bg-card: #f8fafc;
             --border-radius: 16px;
-            --chat-bg-own: #d4f1d4;
-            --chat-bg-other: #f0f0f0;
-            --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.06);
+            --indicator-color: #c8a98e;
+
+            /* Dark mode overrides will be applied via .dark-mode */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-elevated: #ffffff;
+            --bg-input: #f9f9f9;
+            --bg-hover: #f0f0f0;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            --text-muted: #888888;
+            --text-light: #999999;
+            --border-color: #eeeeee;
+            --shadow-color: rgba(0, 0, 0, 0.06);
+            --shadow-strong: rgba(0, 0, 0, 0.08);
+            --nav-bg: rgba(255, 255, 255, 0.25);
+            --nav-border: rgba(255, 255, 255, 0.3);
+            --search-bg: rgba(255, 255, 255, 0.12);
+            --search-focus: rgba(255, 255, 255, 0.20);
+            --dropdown-bg: rgba(255, 255, 255, 0.7);
+            --dropdown-border: rgba(255, 255, 255, 0.3);
+            --modal-overlay: rgba(0, 0, 0, 0.6);
+            --toast-bg: rgba(0, 0, 0, 0.75);
+            --schedule-now-bg: var(--bg-card);
+            --day-card-bg: #ffffff;
+            --subject-bg: #f5f7fa;
+            --subject-hover: rgba(166, 124, 82, 0.08);
+            --subject-active: rgba(166, 124, 82, 0.15);
+            --badge-bg: rgba(166, 124, 82, 0.15);
+            --badge-text: var(--primary);
+            --student-item-bg: #f9f9f9;
+            --student-item-hover: #f0f0f0;
+            --settings-group-bg: var(--bg-card);
+            --settings-nav-hover: #f0f4f8;
+            --name-change-info-bg: #f0f4f8;
+            --option-bg: #ffffff;
+            --placeholder-icon: #bbb;
+            --toggle-bg: #ddd;
+            --toggle-thumb: #fff;
+            --toggle-on: var(--primary-light);
+            --arrow-color: #ccc;
+            --badge-placeholder-bg: #f0f0f0;
+            --badge-placeholder-text: #999;
+            --back-btn-hover: #f0f0f0;
+            --modal-close-hover: #f0f0f0;
+            --photo-bg: transparent;
+
+            /* Feed-specific */
+            --feed-post-bg: var(--bg-elevated);
+            --feed-avatar-size: 44px;
+            --feed-media-radius: 16px;
+
+            /* Global font variable */
+            --global-font: 'Roboto', sans-serif;
         }
 
-        /* ===== RESET ===== */
+        /* ===== DARK MODE OVERRIDES ===== */
+        .dark-mode {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-elevated: #2a2a2a;
+            --bg-input: #2a2a2a;
+            --bg-hover: #333333;
+            --text-primary: #e0e0e0;
+            --text-secondary: #aaaaaa;
+            --text-muted: #777777;
+            --text-light: #666666;
+            --border-color: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --shadow-strong: rgba(0, 0, 0, 0.6);
+            --nav-bg: transparent;
+            --nav-border: rgba(255, 255, 255, 0.05);
+            --search-bg: transparent;
+            --search-focus: transparent;
+            --dropdown-bg: transparent;
+            --dropdown-border: rgba(255, 255, 255, 0.05);
+            --modal-overlay: rgba(0, 0, 0, 0.8);
+            --toast-bg: rgba(0, 0, 0, 0.9);
+            --schedule-now-bg: #2a2a2a;
+            --day-card-bg: #2a2a2a;
+            --subject-bg: #333333;
+            --subject-hover: rgba(166, 124, 82, 0.2);
+            --subject-active: rgba(166, 124, 82, 0.3);
+            --badge-bg: rgba(166, 124, 82, 0.25);
+            --badge-text: #d4b896;
+            --student-item-bg: #2a2a2a;
+            --student-item-hover: #333333;
+            --settings-group-bg: #2a2a2a;
+            --settings-nav-hover: #333333;
+            --name-change-info-bg: #333333;
+            --option-bg: #2a2a2a;
+            --placeholder-icon: #666;
+            --toggle-bg: #444;
+            --toggle-thumb: #ccc;
+            --toggle-on: var(--primary);
+            --arrow-color: #666;
+            --badge-placeholder-bg: #444;
+            --badge-placeholder-text: #aaa;
+            --back-btn-hover: #333;
+            --modal-close-hover: #333;
+            --photo-bg: transparent;
+            --indicator-color: #8b6b4a;
+            --accent-light: #1e3a2a;
+            --bg-card: #2a2a2a;
+            --feed-post-bg: #2a2a2a;
+        }
+
+        /* Global font override */
+        * {
+            font-family: var(--global-font) !important;
+        }
+
+        .nav-icon svg,
+        .option-icon svg,
+        .settings-nav-card .nav-icon svg,
+        .gallery-nav-btn,
+        .search-icon,
+        .result-icon,
+        .modal-close,
+        .back-btn,
+        .search-clear,
+        .settings-header-btn svg {
+            font-family: inherit !important;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -50,14 +168,14 @@
 
         html,
         body {
-            background-color: #ffffff;
-            color: #1a1a1a;
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* ===== LOADING ===== */
+        /* LOADING */
         #loading-screen {
             position: fixed;
             top: 0;
@@ -111,14 +229,14 @@
             font-weight: 300;
         }
 
-        /* ===== OVERLAY INPUT NAMA (AWAL) ===== */
+        /* OVERLAY NAMA */
         #name-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: var(--modal-overlay);
             backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
@@ -130,14 +248,15 @@
             display: flex;
         }
         .name-card {
-            background: #ffffff;
+            background: var(--bg-elevated);
             border-radius: 24px;
             padding: 40px 30px;
             max-width: 400px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px var(--shadow-strong);
             animation: fadeUp 0.4s ease;
+            border: 1px solid var(--border-color);
         }
         @keyframes fadeUp {
             from {
@@ -153,32 +272,35 @@
             font-size: 24px;
             font-weight: 500;
             margin-bottom: 8px;
-            color: #1a1a1a;
+            color: var(--text-primary);
         }
         .name-card p {
             font-size: 14px;
-            color: #666;
+            color: var(--text-muted);
             margin-bottom: 24px;
         }
         .name-card input {
             width: 100%;
             padding: 14px 16px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-color);
             border-radius: 14px;
             font-size: 18px;
             text-align: center;
             letter-spacing: 1px;
             transition: border 0.2s;
-            font-family: 'Roboto', sans-serif;
-            background: #f9f9f9;
+            background: var(--bg-input);
+            color: var(--text-primary);
         }
         .name-card input:focus {
-            border-color: #000000;
-            background: #ffffff;
+            border-color: var(--primary);
+            background: var(--bg-elevated);
         }
         .name-card input.error {
             border-color: #e74c3c;
             background: #fff5f5;
+        }
+        .dark-mode .name-card input.error {
+            background: #3a1a1a;
         }
         .name-card .error-msg {
             color: #e74c3c;
@@ -190,7 +312,7 @@
         .name-card button {
             width: 100%;
             padding: 14px;
-            background: #000000;
+            background: var(--primary);
             color: #ffffff;
             border: none;
             border-radius: 14px;
@@ -199,296 +321,291 @@
             margin-top: 16px;
             cursor: pointer;
             transition: background 0.2s;
-            font-family: 'Roboto', sans-serif;
         }
         .name-card button:hover {
-            background: #333;
+            background: #8b6b4a;
         }
         .name-card button:active {
             transform: scale(0.97);
         }
         .name-card .char-count {
             font-size: 13px;
-            color: #999;
+            color: var(--text-light);
             margin-top: 6px;
             text-align: right;
             padding-right: 4px;
         }
 
-        /* ===== OVERLAY LOGIN CHAT ===== */
-        #chat-login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10001;
-            padding: 20px;
-        }
-        #chat-login-overlay.active {
-            display: flex;
-        }
-        .chat-login-card {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 36px 28px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: fadeUp 0.4s ease;
-        }
-        .chat-login-card h2 {
-            font-size: 22px;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 6px;
-        }
-        .chat-login-card .sub {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 20px;
-        }
-        .chat-login-card .field-group {
-            margin-bottom: 14px;
-            text-align: left;
-        }
-        .chat-login-card .field-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: #444;
-            margin-bottom: 4px;
-        }
-        .chat-login-card .field-group input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 16px;
-            font-family: 'Roboto', sans-serif;
-            transition: border 0.2s;
-            background: #f9f9f9;
-            text-align: center;
-            letter-spacing: 0.5px;
-        }
-        .chat-login-card .field-group input:focus {
-            border-color: var(--primary);
-            background: #fff;
-        }
-        .chat-login-card .field-group input.error {
-            border-color: #e74c3c;
-            background: #fff5f5;
-        }
-        .chat-login-card .field-group .hint {
-            font-size: 11px;
-            color: #999;
-            margin-top: 4px;
-            text-align: right;
-        }
-        .chat-login-card .login-error {
-            color: #e74c3c;
-            font-size: 13px;
-            min-height: 20px;
-            margin-top: 4px;
-        }
-        .chat-login-card button {
-            width: 100%;
-            padding: 14px;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            font-family: 'Roboto', sans-serif;
-            margin-top: 8px;
-        }
-        .chat-login-card button:hover {
-            background: var(--primary-light);
-        }
-        .chat-login-card button:active {
-            transform: scale(0.97);
-        }
-
-        /* ===== MAIN CONTENT ===== */
+        /* MAIN CONTENT */
         #main-content {
             display: none;
             width: 100%;
             min-height: 100vh;
-            background-color: #ffffff;
+            background-color: var(--bg-primary);
             flex-direction: column;
             position: relative;
-            padding-bottom: var(--bottom-nav-height);
+            padding-bottom: calc(var(--bottom-nav-height) + 24px);
+            padding-top: calc(var(--search-header-height) + 8px);
+            transition: background-color 0.3s ease;
         }
         #main-content.visible {
             display: flex;
         }
 
-        /* ===== TOP NAVBAR ===== */
-        .top-nav {
+        /* ===== SEARCH HEADER ===== */
+        #search-header {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
+            right: 0;
             z-index: 100;
+            padding: 8px 16px;
             background: transparent;
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-height: 64px;
+            backdrop-filter: none;
             border-bottom: none;
-        }
-        .top-nav .nav-title {
-            font-size: 20px;
-            font-weight: 500;
-            color: #ffffff;
-            letter-spacing: 0.2px;
-            user-select: none;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            transition: opacity 0.2s;
-        }
-        .top-nav .nav-actions {
+            box-shadow: none;
+            height: var(--search-header-height);
             display: flex;
             align-items: center;
             gap: 10px;
+            pointer-events: none;
         }
-        .top-nav .nav-actions .report-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            color: #ffffff;
-            font-size: 22px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s, transform 0.15s;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-            font-family: 'Roboto', sans-serif;
-            line-height: 1;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            position: relative;
-        }
-        .top-nav .nav-actions .report-btn:hover {
-            background: rgba(255, 255, 255, 0.35);
-        }
-        .top-nav .nav-actions .report-btn:active {
-            transform: scale(0.88);
-            background: rgba(255, 255, 255, 0.5);
+        #search-header .search-bar {
+            pointer-events: auto;
+            flex: 1;
         }
 
-        /* ===== HERO ===== */
-        .hero {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 500px;
             width: 100%;
-            height: var(--hero-height);
-            background-image: url('a301c484ed53b62966ca4d1341eccb3b.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-drag: none;
-            -webkit-touch-callout: none;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-        }
-        .hero-text {
+            background: var(--search-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 40px;
+            padding: 4px 18px;
+            border: none;
+            transition: background 0.2s, box-shadow 0.2s;
             position: relative;
-            z-index: 3;
-            color: #ffffff;
-            text-align: center;
-            padding: 0 20px;
-            font-weight: 700;
-            font-size: 2.8rem;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            letter-spacing: 1px;
-            line-height: 1.2;
-            min-height: 1.4em;
-            margin-top: 20px;
+            box-shadow: 0 4px 30px var(--shadow-color);
         }
-        .hero-text .cursor {
-            display: inline-block;
-            width: 3px;
-            height: 1em;
-            background-color: #ffffff;
-            margin-left: 4px;
-            vertical-align: text-bottom;
-            animation: blink 0.8s step-end infinite;
-        }
-        @keyframes blink {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
-        }
-        .hero-subtitle {
-            position: relative;
-            z-index: 3;
-            color: #ffffff;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: 300;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            margin-top: 10px;
-            padding: 0 20px;
-            pointer-events: none;
+        .search-bar:focus-within {
+            background: var(--search-focus);
+            box-shadow: 0 4px 30px var(--shadow-strong);
         }
 
-        /* ===== KONTEN UTAMA ===== */
+        .search-bar .search-icon {
+            font-size: 20px;
+            line-height: 1;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px 0;
+            font-size: 15px;
+            color: var(--text-primary);
+            min-width: 0;
+        }
+        .search-bar input::placeholder {
+            color: var(--text-light);
+            font-weight: 300;
+        }
+
+        .search-clear {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 50%;
+            transition: background 0.2s, color 0.2s;
+            display: none;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .search-clear.visible {
+            display: block;
+        }
+        .search-clear:hover {
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+        }
+
+        /* ===== SETTINGS HEADER BUTTON ===== */
+        .settings-header-btn {
+            pointer-events: auto;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--search-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: none;
+            box-shadow: 0 4px 30px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            flex-shrink: 0;
+            color: var(--text-primary);
+        }
+        .settings-header-btn:hover {
+            background: var(--search-focus);
+        }
+        .settings-header-btn:active {
+            transform: scale(0.92);
+        }
+        .settings-header-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        /* SEARCH DROPDOWN */
+        .search-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--dropdown-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--dropdown-border);
+            box-shadow: 0 12px 40px var(--shadow-color);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.3s ease,
+                transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            z-index: 101;
+        }
+        .search-dropdown.open {
+            max-height: 420px;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            overflow-y: auto;
+        }
+
+        .search-dropdown .result-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .search-dropdown .result-item:last-child {
+            border-bottom: none;
+        }
+        .search-dropdown .result-item:hover {
+            background: var(--subject-hover);
+        }
+        .search-dropdown .result-item:active {
+            background: var(--subject-active);
+            transform: scale(0.98);
+        }
+
+        .search-dropdown .result-item .result-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            width: 28px;
+            text-align: center;
+        }
+        .search-dropdown .result-item .result-text {
+            flex: 1;
+            word-break: break-word;
+        }
+        .search-dropdown .result-item .result-badge {
+            font-size: 10px;
+            font-weight: 500;
+            padding: 2px 10px;
+            border-radius: 20px;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .search-dropdown .result-item .result-badge.student {
+            background: rgba(45, 125, 70, 0.12);
+            color: var(--accent);
+        }
+        .dark-mode .search-dropdown .result-item .result-badge.student {
+            background: rgba(45, 125, 70, 0.3);
+        }
+        .search-dropdown .result-item .result-badge.schedule {
+            background: var(--badge-bg);
+            color: var(--badge-text);
+        }
+
+        .search-dropdown .no-result {
+            padding: 24px 16px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        .search-dropdown .search-hint {
+            padding: 14px 16px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+            font-weight: 300;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-dropdown::-webkit-scrollbar {
+            width: 4px;
+        }
+        .search-dropdown::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .search-dropdown::-webkit-scrollbar-thumb {
+            background: rgba(166, 124, 82, 0.3);
+            border-radius: 10px;
+        }
+
+        /* MAIN BODY */
         .main-body {
-            margin-top: var(--hero-height);
-            background-color: #ffffff;
+            background-color: var(--bg-primary);
             position: relative;
             z-index: 2;
-        }
-        .curve {
-            height: var(--curve-height);
-            background: #ffffff;
-            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-            margin-top: calc(-1 * var(--curve-height));
-            position: relative;
-            z-index: 3;
-            pointer-events: none;
+            padding-top: 0;
+            transition: background-color 0.3s ease;
         }
 
-        /* ===== PAGE BERANDA ===== */
+        /* BERANDA */
         .photo-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 16px 20px 10px;
-            background: #ffffff;
+            background: var(--bg-primary);
+            transition: background-color 0.3s ease;
         }
+
         .photo-wrapper {
             display: inline-block;
             position: relative;
@@ -496,23 +613,37 @@
             touch-action: manipulation;
             -webkit-touch-callout: none;
             user-select: none;
+            isolation: isolate;
+            background: transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            line-height: 0;
         }
+
         .profile-photo {
             width: 150px;
             height: 150px;
             object-fit: cover;
             display: block;
             border-radius: 8px;
-            background: #f0f0f0;
+            background: transparent !important;
             transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1);
             will-change: transform;
             pointer-events: none;
             -webkit-user-drag: none;
             user-select: none;
+            mix-blend-mode: normal;
         }
+
+        .dark-mode .profile-photo {
+            mix-blend-mode: normal;
+            filter: brightness(1.1) contrast(1.05);
+        }
+
         .photo-wrapper.active .profile-photo {
             transform: scale(1.08);
         }
+
         .photo-text {
             margin-top: 14px;
             min-height: 70px;
@@ -527,26 +658,17 @@
         .teacher-name {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #1a1a1a;
+            color: var(--primary);
             letter-spacing: 0.3px;
             min-height: 2em;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .teacher-name .cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1.1em;
-            background-color: #1a1a1a;
-            margin-left: 3px;
-            vertical-align: text-bottom;
-            animation: blink 0.8s step-end infinite;
-        }
         .teacher-role {
             font-size: 0.95rem;
             font-weight: 400;
-            color: #888;
+            color: var(--text-muted);
             opacity: 0;
             transition: opacity 0.5s ease;
             margin-top: 2px;
@@ -556,84 +678,44 @@
             opacity: 1;
         }
 
-        /* ===== SEARCH ===== */
-        .search-section {
-            position: sticky;
-            top: 64px;
-            z-index: 20;
-            background: #ffffff;
-            padding: 16px 20px 16px;
+        /* STUDENT LIST */
+        .student-list-section {
+            padding: 8px 20px 20px;
             max-width: 500px;
             margin: 0 auto;
             width: 100%;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
-        .search-box {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background: #f5f5f5;
-            border-radius: 30px;
-            padding: 4px 18px;
-            border: 2px solid #e0e0e0;
-            transition: border 0.2s, box-shadow 0.2s;
+        .student-list-section .list-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--primary);
+            margin-bottom: 10px;
+            padding-left: 4px;
         }
-        .search-box:focus-within {
-            border-color: #000000;
-            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
-        }
-        .search-box input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            padding: 12px 0;
-            font-size: 16px;
-            font-family: 'Roboto', sans-serif;
-            color: #1a1a1a;
-            min-width: 0;
-        }
-        .search-box input::placeholder {
-            color: #aaa;
-        }
-        .search-results {
-            margin-top: 20px;
+        .student-grid {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            padding-right: 4px;
+            gap: 4px;
         }
-        .search-results .result-item {
-            background: #f9f9f9;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 15px;
-            border-left: 4px solid #000000;
+        .student-grid .student-item {
+            background: var(--student-item-bg);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            border-left: 3px solid var(--primary-light);
             transition: background 0.2s;
-            animation: slideIn 0.25s ease;
+            color: var(--text-primary);
         }
-        .search-results .result-item:hover {
-            background: #f0f0f0;
+        .student-grid .student-item:hover {
+            background: var(--student-item-hover);
         }
-        .search-results .no-result {
-            text-align: center;
-            color: #999;
-            padding: 20px 0;
-            font-size: 15px;
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .student-grid .student-item .student-no {
+            font-weight: 500;
+            color: var(--primary);
+            margin-right: 8px;
         }
 
-        /* ============================================================
-                   PAGE JADWAL — VERTIKAL 1 KOLOM
-                   ============================================================ */
+        /* JADWAL */
         .page-schedule-wrapper {
             padding: 16px 12px 30px;
             max-width: 500px;
@@ -642,7 +724,7 @@
         }
 
         .schedule-now {
-            background: var(--bg-card);
+            background: var(--schedule-now-bg);
             border-radius: var(--border-radius);
             padding: 14px 18px;
             margin-bottom: 18px;
@@ -650,10 +732,11 @@
             font-size: 1rem;
             font-weight: 500;
             color: var(--primary);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 8px var(--shadow-color);
             min-height: 56px;
             display: flex;
             align-items: center;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
         }
         .schedule-now span {
             display: inline-block;
@@ -677,18 +760,35 @@
         }
 
         .day-card {
-            background: #ffffff;
+            background: var(--day-card-bg);
             border-radius: var(--border-radius);
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 12px var(--shadow-color);
             overflow: hidden;
-            border: 1px solid #eee;
-            transition: border 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border-color);
+            transition: border 0.2s, box-shadow 0.2s, background 0.3s ease;
             width: 100%;
         }
         .day-card.active-day {
             border-color: var(--accent);
             box-shadow: 0 4px 16px rgba(45, 125, 70, 0.15);
             background: var(--accent-light);
+        }
+        .dark-mode .day-card.active-day {
+            box-shadow: 0 4px 16px rgba(45, 125, 70, 0.3);
+        }
+        .day-card.highlight-match {
+            border-color: var(--primary);
+            box-shadow: 0 4px 16px rgba(166, 124, 82, 0.2);
+            animation: highlightPulse 1s ease 2;
+        }
+        @keyframes highlightPulse {
+            0%,
+            100% {
+                box-shadow: 0 4px 16px rgba(166, 124, 82, 0.2);
+            }
+            50% {
+                box-shadow: 0 4px 28px rgba(166, 124, 82, 0.45);
+            }
         }
         .day-header {
             background: var(--primary);
@@ -711,7 +811,7 @@
             padding: 8px 12px;
             border-radius: 8px;
             margin-bottom: 4px;
-            background: #f5f7fa;
+            background: var(--subject-bg);
             line-height: 1.4;
             position: relative;
             padding-left: 20px;
@@ -719,13 +819,15 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: background 0.2s, box-shadow 0.2s;
+            color: var(--text-primary);
         }
         .subject-item .mapel {
             flex: 1;
         }
         .subject-item .guru {
             font-weight: 400;
-            color: #555;
+            color: var(--text-secondary);
             font-size: 0.8rem;
             white-space: nowrap;
         }
@@ -742,6 +844,10 @@
         .subject-item.active-now .dot-active {
             display: inline-block;
         }
+        .subject-item.highlight-match {
+            background: rgba(166, 124, 82, 0.12);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
         @keyframes pulse-dot {
             0%,
             100% {
@@ -756,14 +862,12 @@
 
         .day-card .no-class {
             font-size: 0.85rem;
-            color: #999;
+            color: var(--text-light);
             text-align: center;
             padding: 12px 0;
         }
 
-        /* ============================================================
-                   PAGE GALERI — COVERFLOW 3D
-                   ============================================================ */
+        /* GALERI COVERFLOW */
         .gallery-container {
             position: relative;
             width: 100%;
@@ -792,15 +896,18 @@
             width: 180px;
             height: 240px;
             border-radius: 18px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 30px var(--shadow-color);
             overflow: hidden;
-            background: #f0f0f0;
+            background: var(--photo-bg);
             transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.5s ease, box-shadow 0.5s ease;
             will-change: transform, opacity;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
             cursor: pointer;
             border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+        .dark-mode .gallery-card {
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .gallery-card img {
@@ -816,34 +923,37 @@
             transform: translateX(0px) translateY(-20px) scale(1.15) rotateY(0deg);
             opacity: 1;
             z-index: 10;
-            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 16px 50px var(--shadow-strong);
             border-color: #ffffff;
+        }
+        .dark-mode .gallery-card.center {
+            border-color: #444;
         }
 
         .gallery-card.left-1 {
             transform: translateX(-160px) translateY(0px) scale(0.85) rotateY(18deg);
             opacity: 0.7;
             z-index: 5;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 20px var(--shadow-color);
         }
         .gallery-card.right-1 {
             transform: translateX(160px) translateY(0px) scale(0.85) rotateY(-18deg);
             opacity: 0.7;
             z-index: 5;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 20px var(--shadow-color);
         }
 
         .gallery-card.left-2 {
             transform: translateX(-280px) translateY(10px) scale(0.7) rotateY(30deg);
             opacity: 0.4;
             z-index: 2;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px var(--shadow-color);
         }
         .gallery-card.right-2 {
             transform: translateX(280px) translateY(10px) scale(0.7) rotateY(-30deg);
             opacity: 0.4;
             z-index: 2;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px var(--shadow-color);
         }
 
         .gallery-card.hidden {
@@ -866,7 +976,7 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: #ccc;
+            background: var(--text-light);
             transition: background 0.3s, transform 0.3s;
             cursor: pointer;
             flex-shrink: 0;
@@ -888,7 +998,7 @@
             height: 44px;
             font-size: 24px;
             color: #333;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 12px var(--shadow-color);
             cursor: pointer;
             z-index: 20;
             display: flex;
@@ -898,8 +1008,15 @@
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
         }
+        .dark-mode .gallery-nav-btn {
+            background: rgba(50, 50, 50, 0.8);
+            color: #ddd;
+        }
         .gallery-nav-btn:hover {
             background: rgba(255, 255, 255, 0.9);
+        }
+        .dark-mode .gallery-nav-btn:hover {
+            background: rgba(70, 70, 70, 0.9);
         }
         .gallery-nav-btn:active {
             transform: translateY(-50%) scale(0.92);
@@ -979,241 +1096,368 @@
             }
         }
 
-        /* ============================================================
-                   PAGE CHAT — PRIVATE MESSAGING
-                   ============================================================ */
-        .page-chat-wrapper {
-            padding: 8px 12px 20px;
+        /* ===== MUSIC PAGE ===== */
+        .page-music-wrapper {
+            padding: 16px 16px 30px;
             max-width: 500px;
             margin: 0 auto;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* Chat header / contact info */
-        .chat-header {
+        .music-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 18px;
+            letter-spacing: 0.5px;
+            padding: 0 8px;
+        }
+
+        .music-embed-container {
+            width: 100%;
+            border-radius: 28px;
+            overflow: hidden;
+            background: var(--bg-elevated);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            aspect-ratio: 1 / 1;
+            max-width: 480px;
+            margin: 0 auto;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        }
+
+        .music-embed-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            background: var(--bg-primary);
+        }
+
+        @media (max-width: 480px) {
+            .music-title {
+                font-size: 1.15rem;
+                margin-bottom: 14px;
+            }
+            .music-embed-container {
+                border-radius: 22px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .music-title {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            .music-embed-container {
+                border-radius: 18px;
+            }
+            .page-music-wrapper {
+                padding: 12px 12px 20px;
+            }
+        }
+
+        /* ===== FEED PAGE — SHORTS FULL LAYAR dengan kontrol kustom (LAYOUT BARU) ===== */
+        .page-feed-wrapper {
+            padding: 0;
+            max-width: 100%;
+            height: calc(100vh - var(--search-header-height) - var(--bottom-nav-height) - 24px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
+            margin: 0 auto;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .shorts-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shorts-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            display: block;
+            cursor: pointer;
+        }
+
+        /* === KONTROL VIDEO — LAYOUT BARU === */
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 16px 18px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
+            display: flex;
+            flex-direction: column;
             align-items: center;
             gap: 12px;
-            padding: 10px 14px;
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
-            margin-bottom: 12px;
-            border: 1px solid #eee;
-            flex-wrap: wrap;
-        }
-        .chat-header .chat-with-label {
-            font-weight: 500;
-            color: #444;
-            font-size: 0.9rem;
-            flex: 1;
-            min-width: 120px;
-        }
-        .chat-header .chat-with-label strong {
-            color: var(--primary);
-            font-weight: 600;
-        }
-        .chat-header .chat-status {
-            font-size: 0.75rem;
-            color: #999;
-            background: #f0f0f0;
-            padding: 2px 10px;
-            border-radius: 20px;
-        }
-        .chat-header .chat-status.online {
-            color: var(--accent);
-            background: var(--accent-light);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 5;
         }
 
-        /* Contact input row */
-        .chat-contact-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
+        .video-controls.visible {
+            opacity: 1;
+            pointer-events: auto;
         }
-        .chat-contact-row input {
-            flex: 1;
-            min-width: 140px;
-            padding: 10px 14px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 15px;
-            font-family: 'Roboto', sans-serif;
-            transition: border 0.2s;
-            background: #f9f9f9;
-            text-align: center;
-            letter-spacing: 1px;
-        }
-        .chat-contact-row input:focus {
-            border-color: var(--primary);
-            background: #fff;
-        }
-        .chat-contact-row input.error {
-            border-color: #e74c3c;
-            background: #fff5f5;
-        }
-        .chat-contact-row button {
-            padding: 10px 18px;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-weight: 500;
-            font-size: 0.9rem;
+
+        /* Tombol play/pause di tengah layar */
+        .play-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            pointer-events: auto;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            font-family: 'Roboto', sans-serif;
-            white-space: nowrap;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.4s ease, background 0.2s, transform 0.2s;
+            backdrop-filter: blur(4px);
+            opacity: 1;
         }
-        .chat-contact-row button:hover {
-            background: var(--primary-light);
+        .play-center.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
-        .chat-contact-row button:active {
-            transform: scale(0.96);
+        .play-center:hover {
+            background: rgba(0, 0, 0, 0.5);
         }
-        .chat-contact-row button:disabled {
-            background: #aaa;
-            cursor: not-allowed;
+        .play-center:active {
+            transform: translate(-50%, -50%) scale(0.92);
         }
-        .chat-contact-row .contact-error {
+        .play-center button {
+            background: none;
+            border: none;
+            color: #fff;
             width: 100%;
-            color: #e74c3c;
-            font-size: 13px;
-            min-height: 20px;
-            text-align: center;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+        }
+        .play-center svg {
+            width: 48px;
+            height: 48px;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
         }
 
-        /* Chat messages container */
-        .chat-messages {
-            background: #ffffff;
-            border-radius: var(--border-radius);
-            border: 1px solid #eee;
-            padding: 12px 10px;
-            height: 380px;
-            overflow-y: auto;
+        /* Bar bawah: audio, progress, speed, durasi */
+        .controls-bottom-bar {
             display: flex;
             flex-direction: column;
             gap: 6px;
-            margin-bottom: 10px;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.03);
-        }
-        .chat-messages .empty-chat {
-            text-align: center;
-            color: #aaa;
-            font-size: 0.9rem;
-            padding: 40px 10px;
-            line-height: 1.6;
-        }
-        .chat-messages .empty-chat .emoji {
-            font-size: 2.4rem;
-            display: block;
-            margin-bottom: 8px;
+            width: 100%;
+            margin-top: auto;
         }
 
-        .chat-msg {
-            max-width: 82%;
-            padding: 8px 14px;
-            border-radius: 16px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            word-break: break-word;
-            animation: msgSlide 0.2s ease;
-            position: relative;
-        }
-        @keyframes msgSlide {
-            from {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .chat-msg.own {
-            align-self: flex-end;
-            background: var(--chat-bg-own);
-            border-bottom-right-radius: 4px;
-            color: #1a3a1a;
-        }
-        .chat-msg.other {
-            align-self: flex-start;
-            background: var(--chat-bg-other);
-            border-bottom-left-radius: 4px;
-            color: #1a1a1a;
-        }
-        .chat-msg .msg-sender {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 2px;
-        }
-        .chat-msg.own .msg-sender {
-            color: #2d6a2d;
-        }
-        .chat-msg .msg-time {
-            font-size: 0.6rem;
-            color: #999;
-            margin-top: 2px;
-            text-align: right;
-        }
-        .chat-msg.own .msg-time {
-            color: #6a8a6a;
-        }
-
-        /* Chat input row */
-        .chat-input-row {
+        .controls-top {
             display: flex;
-            gap: 8px;
             align-items: center;
-        }
-        .chat-input-row input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 15px;
-            font-family: 'Roboto', sans-serif;
-            transition: border 0.2s;
-            background: #f9f9f9;
-        }
-        .chat-input-row input:focus {
-            border-color: var(--primary);
-            background: #fff;
-        }
-        .chat-input-row input:disabled {
-            background: #f0f0f0;
-            color: #999;
-        }
-        .chat-input-row button {
-            padding: 10px 20px;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            font-family: 'Roboto', sans-serif;
-            white-space: nowrap;
-        }
-        .chat-input-row button:hover {
-            background: #236b3a;
-        }
-        .chat-input-row button:active {
-            transform: scale(0.96);
-        }
-        .chat-input-row button:disabled {
-            background: #aaa;
-            cursor: not-allowed;
+            justify-content: space-between;
+            width: 100%;
+            gap: 10px;
         }
 
-        /* ===== PAGE LAIN ===== */
+        .controls-top .ctrl-btn {
+            background: rgba(255, 255, 255, 0.10);
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            min-height: 40px;
+            backdrop-filter: blur(4px);
+            font-family: inherit;
+            flex-shrink: 0;
+        }
+        .controls-top .ctrl-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .controls-top .ctrl-btn#speedBtn {
+            font-size: 15px;
+            font-weight: 700;
+            min-width: 44px;
+        }
+        .controls-top .ctrl-btn#muteBtn {
+            font-size: 18px;
+        }
+
+        .controls-top .progress-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            min-width: 60px;
+        }
+        .controls-top .progress-wrap input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.35);
+            outline: none;
+            transition: background 0.2s;
+            cursor: pointer;
+            margin: 0;
+        }
+        .controls-top .progress-wrap input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+        }
+        .controls-top .progress-wrap input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            border: none;
+        }
+
+        .controls-bottom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            font-weight: 400;
+            gap: 6px;
+            user-select: none;
+            letter-spacing: 0.3px;
+        }
+        .controls-bottom .time-sep {
+            opacity: 0.4;
+        }
+
+        /* RESPONSIF */
+        @media (max-width: 480px) {
+            .page-feed-wrapper {
+                height: calc(100vh - var(--search-header-height) - var(--bottom-nav-height) - 16px);
+            }
+            .video-controls {
+                padding: 14px 12px 14px;
+                gap: 10px;
+            }
+            .controls-top .ctrl-btn {
+                font-size: 15px;
+                min-width: 34px;
+                min-height: 34px;
+                padding: 4px 8px;
+            }
+            .controls-top .ctrl-btn#speedBtn {
+                font-size: 13px;
+                min-width: 38px;
+            }
+            .controls-top .ctrl-btn#muteBtn {
+                font-size: 15px;
+            }
+            .play-center {
+                width: 64px;
+                height: 64px;
+            }
+            .play-center svg {
+                width: 38px;
+                height: 38px;
+            }
+            .controls-bottom {
+                font-size: 12px;
+            }
+            .controls-top .progress-wrap input[type="range"] {
+                height: 3px;
+            }
+            .controls-top .progress-wrap input[type="range"]::-webkit-slider-thumb {
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .page-feed-wrapper {
+                height: calc(100vh - var(--search-header-height) - var(--bottom-nav-height) - 12px);
+            }
+            .video-controls {
+                padding: 10px 10px 12px;
+                gap: 8px;
+            }
+            .controls-top .ctrl-btn {
+                font-size: 13px;
+                min-width: 30px;
+                min-height: 30px;
+                padding: 3px 6px;
+            }
+            .controls-top .ctrl-btn#speedBtn {
+                font-size: 11px;
+                min-width: 32px;
+            }
+            .controls-top .ctrl-btn#muteBtn {
+                font-size: 13px;
+            }
+            .play-center {
+                width: 56px;
+                height: 56px;
+            }
+            .play-center svg {
+                width: 32px;
+                height: 32px;
+            }
+            .controls-bottom {
+                font-size: 11px;
+            }
+            .controls-top .progress-wrap input[type="range"] {
+                height: 3px;
+            }
+            .controls-top .progress-wrap input[type="range"]::-webkit-slider-thumb {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        /* PAGE LAIN */
         .page-content {
             display: none;
-            padding: 24px 20px 30px;
+            padding: 0 0 30px;
             max-width: 500px;
             margin: 0 auto;
             width: 100%;
@@ -1226,31 +1470,35 @@
             font-size: 1.5rem;
             font-weight: 500;
             margin-bottom: 16px;
-            color: #1a1a1a;
+            color: var(--primary);
+            padding: 0 20px;
         }
         .page-content p {
-            color: #666;
+            color: var(--text-secondary);
             line-height: 1.6;
         }
 
-        /* ===== PAGE SETTINGS (clean version, no notif) ===== */
+        /* SETTINGS */
         .settings-group {
-            background: var(--bg-card);
+            background: var(--settings-group-bg);
             border-radius: var(--border-radius);
             padding: 18px 16px;
             margin-top: 12px;
-            border: 1px solid #eee;
+            border: 1px solid var(--border-color);
+            margin-left: 20px;
+            margin-right: 20px;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
         .settings-group label {
             display: block;
             font-weight: 500;
             font-size: 0.95rem;
             margin-bottom: 6px;
-            color: #1a1a1a;
+            color: var(--primary);
         }
         .settings-group .desc {
             font-size: 0.85rem;
-            color: #777;
+            color: var(--text-muted);
             margin-bottom: 12px;
         }
 
@@ -1263,21 +1511,24 @@
         .name-change-group .name-input-wrapper input {
             flex: 1;
             padding: 10px 14px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-color);
             border-radius: 12px;
             font-size: 1rem;
-            font-family: 'Roboto', sans-serif;
             transition: border 0.2s;
-            background: #f9f9f9;
+            background: var(--bg-input);
+            color: var(--text-primary);
             min-width: 140px;
         }
         .name-change-group .name-input-wrapper input:focus {
             border-color: var(--primary);
-            background: #ffffff;
+            background: var(--bg-elevated);
         }
         .name-change-group .name-input-wrapper input.error {
             border-color: #e74c3c;
             background: #fff5f5;
+        }
+        .dark-mode .name-change-group .name-input-wrapper input.error {
+            background: #3a1a1a;
         }
         .name-change-group .name-input-wrapper button {
             padding: 10px 20px;
@@ -1288,7 +1539,6 @@
             font-weight: 500;
             cursor: pointer;
             transition: background 0.2s;
-            font-family: 'Roboto', sans-serif;
             font-size: 0.95rem;
             white-space: nowrap;
         }
@@ -1302,10 +1552,11 @@
         .name-change-group .name-change-info {
             margin-top: 10px;
             font-size: 0.85rem;
-            color: #555;
+            color: var(--text-secondary);
             padding: 8px 12px;
-            background: #f0f4f8;
+            background: var(--name-change-info-bg);
             border-radius: 8px;
+            transition: background 0.3s ease;
         }
         .name-change-group .name-change-info .highlight {
             font-weight: 600;
@@ -1313,7 +1564,7 @@
         }
         .name-change-group .char-count-change {
             font-size: 0.8rem;
-            color: #999;
+            color: var(--text-light);
             text-align: right;
             margin-top: 4px;
             padding-right: 4px;
@@ -1325,14 +1576,219 @@
             margin-top: 4px;
         }
 
-        /* ===== MODAL LAPORAN ===== */
+        /* ===== SETTINGS SUB-PAGE: TAMPILAN ===== */
+        .settings-subpage {
+            display: none;
+            padding: 0 0 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+            animation: fadeUp 0.3s ease;
+        }
+        .settings-subpage.active {
+            display: block;
+        }
+
+        .settings-subpage .subpage-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 20px 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+        .settings-subpage .subpage-header .back-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-primary);
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            line-height: 1;
+        }
+        .settings-subpage .subpage-header .back-btn:hover {
+            background: var(--back-btn-hover);
+        }
+        .settings-subpage .subpage-header .subpage-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .settings-subpage .display-option {
+            background: var(--option-bg);
+            border-radius: var(--border-radius);
+            padding: 14px 16px;
+            margin: 0 20px 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.15s, border-color 0.3s ease;
+        }
+        .settings-subpage .display-option .option-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+        .settings-subpage .display-option .option-left .option-icon {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+        .settings-subpage .display-option .option-left .option-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+        }
+        .settings-subpage .display-option .option-left .option-label {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+        .settings-subpage .display-option .option-left .option-desc {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+        .settings-subpage .display-option .option-right {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+        .settings-subpage .display-option .option-right .arrow {
+            font-size: 18px;
+            color: var(--arrow-color);
+        }
+
+        /* Custom select for font */
+        .settings-subpage .display-option select {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 0.85rem;
+            max-width: 160px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            appearance: auto;
+            -webkit-appearance: auto;
+        }
+        .settings-subpage .display-option select:focus {
+            border-color: var(--primary);
+        }
+        .settings-subpage .display-option select option {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        /* Toggle switch */
+        .settings-subpage .display-option .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--toggle-bg);
+            border-radius: 20px;
+            position: relative;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: background 0.25s;
+            border: none;
+            padding: 0;
+        }
+        .settings-subpage .display-option .toggle-switch .thumb {
+            width: 18px;
+            height: 18px;
+            background: var(--toggle-thumb);
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+            transition: left 0.25s, background 0.25s;
+        }
+        .settings-subpage .display-option .toggle-switch.on {
+            background: var(--toggle-on);
+        }
+        .settings-subpage .display-option .toggle-switch.on .thumb {
+            left: 23px;
+        }
+
+        /* SETTINGS NAV CARD */
+        .settings-nav-card {
+            background: var(--settings-group-bg);
+            border-radius: var(--border-radius);
+            padding: 14px 16px;
+            margin-top: 12px;
+            border: 1px solid var(--border-color);
+            margin-left: 20px;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s, border-color 0.3s ease;
+        }
+        .settings-nav-card:hover {
+            background: var(--settings-nav-hover);
+        }
+        .settings-nav-card:active {
+            transform: scale(0.98);
+        }
+        .settings-nav-card .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .settings-nav-card .nav-left .nav-icon {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        .settings-nav-card .nav-left .nav-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+        }
+        .settings-nav-card .nav-left .nav-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .settings-nav-card .nav-left .nav-desc {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+        .settings-nav-card .nav-right {
+            font-size: 22px;
+            color: var(--arrow-color);
+        }
+
+        /* MODAL LAPORAN */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: var(--modal-overlay);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             display: none;
@@ -1345,7 +1801,7 @@
             display: flex;
         }
         .modal-content {
-            background: #ffffff;
+            background: var(--bg-elevated);
             border-radius: 24px;
             padding: 32px 28px 28px;
             max-width: 440px;
@@ -1354,7 +1810,8 @@
             overflow-y: auto;
             position: relative;
             animation: fadeUp 0.35s ease;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 20px 60px var(--shadow-strong);
+            border: 1px solid var(--border-color);
         }
         .modal-close {
             position: absolute;
@@ -1362,7 +1819,7 @@
             right: 16px;
             font-size: 28px;
             font-weight: 300;
-            color: #999;
+            color: var(--text-muted);
             background: none;
             border: none;
             cursor: pointer;
@@ -1372,36 +1829,25 @@
             border-radius: 8px;
         }
         .modal-close:hover {
-            color: #1a1a1a;
-            background: #f0f0f0;
+            color: var(--primary);
+            background: var(--modal-close-hover);
         }
         .modal-content h3 {
             font-size: 1.3rem;
             font-weight: 600;
-            color: #1a1a1a;
+            color: var(--primary);
             margin-bottom: 12px;
             padding-right: 32px;
         }
         .modal-content p {
             font-size: 0.95rem;
             line-height: 1.7;
-            color: #444;
+            color: var(--text-secondary);
             margin-bottom: 10px;
             white-space: normal;
             word-break: break-word;
         }
-        .modal-content .highlight {
-            display: block;
-            margin-top: 14px;
-            padding: 10px 14px;
-            background: #fef3e9;
-            border-radius: 12px;
-            border-left: 4px solid #e07b2b;
-            font-size: 0.85rem;
-            color: #6a3a1a;
-        }
 
-        /* ===== MODAL LAPORAN ===== */
         .modal-content.report-modal {
             max-width: 560px;
             padding: 20px 16px 16px;
@@ -1413,15 +1859,15 @@
         }
         .modal-content.report-modal .sub {
             font-size: 0.85rem;
-            color: #777;
+            color: var(--text-muted);
             margin-bottom: 14px;
         }
         .modal-content.report-modal .form-wrapper {
             width: 100%;
             border-radius: 14px;
             overflow: hidden;
-            background: #f5f7fa;
-            border: 1px solid #e8eaed;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
             position: relative;
             height: 500px;
         }
@@ -1430,14 +1876,14 @@
             height: 100%;
             border: none;
             display: block;
-            background: #ffffff;
+            background: var(--bg-primary);
         }
         .modal-content.report-modal .form-wrapper .loading-placeholder {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #999;
+            color: var(--text-light);
             font-size: 0.9rem;
             display: flex;
             flex-direction: column;
@@ -1448,7 +1894,7 @@
         .modal-content.report-modal .form-wrapper .loading-placeholder .spinner {
             width: 32px;
             height: 32px;
-            border: 3px solid #e8eaed;
+            border: 3px solid var(--border-color);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -1462,20 +1908,23 @@
         /* ===== BOTTOM NAV ===== */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
+            bottom: 12px;
+            left: 12px;
+            width: calc(100% - 24px);
             height: var(--bottom-nav-height);
-            background: #ffffff;
-            border-top: 1px solid #eaeaea;
+            background: var(--nav-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--nav-border);
+            border-radius: 28px;
+            box-shadow: 0 8px 32px var(--shadow-color);
             display: flex;
             align-items: center;
             justify-content: space-around;
             z-index: 200;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
+
         .nav-item {
             display: flex;
             flex-direction: column;
@@ -1484,60 +1933,106 @@
             flex: 1;
             height: 100%;
             cursor: pointer;
-            transition: color 0.2s;
-            color: #999;
             text-decoration: none;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             border: none;
             background: transparent;
-            font-family: 'Roboto', sans-serif;
-            padding: 4px 0;
+            padding: 0;
             position: relative;
         }
         .nav-item .nav-icon {
             font-size: 24px;
             line-height: 1.2;
-            transition: transform 0.2s;
+            transition: transform 0.2s, color 0.2s;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-item .nav-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            transition: stroke 0.2s;
         }
         .nav-item .nav-label {
-            font-size: 11px;
-            font-weight: 500;
-            margin-top: 2px;
-            letter-spacing: 0.3px;
-        }
-        .nav-item.active {
-            color: #000000;
+            display: none;
         }
         .nav-item.active .nav-icon {
+            color: #ffffff;
             transform: scale(1.05);
         }
         .nav-item:active {
             opacity: 0.6;
         }
 
-        /* ============================================================
-                   RESPONSIF
-                   ============================================================ */
+        #nav-indicator {
+            position: absolute;
+            bottom: 50%;
+            transform: translateY(50%);
+            left: 0;
+            height: 32px;
+            width: 28px;
+            background: var(--indicator-color);
+            border-radius: 999px;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5), 0 2px 8px var(--shadow-color);
+            transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: left, width;
+            pointer-events: none;
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--toast-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 400;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            white-space: nowrap;
+            max-width: 90%;
+            box-shadow: 0 4px 20px var(--shadow-strong);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ============================================================ */
+
+        /* RESPONSIF */
         @media (max-width: 480px) {
             :root {
-                --hero-height: 500px;
-                --curve-height: 50px;
                 --bottom-nav-height: 56px;
+                --search-header-height: 56px;
+                --feed-avatar-size: 38px;
             }
-            .top-nav {
-                padding: 10px 16px;
-                min-height: 56px;
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
+            #nav-indicator {
+                height: 28px;
+                width: 24px;
+                border-radius: 999px;
             }
-            .top-nav .nav-title {
-                font-size: 17px;
+            .bottom-nav {
+                border-radius: 22px;
+                bottom: 10px;
+                left: 10px;
+                width: calc(100% - 20px);
             }
-            .top-nav .nav-actions .report-btn {
-                width: 34px;
-                height: 34px;
-                font-size: 19px;
+            #main-content {
+                padding-top: calc(var(--search-header-height) + 4px);
             }
             .logo-img {
                 width: 100px;
@@ -1546,13 +2041,49 @@
             .brand-text {
                 font-size: 17px;
             }
-            .hero-text {
-                font-size: 2rem;
-                margin-top: 16px;
+            #search-header {
+                padding: 6px 12px;
+                height: var(--search-header-height);
+                gap: 8px;
             }
-            .hero-subtitle {
-                font-size: 1rem;
-                margin-top: 6px;
+            .search-bar {
+                padding: 2px 14px;
+                border-radius: 30px;
+            }
+            .search-bar input {
+                font-size: 14px;
+                padding: 8px 0;
+            }
+            .search-bar .search-icon {
+                font-size: 18px;
+            }
+            .search-clear {
+                font-size: 16px;
+            }
+            .settings-header-btn {
+                width: 38px;
+                height: 38px;
+            }
+            .settings-header-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+            .search-dropdown {
+                border-radius: 16px;
+                top: calc(100% + 6px);
+            }
+            .search-dropdown .result-item {
+                padding: 8px 14px;
+                font-size: 13px;
+                gap: 10px;
+            }
+            .search-dropdown .result-item .result-icon {
+                font-size: 16px;
+                width: 24px;
+            }
+            .search-dropdown .result-item .result-badge {
+                font-size: 9px;
+                padding: 1px 8px;
             }
             .photo-section {
                 padding: 12px 16px 8px;
@@ -1567,26 +2098,22 @@
             .teacher-role {
                 font-size: 0.85rem;
             }
-            .search-section {
-                padding: 12px 16px 12px;
-                top: 56px;
+            .student-list-section {
+                padding: 4px 16px 16px;
             }
-            .search-box {
-                padding: 4px 14px;
+            .student-list-section .list-title {
+                font-size: 0.9rem;
             }
-            .search-box input {
-                font-size: 15px;
-                padding: 10px 0;
-            }
-            .search-results .result-item {
-                font-size: 14px;
-                padding: 10px 14px;
+            .student-grid .student-item {
+                font-size: 13px;
+                padding: 8px 12px;
             }
             .nav-item .nav-icon {
                 font-size: 22px;
             }
-            .nav-item .nav-label {
-                font-size: 10px;
+            .nav-item .nav-icon svg {
+                width: 22px;
+                height: 22px;
             }
             .name-card {
                 padding: 30px 20px;
@@ -1595,10 +2122,11 @@
                 font-size: 20px;
             }
             .page-content {
-                padding: 20px 16px 24px;
+                padding: 0 0 20px;
             }
             .page-content h2 {
                 font-size: 1.3rem;
+                padding: 0 16px;
             }
 
             .page-schedule-wrapper {
@@ -1636,6 +2164,29 @@
                 font-size: 0.65rem;
                 padding: 1px 10px;
             }
+            .settings-group {
+                margin-left: 16px;
+                margin-right: 16px;
+            }
+            .settings-nav-card {
+                margin-left: 16px;
+                margin-right: 16px;
+            }
+            .settings-subpage .display-option {
+                margin-left: 16px;
+                margin-right: 16px;
+            }
+            .settings-subpage .subpage-header {
+                padding: 0 16px 14px;
+            }
+            .settings-subpage .subpage-header .subpage-title {
+                font-size: 1.1rem;
+            }
+            .settings-subpage .display-option select {
+                max-width: 120px;
+                font-size: 0.75rem;
+                padding: 2px 6px;
+            }
 
             .modal-content {
                 padding: 24px 18px 20px;
@@ -1661,77 +2212,32 @@
                 width: 100%;
                 text-align: center;
             }
-
-            /* Chat responsive */
-            .page-chat-wrapper {
-                padding: 6px 8px 16px;
-            }
-            .chat-messages {
-                height: 300px;
-                padding: 10px 8px;
-            }
-            .chat-msg {
-                max-width: 88%;
-                font-size: 0.85rem;
-                padding: 6px 12px;
-            }
-            .chat-header {
-                padding: 8px 12px;
-                font-size: 0.85rem;
-            }
-            .chat-contact-row input {
-                font-size: 14px;
-                padding: 8px 10px;
-                min-width: 100px;
-            }
-            .chat-contact-row button {
-                font-size: 0.8rem;
-                padding: 8px 14px;
-            }
-            .chat-input-row input {
-                font-size: 14px;
-                padding: 8px 12px;
-            }
-            .chat-input-row button {
-                font-size: 0.8rem;
-                padding: 8px 14px;
-            }
-
-            .chat-login-card {
-                padding: 28px 20px;
-            }
-            .chat-login-card h2 {
-                font-size: 19px;
-            }
-            .chat-login-card .field-group input {
-                font-size: 15px;
-                padding: 10px 12px;
-            }
-            .chat-login-card button {
-                font-size: 15px;
-                padding: 12px;
+            .toast {
+                bottom: 78px;
+                font-size: 12px;
+                padding: 8px 18px;
             }
         }
 
         @media (max-width: 380px) {
             :root {
-                --hero-height: 400px;
-                --curve-height: 40px;
                 --bottom-nav-height: 50px;
+                --search-header-height: 52px;
+                --feed-avatar-size: 34px;
             }
-            .top-nav {
-                padding: 8px 12px;
-                min-height: 48px;
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
+            #nav-indicator {
+                height: 24px;
+                width: 20px;
+                border-radius: 999px;
             }
-            .top-nav .nav-title {
-                font-size: 15px;
+            .bottom-nav {
+                border-radius: 18px;
+                bottom: 8px;
+                left: 8px;
+                width: calc(100% - 16px);
             }
-            .top-nav .nav-actions .report-btn {
-                width: 30px;
-                height: 30px;
-                font-size: 17px;
+            #main-content {
+                padding-top: calc(var(--search-header-height) + 2px);
             }
             .logo-img {
                 width: 80px;
@@ -1740,13 +2246,44 @@
             .brand-text {
                 font-size: 15px;
             }
-            .hero-text {
-                font-size: 1.5rem;
-                margin-top: 12px;
+            #search-header {
+                padding: 4px 10px;
+                height: var(--search-header-height);
+                gap: 6px;
             }
-            .hero-subtitle {
-                font-size: 0.9rem;
-                margin-top: 4px;
+            .search-bar {
+                padding: 2px 12px;
+                border-radius: 26px;
+            }
+            .search-bar input {
+                font-size: 13px;
+                padding: 6px 0;
+            }
+            .search-bar .search-icon {
+                font-size: 16px;
+            }
+            .search-clear {
+                font-size: 14px;
+            }
+            .settings-header-btn {
+                width: 34px;
+                height: 34px;
+            }
+            .settings-header-btn svg {
+                width: 18px;
+                height: 18px;
+            }
+            .search-dropdown .result-item {
+                padding: 6px 12px;
+                font-size: 12px;
+                gap: 8px;
+            }
+            .search-dropdown .result-item .result-icon {
+                font-size: 14px;
+                width: 20px;
+            }
+            .photo-section {
+                padding: 8px 12px 4px;
             }
             .profile-photo {
                 width: 100px;
@@ -1758,26 +2295,22 @@
             .teacher-role {
                 font-size: 0.8rem;
             }
-            .search-section {
-                padding: 8px 12px 8px;
-                top: 48px;
+            .student-list-section {
+                padding: 2px 12px 12px;
             }
-            .search-box {
-                padding: 4px 12px;
+            .student-list-section .list-title {
+                font-size: 0.8rem;
             }
-            .search-box input {
-                font-size: 14px;
-                padding: 8px 0;
-            }
-            .search-results .result-item {
-                font-size: 13px;
-                padding: 8px 12px;
+            .student-grid .student-item {
+                font-size: 12px;
+                padding: 6px 10px;
             }
             .nav-item .nav-icon {
                 font-size: 20px;
             }
-            .nav-item .nav-label {
-                font-size: 9px;
+            .nav-item .nav-icon svg {
+                width: 20px;
+                height: 20px;
             }
             .name-card {
                 padding: 24px 16px;
@@ -1790,10 +2323,11 @@
                 padding: 12px;
             }
             .page-content {
-                padding: 16px 12px 20px;
+                padding: 0 0 16px;
             }
             .page-content h2 {
                 font-size: 1.1rem;
+                padding: 0 12px;
             }
 
             .schedule-grid {
@@ -1824,6 +2358,29 @@
                 font-size: 0.75rem;
                 padding: 8px 10px;
             }
+            .settings-group {
+                margin-left: 12px;
+                margin-right: 12px;
+            }
+            .settings-nav-card {
+                margin-left: 12px;
+                margin-right: 12px;
+            }
+            .settings-subpage .display-option {
+                margin-left: 12px;
+                margin-right: 12px;
+            }
+            .settings-subpage .subpage-header {
+                padding: 0 12px 12px;
+            }
+            .settings-subpage .subpage-header .subpage-title {
+                font-size: 1rem;
+            }
+            .settings-subpage .display-option select {
+                max-width: 100px;
+                font-size: 0.7rem;
+                padding: 2px 4px;
+            }
 
             .modal-content {
                 padding: 20px 14px 16px;
@@ -1849,63 +2406,26 @@
                 font-size: 0.85rem;
                 padding: 8px 12px;
             }
-
-            /* Chat responsive 380 */
-            .chat-messages {
-                height: 250px;
-                padding: 8px 6px;
-            }
-            .chat-msg {
-                max-width: 92%;
-                font-size: 0.8rem;
-                padding: 5px 10px;
-            }
-            .chat-contact-row input {
-                font-size: 13px;
-                padding: 6px 8px;
-                min-width: 80px;
-            }
-            .chat-contact-row button {
-                font-size: 0.7rem;
-                padding: 6px 10px;
-            }
-            .chat-input-row input {
-                font-size: 13px;
-                padding: 6px 10px;
-            }
-            .chat-input-row button {
-                font-size: 0.7rem;
-                padding: 6px 10px;
-            }
-            .chat-login-card {
-                padding: 20px 16px;
-            }
-            .chat-login-card h2 {
-                font-size: 17px;
-            }
-            .chat-login-card .field-group input {
-                font-size: 14px;
-                padding: 8px 10px;
-            }
-            .chat-login-card button {
-                font-size: 14px;
-                padding: 10px;
+            .toast {
+                bottom: 72px;
+                font-size: 11px;
+                padding: 6px 14px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== LOADING ===== -->
+    <!-- LOADING -->
     <div id="loading-screen">
         <div class="center-content">
             <img src="logokelas.png" alt="Logo" class="logo-img" />
             <div class="brand-text">IXF</div>
         </div>
-        <div class="version-text">Versi 26.0</div>
+        <div class="version-text">Versi 26.1</div>
     </div>
 
-    <!-- ===== OVERLAY INPUT NAMA (AWAL) ===== -->
+    <!-- OVERLAY NAMA -->
     <div id="name-overlay">
         <div class="name-card">
             <h2>Masukkan Nama</h2>
@@ -1917,74 +2437,47 @@
         </div>
     </div>
 
-    <!-- ===== OVERLAY LOGIN CHAT ===== -->
-    <div id="chat-login-overlay">
-        <div class="chat-login-card">
-            <h2>💬 Chat IXF</h2>
-            <p class="sub">Masuk dengan Nama &amp; ID 5 digit</p>
-            <div class="field-group">
-                <label for="chat-login-name">Nama Kamu</label>
-                <input type="text" id="chat-login-name" placeholder="Nama panggilan" maxlength="20" autocomplete="off" />
-            </div>
-            <div class="field-group">
-                <label for="chat-login-id">ID Unik (5 digit angka)</label>
-                <input type="text" id="chat-login-id" placeholder="Contoh: 10542" maxlength="5" autocomplete="off" inputmode="numeric" />
-                <div class="hint">* Gunakan ID yang sama setiap kali masuk</div>
-            </div>
-            <div class="login-error" id="chat-login-error"></div>
-            <button id="chat-login-btn">Masuk Chat</button>
-        </div>
-    </div>
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
 
-    <!-- ===== HALAMAN UTAMA ===== -->
+    <!-- MAIN CONTENT -->
     <div id="main-content">
-        <nav class="top-nav">
-            <span class="nav-title" id="navTitle">Beranda</span>
-            <div class="nav-actions">
-                <button class="report-btn" id="reportBtn" aria-label="Laporkan bug">
-                    <span>!</span>
-                </button>
-            </div>
-        </nav>
 
-        <!-- ===== HERO ===== -->
-        <div class="hero">
-            <div class="hero-text" id="heroText">
-                <span id="typewriter-content"></span><span class="cursor"></span>
+        <!-- SEARCH HEADER -->
+        <div id="search-header">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="globalSearch" placeholder="Cari nama siswa atau jadwal..." autocomplete="off" />
+                <button class="search-clear" id="searchClear">✕</button>
+                <div class="search-dropdown" id="searchDropdown"></div>
             </div>
-            <div class="hero-subtitle">Website Kelas IX F</div>
+            <button class="settings-header-btn" id="settingsHeaderBtn" aria-label="Pengaturan">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </button>
         </div>
 
         <div class="main-body">
-            <!-- ===== LENGKUNGAN ===== -->
-            <div class="curve"></div>
-
-            <!-- ===== PAGE BERANDA ===== -->
+            <!-- HOME -->
             <div id="page-home" class="page-content active">
                 <div class="photo-section">
                     <div class="photo-wrapper" id="photoWrapper">
-                        <img src="Picsart_26-07-13_18-17-11-957.jpg"
-                        alt="Foto Profil"
-                        class="profile-photo"
-                        draggable="false"
-                        oncontextmenu="return false"
-                        />
+                        <img src="1784960267147.png" alt="Foto Profil" class="profile-photo" draggable="false" oncontextmenu="return false" />
                     </div>
                     <div class="photo-text">
                         <div class="teacher-name" id="teacherName"></div>
                         <div class="teacher-role" id="teacherRole">Wali kelas IX F</div>
                     </div>
                 </div>
-
-                <div class="search-section">
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Cari siswa..." autocomplete="off" />
-                    </div>
-                    <div class="search-results" id="searchResults"></div>
+                <div class="student-list-section" id="studentListSection">
+                    <div class="list-title">📋 Daftar Siswa IX F</div>
+                    <div class="student-grid" id="studentGrid"></div>
                 </div>
             </div>
 
-            <!-- ===== PAGE JADWAL ===== -->
+            <!-- JADWAL -->
             <div id="page-schedule" class="page-content">
                 <div class="page-schedule-wrapper">
                     <div class="schedule-now" id="scheduleNow">
@@ -1995,7 +2488,21 @@
                 </div>
             </div>
 
-            <!-- ===== PAGE GALERI ===== -->
+            <!-- MUSIC -->
+            <div id="page-music" class="page-content">
+                <div class="page-music-wrapper">
+                    <div class="music-title">🎵 Putar Lagu favorit mereka</div>
+                    <div class="music-embed-container">
+                        <iframe
+                        src="https://open.spotify.com/embed/playlist/48eLfrEugCjf4wF6hpzYRA?utm_source=generator"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                        ></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GALERI -->
             <div id="page-gallery" class="page-content">
                 <div class="gallery-container" id="galleryContainer">
                     <div class="gallery-slider" id="gallerySlider"></div>
@@ -2005,114 +2512,207 @@
                 </div>
             </div>
 
-            <!-- ===== PAGE CHAT ===== -->
-            <div id="page-chat" class="page-content">
-                <div class="page-chat-wrapper">
-                    <!-- Header info -->
-                    <div class="chat-header" id="chatHeader">
-                        <span class="chat-with-label">💬 <span id="chatContactLabel">Belum ada kontak</span></span>
-                        <span class="chat-status" id="chatStatus">⏸ offline</span>
-                    </div>
+            <!-- FEED — SHORTS FULL LAYAR dengan kontrol kustom (LAYOUT BARU) -->
+            <div id="page-feed" class="page-content">
+                <div class="page-feed-wrapper" id="feedWrapper">
+                    <div class="shorts-container">
+                        <video id="shortsVideo"
+                            src="video konten9f.mp4"
+                            playsinline
+                            muted
+                            autoplay
+                            loop>
+                            Browser Anda tidak mendukung pemutaran video.
+                        </video>
 
-                    <!-- Contact input -->
-                    <div class="chat-contact-row">
-                        <input type="text" id="chatContactInput" placeholder="ID teman (5 digit)" maxlength="5" inputmode="numeric" autocomplete="off" />
-                        <button id="chatConnectBtn">Hubungi</button>
-                        <div class="contact-error" id="chatContactError"></div>
-                    </div>
+                        <!-- Tombol play/pause di tengah layar (SEKARANG BERADA DI LUAR .video-controls) -->
+                        <div class="play-center" id="playCenter">
+                            <button id="playBtn">
+                                <!-- Ikon play (segitiga) default -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="6,3 20,12 6,21" />
+                                </svg>
+                            </button>
+                        </div>
 
-                    <!-- Messages -->
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="empty-chat">
-                            <span class="emoji">💬</span>
-                            Masukkan ID teman untuk mulai chatting
+                        <!-- Kontrol bawah (baru) -->
+                        <div class="video-controls" id="videoControls">
+                            <div class="controls-bottom-bar">
+                                <div class="controls-top">
+                                    <button class="ctrl-btn" id="muteBtn">🔊</button>
+                                    <div class="progress-wrap">
+                                        <input type="range" class="progress-bar" id="progressBar" value="0" step="0.01" />
+                                    </div>
+                                    <button class="ctrl-btn" id="speedBtn">1x</button>
+                                </div>
+                                <div class="controls-bottom">
+                                    <span id="timeCurrent">0:00</span>
+                                    <span class="time-sep">/</span>
+                                    <span id="timeTotal">0:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PENGATURAN -->
+            <div id="page-settings" class="page-content">
+                <h2>Pengaturan</h2>
+
+                <div class="settings-subpage" id="settingsDisplaySubpage">
+                    <div class="subpage-header">
+                        <button class="back-btn" id="displayBackBtn">‹</button>
+                        <span class="subpage-title">Tampilan</span>
+                    </div>
+                    <div class="display-option" id="darkModeOption">
+                        <div class="option-left">
+                            <span class="option-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+                                    <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+                                    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+                                    <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+                                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 c.92 0 1.7-.68 1.83-1.6.09-.64-.2-1.25-.66-1.69-.47-.45-.72-1.07-.66-1.71.13-.93.91-1.6 1.83-1.6H17c2.8 0 5-2.2 5-5 0-4.4-4.5-8-10-8z"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="option-label">Mode Gelap</div>
+                                <div class="option-desc">Aktifkan tampilan gelap</div>
+                            </div>
+                        </div>
+                        <button class="toggle-switch" id="darkModeToggle" aria-label="Toggle dark mode">
+                            <span class="thumb"></span>
+                        </button>
+                    </div>
+                    <div class="display-option" id="fontStyleOption">
+                        <div class="option-left">
+                            <span class="option-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+                                    <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+                                    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+                                    <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+                                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 c.92 0 1.7-.68 1.83-1.6.09-.64-.2-1.25-.66-1.69-.47-.45-.72-1.07-.66-1.71.13-.93.91-1.6 1.83-1.6H17c2.8 0 5-2.2 5-5 0-4.4-4.5-8-10-8z"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="option-label">Gaya Font</div>
+                                <div class="option-desc">Pilih gaya font untuk seluruh tampilan</div>
+                            </div>
+                        </div>
+                        <div class="option-right">
+                            <select id="fontStyleSelect"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settingsMainContent">
+                    <div class="settings-group name-change-group">
+                        <label for="changeNameInput">Ganti Nama</label>
+                        <div class="desc">Hanya huruf, maksimal 9 karakter. Hanya bisa diganti setiap 30 hari sekali.</div>
+                        <div class="name-input-wrapper">
+                            <input type="text" id="changeNameInput" placeholder="Nama baru" maxlength="9" autocomplete="off" />
+                            <button id="changeNameBtn">Ganti Nama</button>
+                        </div>
+                        <div class="char-count-change" id="charCountChange">0 / 9</div>
+                        <div class="error-msg-change" id="errorMsgChange"></div>
+                        <div class="name-change-info" id="nameChangeInfo">
+                            <span class="highlight"></span> <span id="nameChangeStatus">Memuat...</span>
                         </div>
                     </div>
 
-                    <!-- Message input -->
-                    <div class="chat-input-row">
-                        <input type="text" id="chatMsgInput" placeholder="Ketik pesan..." autocomplete="off" disabled />
-                        <button id="chatSendBtn" disabled>Kirim</button>
+                    <div class="settings-nav-card" id="displayNavCard">
+                        <div class="nav-left">
+                            <span class="nav-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+                                    <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+                                    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+                                    <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+                                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 c.92 0 1.7-.68 1.83-1.6.09-.64-.2-1.25-.66-1.69-.47-.45-.72-1.07-.66-1.71.13-.93.91-1.6 1.83-1.6H17c2.8 0 5-2.2 5-5 0-4.4-4.5-8-10-8z"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="nav-label">Tampilan</div>
+                                <div class="nav-desc">Atur tema, font, dan lainnya</div>
+                            </div>
+                        </div>
+                        <div class="nav-right">›</div>
+                    </div>
+
+                    <div class="settings-group" style="margin-top:12px;">
+                        <label>Laporan Bug</label>
+                        <div class="desc">Laporkan kendala atau saran perbaikan kepada tim pengembang.</div>
+                        <button id="reportBtnSettings" style="padding:10px 20px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-weight:500;font-size:0.95rem;cursor:pointer;width:100%;">Buka Form Laporan</button>
                     </div>
                 </div>
             </div>
-
-            <!-- ===== PAGE PENGATURAN (clean) ===== -->
-            <div id="page-settings" class="page-content">
-                <h2>⚙️ Pengaturan</h2>
-
-                <!-- GANTI NAMA -->
-                <div class="settings-group name-change-group">
-                    <label for="changeNameInput">✏️ Ganti Nama</label>
-                    <div class="desc">Hanya huruf, maksimal 9 karakter. Hanya bisa diganti setiap 30 hari sekali.</div>
-                    <div class="name-input-wrapper">
-                        <input type="text" id="changeNameInput" placeholder="Nama baru" maxlength="9" autocomplete="off" />
-                        <button id="changeNameBtn">Ganti Nama</button>
-                    </div>
-                    <div class="char-count-change" id="charCountChange">0 / 9</div>
-                    <div class="error-msg-change" id="errorMsgChange"></div>
-                    <div class="name-change-info" id="nameChangeInfo">
-                        <span class="highlight">⏳</span> <span id="nameChangeStatus">Memuat...</span>
-                    </div>
-                </div>
-
-                <!-- CHAT LOGOUT -->
-                <div class="settings-group" style="margin-top:16px;">
-                    <label>🔐 Chat</label>
-                    <div class="desc">Keluar dari chat dan hapus data login lokal.</div>
-                    <button id="chatLogoutBtn" style="padding:10px 20px;background:#e74c3c;color:#fff;border:none;border-radius:12px;font-weight:500;font-size:0.95rem;cursor:pointer;font-family:'Roboto',sans-serif;width:100%;">Logout dari Chat</button>
-                </div>
-
-                <p style="margin-top: 20px; color: #999; font-size: 14px;">Pengaturan lainnya (tema, notifikasi) dalam pengembangan.</p>
-            </div>
-
         </div>
-        <!-- /main-body -->
 
-        <!-- ===== BOTTOM NAV ===== -->
+        <!-- BOTTOM NAV -->
         <nav class="bottom-nav" id="bottomNav">
+            <div id="nav-indicator"></div>
+
             <button class="nav-item active" data-page="home">
-                <span class="nav-icon">⌂</span>
-                <span class="nav-label">Beranda</span>
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </span>
             </button>
             <button class="nav-item" data-page="schedule">
-                <span class="nav-icon">📅</span>
-                <span class="nav-label">Jadwal</span>
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                        <line x1="16" x2="16" y1="2" y2="6"/>
+                        <line x1="8" x2="8" y1="2" y2="6"/>
+                        <line x1="3" x2="21" y1="10" y2="10"/>
+                    </svg>
+                </span>
+            </button>
+            <button class="nav-item" data-page="music">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18V5l12-2v13"/>
+                        <circle cx="6" cy="18" r="3"/>
+                        <circle cx="18" cy="16" r="3"/>
+                    </svg>
+                </span>
             </button>
             <button class="nav-item" data-page="gallery">
-                <span class="nav-icon">🖼️</span>
-                <span class="nav-label">Galeri</span>
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                        <circle cx="9" cy="9" r="2"/>
+                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                    </svg>
+                </span>
             </button>
-            <button class="nav-item" data-page="chat">
-                <span class="nav-icon">💬</span>
-                <span class="nav-label">Chat</span>
-            </button>
-            <button class="nav-item" data-page="settings">
-                <span class="nav-icon">⚙</span>
-                <span class="nav-label">Pengaturan</span>
+            <button class="nav-item" data-page="feed">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m10 9 5 3-5 3V9z"/>
+                        <rect width="14" height="20" x="5" y="2" rx="3" ry="3"/>
+                    </svg>
+                </span>
             </button>
         </nav>
     </div>
-    <!-- /main-content -->
 
-    <!-- ===== MODAL LAPORAN ===== -->
+    <!-- MODAL LAPORAN -->
     <div class="modal-overlay" id="reportModal">
         <div class="modal-content report-modal">
             <button class="modal-close" id="reportModalClose">&times;</button>
-            <h3>📋 Laporkan Bug kepada tim dukungan kami</h3>
-            <p class="sub">Isi formulir di bawah untuk melaporkan kendala atau saran perbaikan kami akan membalas dalam maksimal 48 jam.</p>
+            <h3>Laporkan Bug</h3>
+            <p class="sub">Isi formulir di bawah, kami akan membalas dalam maksimal 48 jam.</p>
             <div class="form-wrapper">
                 <div class="loading-placeholder" id="formLoading">
                     <div class="spinner"></div>
                     <span>Memuat formulir...</span>
                 </div>
-                <iframe
-                src="https://docs.google.com/forms/d/e/1FAIpQLScY5qHOxLrt1_TwdHfzmXJO1gA8nMsW_NZ0f8cn2LJxrrPDxA/viewform?embedded=true"
-                id="reportFrame"
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                loading="lazy"
-                onload="document.getElementById('formLoading').style.display='none'"
-                ></iframe>
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScY5qHOxLrt1_TwdHfzmXJO1gA8nMsW_NZ0f8cn2LJxrrPDxA/viewform?embedded=true" id="reportFrame" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" loading="lazy" onload="document.getElementById('formLoading').style.display='none'"></iframe>
             </div>
         </div>
     </div>
@@ -2120,9 +2720,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // ============================================================
-            // 0. KONFIGURASI FIREBASE (GANTI DENGAN MILIKMU)
+            // KONFIGURASI FIREBASE (tidak digunakan untuk demo)
             // ============================================================
-            // ===== ISI DI BAWAH INI DENGAN KONFIGURASI FIREBASE KAMU =====
             const firebaseConfig = {
                 apiKey: "AIzaSyDummyKeyGantiDenganMilikmu",
                 authDomain: "your-project.firebaseapp.com",
@@ -2132,23 +2731,15 @@
                 messagingSenderId: "123456789",
                 appId: "1:123456789:web:abcdef"
             };
-            // ============================================================
-
-            // Inisialisasi Firebase
-            let firebaseInitialized = false;
             try {
                 firebase.initializeApp(firebaseConfig);
-                firebaseInitialized = true;
                 console.log('✅ Firebase initialized');
             } catch (err) {
                 console.warn('⚠️ Firebase gagal diinisialisasi:', err);
-                // Tampilkan pesan di UI nanti
             }
 
-            const database = firebaseInitialized ? firebase.database() : null;
-
             // ============================================================
-            // 1. ELEMEN & STATE
+            // ELEMEN
             // ============================================================
             const loadingScreen = document.getElementById('loading-screen');
             const mainContent = document.getElementById('main-content');
@@ -2157,22 +2748,21 @@
             const charCount = document.getElementById('char-count');
             const errorMsg = document.getElementById('error-msg');
             const submitBtn = document.getElementById('submit-name');
-            const typewriterContent = document.getElementById('typewriter-content');
 
             const photoWrapper = document.getElementById('photoWrapper');
             const teacherNameEl = document.getElementById('teacherName');
             const teacherRoleEl = document.getElementById('teacherRole');
 
-            const searchInput = document.getElementById('searchInput');
-            const searchResults = document.getElementById('searchResults');
+            const studentGrid = document.getElementById('studentGrid');
 
             const navItems = document.querySelectorAll('.nav-item');
-            const navTitle = document.getElementById('navTitle');
+            const navIndicator = document.getElementById('nav-indicator');
             const pages = {
                 home: document.getElementById('page-home'),
                 schedule: document.getElementById('page-schedule'),
+                music: document.getElementById('page-music'),
                 gallery: document.getElementById('page-gallery'),
-                chat: document.getElementById('page-chat'),
+                feed: document.getElementById('page-feed'),
                 settings: document.getElementById('page-settings')
             };
 
@@ -2190,45 +2780,78 @@
             const galleryPrev = document.getElementById('galleryPrev');
             const galleryNext = document.getElementById('galleryNext');
 
-            const reportBtn = document.getElementById('reportBtn');
             const reportModal = document.getElementById('reportModal');
             const reportModalClose = document.getElementById('reportModalClose');
+            const reportBtnSettings = document.getElementById('reportBtnSettings');
 
-            // --- CHAT ELEMENTS ---
-            const chatLoginOverlay = document.getElementById('chat-login-overlay');
-            const chatLoginName = document.getElementById('chat-login-name');
-            const chatLoginId = document.getElementById('chat-login-id');
-            const chatLoginError = document.getElementById('chat-login-error');
-            const chatLoginBtn = document.getElementById('chat-login-btn');
+            const displayNavCard = document.getElementById('displayNavCard');
+            const settingsDisplaySubpage = document.getElementById('settingsDisplaySubpage');
+            const settingsMainContent = document.getElementById('settingsMainContent');
+            const displayBackBtn = document.getElementById('displayBackBtn');
 
-            const chatContactInput = document.getElementById('chatContactInput');
-            const chatConnectBtn = document.getElementById('chatConnectBtn');
-            const chatContactError = document.getElementById('chatContactError');
-            const chatContactLabel = document.getElementById('chatContactLabel');
-            const chatStatus = document.getElementById('chatStatus');
-            const chatMessages = document.getElementById('chatMessages');
-            const chatMsgInput = document.getElementById('chatMsgInput');
-            const chatSendBtn = document.getElementById('chatSendBtn');
-            const chatLogoutBtn = document.getElementById('chatLogoutBtn');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+
+            const fontStyleSelect = document.getElementById('fontStyleSelect');
+
+            const globalSearchInput = document.getElementById('globalSearch');
+            const searchDropdown = document.getElementById('searchDropdown');
+            const searchClear = document.getElementById('searchClear');
+
+            const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
+
+            const toast = document.getElementById('toast');
+
+            // ===== SHORTS VIDEO ELEMEN (layout baru) =====
+            const shortsVideo = document.getElementById('shortsVideo');
+            const videoControls = document.getElementById('videoControls');
+            const playBtn = document.getElementById('playBtn');
+            const playCenter = document.getElementById('playCenter');
+            const muteBtn = document.getElementById('muteBtn');
+            const speedBtn = document.getElementById('speedBtn');
+            const progressBar = document.getElementById('progressBar');
+            const timeCurrent = document.getElementById('timeCurrent');
+            const timeTotal = document.getElementById('timeTotal');
 
             let savedName = localStorage.getItem('ixf_user_name');
-            let chatUser = null; // { name, id }
-            let chatRoomId = null;
-            let chatContactId = null;
-            let chatListener = null;
-            let chatTypingTimeout = null;
-
-            const pageTitles = {
-                home: 'Beranda',
-                schedule: 'Jadwal',
-                gallery: 'Galeri',
-                chat: 'Chat',
-                settings: 'Pengaturan'
-            };
+            let toastTimer = null;
 
             // ============================================================
-            // 2. DATA JADWAL KELAS 9F
+            // DATA
             // ============================================================
+            const studentData = [
+                { no: 1, name: 'AFFLAH INTAN NOOR IZZAH' },
+                { no: 2, name: 'AHMAD RENO KHOIDOR MAULANA' },
+                { no: 3, name: 'AMELIA AYU SAFIRA' },
+                { no: 4, name: 'ANGGUN KHAIRUNNISA AZZAHRA' },
+                { no: 5, name: 'ARIFFI KHOIRUN NIZAR' },
+                { no: 6, name: 'ATHALIA WIDYA PRAMESWARI' },
+                { no: 7, name: 'AYU NOVITA DIUSTIRA' },
+                { no: 8, name: 'BISMA NARENDRA AZKA LAKSANA' },
+                { no: 9, name: 'CALLISTA MICHEILS NATHANIA' },
+                { no: 10, name: 'CYNTHA LIALATUL QUR\'AN' },
+                { no: 11, name: 'DEVARA RAKHA ADWIJAYA' },
+                { no: 12, name: 'DHIA AULIA NUR MAKAILA' },
+                { no: 13, name: 'DINI ANGGRAINI' },
+                { no: 14, name: 'FAIRIS ZALFA HERDIANI' },
+                { no: 15, name: 'FIRMAN MAULANA PUTRA' },
+                { no: 16, name: 'GHISTA FELIYANA FAIRIN' },
+                { no: 17, name: 'IBNU SAWQISYAH' },
+                { no: 18, name: 'JULIA PRICILIA TUNGGAL DEWI' },
+                { no: 19, name: 'M. RAFY HANIF ASLAM' },
+                { no: 20, name: 'MOCH ARIEF RAHMAN HAKIM' },
+                { no: 21, name: 'MUHAMMAD CAESAR FAHREZY' },
+                { no: 22, name: 'MUHAMMAD NAUFAL PUTRA RADITYA' },
+                { no: 23, name: 'MUHAMMAD RIZAL TRISANTOSO' },
+                { no: 24, name: 'NAFITA DWI LESTARI' },
+                { no: 25, name: 'NINDIYA CALLISTA PRIMALIA SARI' },
+                { no: 26, name: 'PRADANA RAHADIAN NUGROHO' },
+                { no: 27, name: 'QANIAH SHAKIRAH PULUNGAN' },
+                { no: 28, name: 'SATRIO ANDI BRAMANTIO' },
+                { no: 29, name: 'SAZKIA AULIA PUTRI' },
+                { no: 30, name: 'YANJARTA AINUN NADZAR' },
+                { no: 31, name: 'YULIANA NUR CAHYA' }
+            ];
+
             const scheduleData = {
                 'Senin': [
                     { jam: [2, 3, 4], mapel: 'Ilmu Pengetahuan Sosial', guru: 'Pak Ali' },
@@ -2272,9 +2895,129 @@
                 7: { start: 11 * 60 + 15, end: 11 * 60 + 55 }
             };
 
+            const TOTAL_IMAGES = 43;
+            const imageFileNames = [
+                'IMG-20250324-WA0064.jpg', 'IMG-20241121-WA0090.jpg', 'IMG-20250416-WA0020.jpg',
+                'IMG-20241121-WA0086.jpg', 'IMG-20250216-WA0006.jpg', 'IMG-20250216-WA0005.jpg',
+                'IMG-20241121-WA0077.jpg', 'IMG-20240816-WA0006.jpg', 'IMG-20240812_160956_228.jpg',
+                'IMG-20240816-WA0006 (1).jpg', 'IMG-20240816-WA0010.jpg', 'IMG-20250416-WA0018.jpg',
+                '1732272881190586-0.jpg', 'IMG-20240921-WA0014.jpg', 'IMG-20240921-WA0015.jpg',
+                'IMG-20241121-WA0084.jpg', 'IMG-20250416-WA0022.jpg', 'IMG-20240816-WA0009.jpg',
+                'download.png', 'IMG-20250324-WA0066.jpg', 'IMG-20240816-WA0007 (1).jpg',
+                '1732272872295330-2.jpg', 'b7a33b005e9841429aa90b3a80fe7775.jpg', 'IMG-20240816-WA0008.jpg',
+                'IMG-20241121-WA0092.jpg', 'IMG-20250416-WA0026.jpg', 'IMG-20250324-WA0067.jpg',
+                'IMG-20241121-WA0080.jpg', '1732272876081645-1.jpg', '1732272862960891-3.jpg',
+                'IMG-20241005-WA0022.jpg', 'IMG-20241121-WA0078.jpg', 'IMG-20250216-WA0003.jpg',
+                'IMG-20241121-WA0088.jpg', 'IMG-20240816-WA0003.jpg', 'IMG-20241121-WA0082.jpg',
+                'IMG-20250216-WA0007.jpg', 'IMG-20240816-WA0008 (1).jpg', 'IMG-20250416-WA0028.jpg',
+                'IMG-20240816-WA0007.jpg', 'IMG-20250416-WA0016.jpg', 'IMG-20240816-WA0010 (1).jpg',
+                'IMG-20250416-WA0024.jpg'
+            ];
+
             // ============================================================
-            // 3. FUNGSI JADWAL
+            // FONT STYLE - 78 UNIQUE FONTS
             // ============================================================
+            const fontList = [
+                'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Oswald', 'Raleway', 'Ubuntu',
+                'Merriweather', 'Playfair Display', 'Nunito', 'Poppins', 'Work Sans',
+                'Source Sans Pro', 'PT Sans', 'Dosis', 'Quicksand', 'Josefin Sans',
+                'Barlow', 'Inter', 'Lexend', 'Manrope', 'Plus Jakarta Sans', 'DM Sans',
+                'Space Grotesk', 'Archivo', 'Figtree', 'Onest', 'Sora', 'Epilogue',
+                'Fraunces', 'Instrument Sans', 'Literata', 'Newsreader', 'Public Sans',
+                'Recursive', 'Sen', 'Syne', 'Urbanist', 'Zilla Slab', 'Amiri',
+                'Cormorant Garamond', 'EB Garamond', 'Josefin Slab', 'Libre Baskerville',
+                'Lora', 'Old Standard TT', 'PT Serif', 'Source Serif Pro',
+                'Tiro Devanagari Marathi', 'Tiro Gurmukhi', 'Tiro Kannada', 'Tiro Tamil',
+                'Tiro Telugu', 'Noto Sans', 'Noto Serif', 'Nunito Sans', 'Fira Sans',
+                'Fira Sans Condensed', 'Fira Sans Extra Condensed', 'IBM Plex Sans',
+                'IBM Plex Serif', 'IBM Plex Mono', 'Inconsolata', 'JetBrains Mono',
+                'Source Code Pro', 'Ubuntu Mono', 'Space Mono', 'Courier Prime',
+                'Roboto Mono', 'PT Mono', 'Anonymous Pro', 'Overpass Mono',
+                'Oxygen Mono', 'Droid Sans Mono', 'Share Tech Mono', 'Fira Mono',
+                'Nanum Gothic Coding', 'Noto Sans Mono'
+            ];
+
+            let loadedFonts = new Set();
+
+            function loadGoogleFont(fontName) {
+                if (loadedFonts.has(fontName)) return;
+                const formatted = fontName.replace(/ /g, '+');
+                const link = document.createElement('link');
+                link.href = `https://fonts.googleapis.com/css2?family=${formatted}:wght@400;500;700&display=swap`;
+                link.rel = 'stylesheet';
+                document.head.appendChild(link);
+                loadedFonts.add(fontName);
+            }
+
+            function applyFont(fontName) {
+                document.documentElement.style.setProperty('--global-font', `'${fontName}', sans-serif`);
+                localStorage.setItem('ixf_selected_font', fontName);
+                if (fontName !== 'Roboto') {
+                    loadGoogleFont(fontName);
+                }
+                fontStyleSelect.value = fontName;
+                showToast('🔤 Gaya font diubah menjadi ' + fontName);
+            }
+
+            function populateFontSelect() {
+                fontStyleSelect.innerHTML = '';
+                fontList.forEach(font => {
+                    const opt = document.createElement('option');
+                    opt.value = font;
+                    opt.textContent = font;
+                    opt.style.fontFamily = `'${font}', sans-serif`;
+                    fontStyleSelect.appendChild(opt);
+                });
+                const savedFont = localStorage.getItem('ixf_selected_font') || 'Roboto';
+                fontStyleSelect.value = savedFont;
+                document.documentElement.style.setProperty('--global-font', `'${savedFont}', sans-serif`);
+                if (savedFont !== 'Roboto') {
+                    loadGoogleFont(savedFont);
+                }
+                fontStyleSelect.addEventListener('change', function() {
+                    const selected = this.value;
+                    applyFont(selected);
+                });
+            }
+
+            // ============================================================
+            // DARK MODE
+            // ============================================================
+            function applyDarkMode(isDark) {
+                if (isDark) {
+                    document.documentElement.classList.add('dark-mode');
+                    darkModeToggle.classList.add('on');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                    darkModeToggle.classList.remove('on');
+                }
+                localStorage.setItem('ixf_dark_mode', isDark ? 'true' : 'false');
+            }
+
+            function toggleDarkMode() {
+                const isDark = !document.documentElement.classList.contains('dark-mode');
+                applyDarkMode(isDark);
+                showToast(isDark ? '🌙 Mode Gelap diaktifkan' : '☀️ Mode Terang diaktifkan');
+            }
+
+            const savedDark = localStorage.getItem('ixf_dark_mode');
+            if (savedDark === 'true') {
+                applyDarkMode(true);
+            } else if (savedDark === 'false') {
+                applyDarkMode(false);
+            } else {
+                applyDarkMode(false);
+            }
+
+            darkModeToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleDarkMode();
+            });
+
+            // ============================================================
+            // FUNGSI
+            // ============================================================
+
             function getTodayIndex() {
                 const d = new Date();
                 let idx = d.getDay() - 1;
@@ -2313,6 +3056,20 @@
                 return { mapel: 'Istirahat / Kosong', guru: '', jam: null };
             }
 
+            // ============================================================
+            // RENDER SISWA
+            // ============================================================
+            function renderStudentList() {
+                let html = '';
+                studentData.forEach(item => {
+                    html += `<div class="student-item"><span class="student-no">${item.no}.</span> ${item.name}</div>`;
+                });
+                studentGrid.innerHTML = html;
+            }
+
+            // ============================================================
+            // RENDER JADWAL
+            // ============================================================
             function renderSchedule() {
                 const todayIdx = getTodayIndex();
                 let html = '';
@@ -2321,9 +3078,8 @@
                     const day = dayNames[i];
                     const lessons = scheduleData[day] || [];
                     const isActive = (i === todayIdx);
-                    const isToday = isActive;
 
-                    html += `<div class="day-card ${isActive ? 'active-day' : ''}">`;
+                    html += `<div class="day-card ${isActive ? 'active-day' : ''}" data-day="${day}">`;
                     html += `<div class="day-header">${day}</div>`;
                     html += `<div class="day-body">`;
 
@@ -2341,7 +3097,7 @@
                         } else {
                             for (let les of lessons) {
                                 let hasActive = false;
-                                if (isToday) {
+                                if (isActive) {
                                     for (let j of les.jam) {
                                         if (isJamActive(j)) { hasActive = true; break; }
                                     }
@@ -2349,7 +3105,7 @@
                                 const displayText = les.guru ?
                                     `${les.mapel} (${les.guru})` :
                                     les.mapel;
-                                html += `<div class="subject-item ${hasActive ? 'active-now' : ''}">`;
+                                html += `<div class="subject-item ${hasActive ? 'active-now' : ''}" data-mapel="${les.mapel}" data-guru="${les.guru}" data-day="${day}">`;
                                 html += `<span class="mapel">${displayText}</span>`;
                                 html += `<span class="dot-active"></span>`;
                                 html += `</div>`;
@@ -2362,6 +3118,9 @@
 
                 scheduleGrid.innerHTML = html;
                 updateNowText();
+                document.querySelectorAll('.day-card.highlight-match').forEach(el => el.classList.remove('highlight-match'));
+                document.querySelectorAll('.subject-item.highlight-match').forEach(el => el.classList.remove(
+                'highlight-match'));
             }
 
             function updateNowText() {
@@ -2383,42 +3142,8 @@
             }
 
             // ============================================================
-            // 4. TYPEWRITER & LONG PRESS
+            // LONG PRESS FOTO
             // ============================================================
-            let typewriterTimeout = null;
-            const NAME_TEXT = 'Umar Adi Susanto, S.Pd.M.Ling.Gr';
-            const ROLE_TEXT = 'Wali kelas';
-
-            function typeWriter(text, element, speed = 55, callback) {
-                let i = 0;
-                element.textContent = '';
-
-                function typing() {
-                    if (i < text.length) {
-                        element.textContent += text.charAt(i);
-                        i++;
-                        typewriterTimeout = setTimeout(typing, speed);
-                    } else {
-                        if (callback) callback();
-                    }
-                }
-                typing();
-            }
-
-            function stopTypewriter() {
-                if (typewriterTimeout) {
-                    clearTimeout(typewriterTimeout);
-                    typewriterTimeout = null;
-                }
-            }
-
-            function resetTeacherText() {
-                stopTypewriter();
-                teacherNameEl.textContent = '';
-                teacherRoleEl.classList.remove('visible');
-                photoWrapper.classList.remove('active');
-            }
-
             let longPressTimer = null;
             let isLongPress = false;
 
@@ -2429,11 +3154,8 @@
                 longPressTimer = setTimeout(() => {
                     isLongPress = true;
                     photoWrapper.classList.add('active');
-                    stopTypewriter();
-                    teacherNameEl.textContent = '';
-                    typeWriter(NAME_TEXT, teacherNameEl, 45, () => {
-                        teacherRoleEl.classList.add('visible');
-                    });
+                    teacherNameEl.textContent = 'Umar Adi Susanto, S.Pd.M.Ling.Gr';
+                    teacherRoleEl.classList.add('visible');
                 }, 500);
             }
 
@@ -2443,7 +3165,6 @@
                     longPressTimer = null;
                 }
                 if (isLongPress) {
-                    stopTypewriter();
                     teacherNameEl.textContent = '';
                     teacherRoleEl.classList.remove('visible');
                     photoWrapper.classList.remove('active');
@@ -2459,109 +3180,111 @@
             photoWrapper.addEventListener('mouseleave', endLongPress);
 
             // ============================================================
-            // 5. PENCARIAN SISWA
+            // NAVIGASI
             // ============================================================
-            const studentData = [
-                { no: 1, name: 'AFFLAH INTAN NOOR IZZAH' },
-                { no: 2, name: 'AHMAD RENO KHOIDOR MAULANA' },
-                { no: 3, name: 'AMELIA AYU SAFIRA' },
-                { no: 4, name: 'ANGGUN KHAIRUNNISA AZZAHRA' },
-                { no: 5, name: 'ARIFFI KHOIRUN NIZAR' },
-                { no: 6, name: 'ATHALIA WIDYA PRAMESWARI' },
-                { no: 7, name: 'AYU NOVITA DIUSTIRA' },
-                { no: 8, name: 'BISMA NARENDRA AZKA LAKSANA' },
-                { no: 9, name: 'CALLISTA MICHEILS NATHANIA' },
-                { no: 10, name: 'CYNTHA LIALATUL QUR\'AN' },
-                { no: 11, name: 'DEVARA RAKHA ADWIJAYA' },
-                { no: 12, name: 'DHIA AULIA NUR MAKAILA' },
-                { no: 13, name: 'DINI ANGGRAINI' },
-                { no: 14, name: 'FAIRIS ZALFA HERDIANI' },
-                { no: 15, name: 'FIRMAN MAULANA PUTRA' },
-                { no: 16, name: 'GHISTA FELIYANA FAIRIN' },
-                { no: 17, name: 'IBNU SAWQISYAH' },
-                { no: 18, name: 'JULIA PRICILIA TUNGGAL DEWI' },
-                { no: 19, name: 'M. RAFY HANIF ASLAM' },
-                { no: 20, name: 'MOCH ARIEF RAHMAN HAKIM' },
-                { no: 21, name: 'MUHAMMAD CAESAR FAHREZY' },
-                { no: 22, name: 'MUHAMMAD NAUFAL PUTRA RADITYA' },
-                { no: 23, name: 'MUHAMMAD RIZAL TRISANTOSO' },
-                { no: 24, name: 'NAFITA DWI LESTARI' },
-                { no: 25, name: 'NINDIYA CALLISTA PRIMALIA SARI' },
-                { no: 26, name: 'PRADANA RAHADIAN NUGROHO' },
-                { no: 27, name: 'QANIAH SHAKIRAH PULUNGAN' },
-                { no: 28, name: 'SATRIO ANDI BRAMANTIO' },
-                { no: 29, name: 'SAZKIA AULIA PUTRI' },
-                { no: 30, name: 'YANJARTA AINUN NADZAR' },
-                { no: 31, name: 'YULIANA NUR CAHYA' }
-            ];
-
-            function performSearch(query) {
-                const q = query.trim().toLowerCase();
-                let filtered = [];
-                if (q === '') {
-                    filtered = studentData;
-                } else {
-                    filtered = studentData.filter(item => item.name.toLowerCase().includes(q));
-                }
-                renderResults(filtered, q);
+            function updateIndicator(targetItem) {
+                if (!targetItem) return;
+                const navRect = document.getElementById('bottomNav').getBoundingClientRect();
+                const itemRect = targetItem.getBoundingClientRect();
+                const indicatorWidth = Math.max(24, itemRect.width * 0.35);
+                const left = itemRect.left - navRect.left + (itemRect.width - indicatorWidth) / 2;
+                navIndicator.style.left = left + 'px';
+                navIndicator.style.width = indicatorWidth + 'px';
             }
 
-            function renderResults(items, query) {
-                if (items.length === 0) {
-                    searchResults.innerHTML =
-                        `<div class="no-result">Tidak ada siswa dengan nama "${query}"</div>`;
-                    return;
-                }
-                let html = '';
-                items.forEach(item => {
-                    html += `<div class="result-item">${item.no}. ${item.name}</div>`;
-                });
-                searchResults.innerHTML = html;
-            }
-
-            searchInput.addEventListener('input', function() {
-                performSearch(this.value);
-            });
-
-            // ============================================================
-            // 6. NAVIGASI
-            // ============================================================
-            function navigateTo(pageId) {
+            function navigateTo(pageId, extra) {
                 Object.keys(pages).forEach(key => {
                     pages[key].classList.remove('active');
                 });
                 if (pages[pageId]) {
                     pages[pageId].classList.add('active');
                 }
-                navTitle.textContent = pageTitles[pageId] || 'IXF';
+
+                let activeItem = null;
                 navItems.forEach(item => {
                     item.classList.remove('active');
                     if (item.dataset.page === pageId) {
                         item.classList.add('active');
+                        activeItem = item;
                     }
                 });
 
+                if (activeItem) {
+                    updateIndicator(activeItem);
+                }
+
+                if (pageId === 'settings') {
+                    settingsMainContent.style.display = 'block';
+                    settingsDisplaySubpage.classList.remove('active');
+                }
+
                 if (pageId === 'schedule') {
                     renderSchedule();
+                    if (extra && extra.day) {
+                        setTimeout(() => {
+                            const dayCards = document.querySelectorAll('.day-card');
+                            dayCards.forEach(card => {
+                                if (card.dataset.day === extra.day) {
+                                    card.classList.add('highlight-match');
+                                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            });
+                            if (extra.mapel) {
+                                const items = document.querySelectorAll('.subject-item');
+                                items.forEach(el => {
+                                    if (el.dataset.mapel === extra.mapel && el.dataset.day === extra
+                                        .day) {
+                                        el.classList.add('highlight-match');
+                                    }
+                                });
+                            }
+                        }, 300);
+                    }
                 }
-                if (pageId === 'gallery') {
-                    updateGallery();
-                }
-                if (pageId === 'chat') {
-                    // Jika belum login chat, tampilkan overlay
-                    if (!chatUser) {
-                        chatLoginOverlay.classList.add('active');
-                    } else {
-                        chatLoginOverlay.classList.remove('active');
-                        // Refresh chat UI
-                        updateChatUI();
-                        if (chatRoomId) {
-                            listenMessages(chatRoomId);
-                        }
+
+                if (pageId === 'home') {
+                    renderStudentList();
+                    if (extra && extra.studentName) {
+                        setTimeout(() => {
+                            const items = document.querySelectorAll('.student-item');
+                            let found = false;
+                            items.forEach(el => {
+                                if (el.textContent.includes(extra.studentName)) {
+                                    el.style.background = 'rgba(166,124,82,0.15)';
+                                    el.style.borderLeft = '4px solid var(--primary)';
+                                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    found = true;
+                                    setTimeout(() => {
+                                        el.style.background = '';
+                                        el.style.borderLeft = '';
+                                    }, 2500);
+                                }
+                            });
+                            if (found) {
+                                showToast('👤 Menuju siswa: ' + extra.studentName);
+                            }
+                        }, 300);
                     }
                 }
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                closeDropdown();
+                globalSearchInput.value = '';
+                searchClear.classList.remove('visible');
+
+                if (pageId === 'feed') {
+                    if (shortsVideo) {
+                        shortsVideo.play().catch(function(e) { /* ignore */ });
+                    }
+                    showControlsTemporarily();
+                } else {
+                    if (shortsVideo) {
+                        shortsVideo.pause();
+                    }
+                    videoControls.classList.remove('visible');
+                    playCenter.classList.add('hidden');
+                    clearTimeout(controlsHideTimeout);
+                }
             }
 
             navItems.forEach(item => {
@@ -2570,45 +3293,411 @@
                     navigateTo(page);
                 });
             });
-            navTitle.textContent = 'Beranda';
+
+            settingsHeaderBtn.addEventListener('click', function() {
+                navigateTo('settings');
+            });
+
+            setTimeout(() => {
+                const activeNav = document.querySelector('.nav-item.active');
+                if (activeNav) {
+                    updateIndicator(activeNav);
+                }
+            }, 100);
+
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    const activeNav = document.querySelector('.nav-item.active');
+                    if (activeNav) {
+                        updateIndicator(activeNav);
+                    }
+                }, 200);
+            });
 
             // ============================================================
-            // 7. ENTER APP & NAMA AWAL
+            // TOAST
+            // ============================================================
+            function showToast(msg) {
+                if (toastTimer) {
+                    clearTimeout(toastTimer);
+                    toastTimer = null;
+                }
+                toast.textContent = msg;
+                toast.classList.add('show');
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                    toastTimer = null;
+                }, 2500);
+            }
+
+            // ============================================================
+            // SEARCH GLOBAL
+            // ============================================================
+            function performGlobalSearch(query) {
+                const q = query.trim().toLowerCase();
+                const dropdown = searchDropdown;
+
+                if (!q) {
+                    closeDropdown();
+                    searchClear.classList.remove('visible');
+                    return;
+                }
+
+                searchClear.classList.add('visible');
+                const results = [];
+
+                studentData.forEach(s => {
+                    if (s.name.toLowerCase().includes(q)) {
+                        results.push({
+                            type: 'student',
+                            icon: '👤',
+                            label: s.name,
+                            detail: `No. ${s.no}`,
+                            data: { studentName: s.name }
+                        });
+                    }
+                });
+
+                Object.keys(scheduleData).forEach(day => {
+                    const lessons = scheduleData[day];
+                    lessons.forEach(lesson => {
+                        if (lesson.mapel && lesson.mapel !== 'kokulikuler') {
+                            const searchText = `${lesson.mapel} ${lesson.guru} ${day}`.toLowerCase();
+                            if (searchText.includes(q)) {
+                                results.push({
+                                    type: 'schedule',
+                                    icon: '📖',
+                                    label: lesson.mapel,
+                                    detail: `${lesson.guru} · ${day}`,
+                                    data: { day: day, mapel: lesson.mapel, guru: lesson.guru }
+                                });
+                            }
+                        }
+                    });
+                });
+
+                const maxResults = 20;
+                const limited = results.slice(0, maxResults);
+
+                if (limited.length === 0) {
+                    dropdown.innerHTML = `<div class="no-result">Tidak ada hasil untuk "${q}"</div>`;
+                    dropdown.classList.add('open');
+                    return;
+                }
+
+                let html = '';
+                if (results.length > maxResults) {
+                    html +=
+                        `<div class="search-hint">Menampilkan ${maxResults} dari ${results.length} hasil</div>`;
+                }
+                limited.forEach(r => {
+                    const badgeClass = r.type === 'student' ? 'student' : 'schedule';
+                    const badgeLabel = r.type === 'student' ? 'Siswa' : 'Jadwal';
+                    html += `
+                                <div class="result-item" data-type="${r.type}" data-name="${r.label}" data-day="${r.data.day || ''}" data-mapel="${r.data.mapel || ''}" data-student="${r.data.studentName || ''}">
+                                    <span class="result-icon">${r.icon}</span>
+                                    <span class="result-text"><strong>${r.label}</strong> <span style="color:var(--text-muted);font-size:0.85rem;">${r.detail}</span></span>
+                                    <span class="result-badge ${badgeClass}">${badgeLabel}</span>
+                                </div>
+                            `;
+                });
+
+                dropdown.innerHTML = html;
+                dropdown.classList.add('open');
+
+                dropdown.querySelectorAll('.result-item').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const type = this.dataset.type;
+                        const name = this.dataset.name;
+                        const day = this.dataset.day;
+                        const mapel = this.dataset.mapel;
+                        const student = this.dataset.student;
+
+                        if (type === 'student') {
+                            navigateTo('home', { studentName: student || name });
+                        } else if (type === 'schedule') {
+                            navigateTo('schedule', { day: day, mapel: mapel });
+                        }
+                        closeDropdown();
+                        globalSearchInput.value = '';
+                        searchClear.classList.remove('visible');
+                    });
+                });
+            }
+
+            function closeDropdown() {
+                searchDropdown.classList.remove('open');
+                searchDropdown.innerHTML = '';
+            }
+
+            globalSearchInput.addEventListener('input', function() {
+                performGlobalSearch(this.value);
+            });
+
+            searchClear.addEventListener('click', function() {
+                globalSearchInput.value = '';
+                searchClear.classList.remove('visible');
+                closeDropdown();
+                globalSearchInput.focus();
+            });
+
+            document.addEventListener('click', function(e) {
+                const searchHeader = document.getElementById('search-header');
+                if (searchHeader && !searchHeader.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeDropdown();
+                    globalSearchInput.blur();
+                }
+            });
+
+            // ============================================================
+            // SHORTS VIDEO KONTROL KUSTOM — LAYOUT BARU dengan ikon
+            // ============================================================
+            let controlsHideTimeout = null;
+            let isControlsVisible = false;
+            let isDragging = false;
+
+            function formatTime(seconds) {
+                if (isNaN(seconds)) return '0:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            function updateProgress() {
+                if (!shortsVideo.duration) return;
+                const percent = (shortsVideo.currentTime / shortsVideo.duration) * 100;
+                progressBar.value = percent;
+                timeCurrent.textContent = formatTime(shortsVideo.currentTime);
+                timeTotal.textContent = formatTime(shortsVideo.duration);
+            }
+
+            function showControlsTemporarily() {
+                if (document.getElementById('page-feed').classList.contains('active')) {
+                    videoControls.classList.add('visible');
+                    playCenter.classList.remove('hidden');
+                    isControlsVisible = true;
+                    clearTimeout(controlsHideTimeout);
+                    controlsHideTimeout = setTimeout(() => {
+                        videoControls.classList.remove('visible');
+                        playCenter.classList.add('hidden');
+                        isControlsVisible = false;
+                    }, 3000);
+                }
+            }
+
+            // Fungsi untuk mengganti ikon play/pause
+            function updatePlayIcon(isPlaying) {
+                const playBtnEl = document.getElementById('playBtn');
+                if (isPlaying) {
+                    playBtnEl.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="6" y="4" width="4" height="16" rx="1.5" fill="currentColor"/>
+                                    <rect x="14" y="4" width="4" height="16" rx="1.5" fill="currentColor"/>
+                                </svg>
+                            `;
+                } else {
+                    playBtnEl.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="6,3 20,12 6,21" />
+                                </svg>
+                            `;
+                }
+            }
+
+            function togglePlay() {
+                if (shortsVideo.paused) {
+                    shortsVideo.play().catch(function(e) { /* ignore */ });
+                    updatePlayIcon(true);
+                } else {
+                    shortsVideo.pause();
+                    updatePlayIcon(false);
+                }
+                showControlsTemporarily();
+            }
+
+            shortsVideo.addEventListener('play', function() {
+                updatePlayIcon(true);
+            });
+            shortsVideo.addEventListener('pause', function() {
+                updatePlayIcon(false);
+            });
+            shortsVideo.addEventListener('timeupdate', updateProgress);
+            shortsVideo.addEventListener('loadedmetadata', function() {
+                timeTotal.textContent = formatTime(shortsVideo.duration);
+                progressBar.value = 0;
+                updateProgress();
+                if (!shortsVideo.paused) {
+                    updatePlayIcon(true);
+                } else {
+                    updatePlayIcon(false);
+                }
+            });
+
+            // Klik tombol play di tengah
+            playBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                togglePlay();
+            });
+
+            // Klik video toggle play/pause
+            shortsVideo.addEventListener('click', function(e) {
+                togglePlay();
+            });
+
+            muteBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                shortsVideo.muted = !shortsVideo.muted;
+                muteBtn.textContent = shortsVideo.muted ? '🔇' : '🔊';
+                showControlsTemporarily();
+            });
+
+            speedBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (shortsVideo.playbackRate === 1) {
+                    shortsVideo.playbackRate = 2;
+                    speedBtn.textContent = '2x';
+                } else {
+                    shortsVideo.playbackRate = 1;
+                    speedBtn.textContent = '1x';
+                }
+                showControlsTemporarily();
+            });
+
+            progressBar.addEventListener('input', function(e) {
+                isDragging = true;
+                const percent = parseFloat(this.value);
+                if (shortsVideo.duration) {
+                    const time = (percent / 100) * shortsVideo.duration;
+                    timeCurrent.textContent = formatTime(time);
+                }
+            });
+
+            progressBar.addEventListener('change', function(e) {
+                isDragging = false;
+                const percent = parseFloat(this.value);
+                if (shortsVideo.duration) {
+                    shortsVideo.currentTime = (percent / 100) * shortsVideo.duration;
+                    updateProgress();
+                }
+                showControlsTemporarily();
+            });
+
+            let lastTap = 0;
+            shortsVideo.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const mid = rect.width / 2;
+                if (x < mid) {
+                    shortsVideo.currentTime = Math.max(0, shortsVideo.currentTime - 10);
+                } else {
+                    shortsVideo.currentTime = Math.min(shortsVideo.duration, shortsVideo.currentTime + 10);
+                }
+                updateProgress();
+                showControlsTemporarily();
+            });
+
+            let touchStartX = 0;
+            let touchStartTime = 0;
+            shortsVideo.addEventListener('touchstart', function(e) {
+                const touch = e.touches[0];
+                touchStartX = touch.clientX;
+                touchStartTime = Date.now();
+            });
+
+            shortsVideo.addEventListener('touchend', function(e) {
+                const now = Date.now();
+                const delta = now - touchStartTime;
+                if (delta < 300 && delta > 50) {
+                    if (lastTap && (now - lastTap) < 300) {
+                        const rect = this.getBoundingClientRect();
+                        const x = touchStartX - rect.left;
+                        const mid = rect.width / 2;
+                        if (x < mid) {
+                            shortsVideo.currentTime = Math.max(0, shortsVideo.currentTime - 10);
+                        } else {
+                            shortsVideo.currentTime = Math.min(shortsVideo.duration, shortsVideo.currentTime + 10);
+                        }
+                        updateProgress();
+                        showControlsTemporarily();
+                        lastTap = 0;
+                    } else {
+                        lastTap = now;
+                    }
+                }
+            });
+
+            shortsVideo.addEventListener('mouseenter', function() {
+                if (document.getElementById('page-feed').classList.contains('active')) {
+                    showControlsTemporarily();
+                }
+            });
+
+            shortsVideo.addEventListener('mousemove', function() {
+                if (document.getElementById('page-feed').classList.contains('active')) {
+                    showControlsTemporarily();
+                }
+            });
+
+            shortsVideo.addEventListener('mouseleave', function() {
+                clearTimeout(controlsHideTimeout);
+                if (!isDragging) {
+                    videoControls.classList.remove('visible');
+                    playCenter.classList.add('hidden');
+                    isControlsVisible = false;
+                }
+            });
+
+            shortsVideo.addEventListener('touchstart', function() {
+                if (document.getElementById('page-feed').classList.contains('active')) {
+                    showControlsTemporarily();
+                }
+            });
+
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden && document.getElementById('page-feed').classList.contains('active')) {
+                    showControlsTemporarily();
+                }
+            });
+
+            // ============================================================
+            // ENTER APP
             // ============================================================
             function enterApp() {
                 loadingScreen.classList.add('hidden');
                 mainContent.classList.add('visible');
                 nameOverlay.classList.remove('active');
 
-                const displayName = savedName || 'Teman';
-                const fullText = `Hai ${displayName}, Selamat datang`;
-
-                setTimeout(() => {
-                    typeWriter(fullText, typewriterContent, 50);
-                }, 300);
-
-                renderResults(studentData, '');
+                renderStudentList();
                 renderSchedule();
                 updateNameChangeUI();
                 initGallery();
+                populateFontSelect();
 
-                // Cek chat login tersimpan
-                const savedChat = localStorage.getItem('ixf_chat_user');
-                if (savedChat) {
-                    try {
-                        const parsed = JSON.parse(savedChat);
-                        if (parsed.name && parsed.id && /^\d{5}$/.test(parsed.id)) {
-                            chatUser = parsed;
-                            chatLoginOverlay.classList.remove('active');
-                            console.log('✅ Chat user restored:', chatUser);
-                            updateChatUI();
-                        }
-                    } catch (e) {
-                        localStorage.removeItem('ixf_chat_user');
+                settingsDisplaySubpage.classList.remove('active');
+                settingsMainContent.style.display = 'block';
+
+                setTimeout(() => {
+                    const activeNav = document.querySelector('.nav-item.active');
+                    if (activeNav) {
+                        updateIndicator(activeNav);
                     }
+                }, 200);
+
+                if (document.getElementById('page-feed').classList.contains('active')) {
+                    shortsVideo.play().catch(function(e) { /* ignore */ });
+                    showControlsTemporarily();
                 }
 
-                console.log('✅ Selamat datang, ' + displayName + '!');
+                console.log('✅ Selamat datang, ' + (savedName || 'Teman') + '!');
             }
 
             if (savedName) {
@@ -2624,7 +3713,7 @@
             }
 
             // ============================================================
-            // 8. INPUT NAMA AWAL
+            // INPUT NAMA AWAL
             // ============================================================
             nameInput.addEventListener('input', function() {
                 const val = this.value;
@@ -2674,7 +3763,7 @@
             });
 
             // ============================================================
-            // 9. GANTI NAMA (30 hari)
+            // GANTI NAMA
             // ============================================================
             function updateNameChangeUI() {
                 const lastChange = localStorage.getItem('ixf_name_change_date');
@@ -2747,68 +3836,21 @@
                 changeNameInput.classList.remove('error');
 
                 updateNameChangeUI();
-                alert('✅ Nama berhasil diganti menjadi "' + raw + '".');
+                showToast('✅ Nama berhasil diganti menjadi "' + raw + '"');
                 updateNowText();
             });
 
             updateNameChangeUI();
 
             // ============================================================
-            // 10. GALERI FOTO
+            // GALERI
             // ============================================================
-            const TOTAL_IMAGES = 43;
             let galleryIndex = 0;
             let galleryCards = [];
             let isDraggingGallery = false;
             let startXGallery = 0;
             let currentXGallery = 0;
             let isSwipingGallery = false;
-
-            const imageFileNames = [
-                'IMG-20250324-WA0064.jpg',
-                'IMG-20241121-WA0090.jpg',
-                'IMG-20250416-WA0020.jpg',
-                'IMG-20241121-WA0086.jpg',
-                'IMG-20250216-WA0006.jpg',
-                'IMG-20250216-WA0005.jpg',
-                'IMG-20241121-WA0077.jpg',
-                'IMG-20240816-WA0006.jpg',
-                'IMG-20240812_160956_228.jpg',
-                'IMG-20240816-WA0006 (1).jpg',
-                'IMG-20240816-WA0010.jpg',
-                'IMG-20250416-WA0018.jpg',
-                '1732272881190586-0.jpg',
-                'IMG-20240921-WA0014.jpg',
-                'IMG-20240921-WA0015.jpg',
-                'IMG-20241121-WA0084.jpg',
-                'IMG-20250416-WA0022.jpg',
-                'IMG-20240816-WA0009.jpg',
-                'download.png',
-                'IMG-20250324-WA0066.jpg',
-                'IMG-20240816-WA0007 (1).jpg',
-                '1732272872295330-2.jpg',
-                'b7a33b005e9841429aa90b3a80fe7775.jpg',
-                'IMG-20240816-WA0008.jpg',
-                'IMG-20241121-WA0092.jpg',
-                'IMG-20250416-WA0026.jpg',
-                'IMG-20250324-WA0067.jpg',
-                'IMG-20241121-WA0080.jpg',
-                '1732272876081645-1.jpg',
-                '1732272862960891-3.jpg',
-                'IMG-20241005-WA0022.jpg',
-                'IMG-20241121-WA0078.jpg',
-                'IMG-20250216-WA0003.jpg',
-                'IMG-20241121-WA0088.jpg',
-                'IMG-20240816-WA0003.jpg',
-                'IMG-20241121-WA0082.jpg',
-                'IMG-20250216-WA0007.jpg',
-                'IMG-20240816-WA0008 (1).jpg',
-                'IMG-20250416-WA0028.jpg',
-                'IMG-20240816-WA0007.jpg',
-                'IMG-20250416-WA0016.jpg',
-                'IMG-20240816-WA0010 (1).jpg',
-                'IMG-20250416-WA0024.jpg'
-            ];
 
             function initGallery() {
                 const imageUrls = imageFileNames.map(name => name);
@@ -2985,365 +4027,22 @@
             }
 
             // ============================================================
-            // 11. CHAT — LOGIN
+            // SETTINGS SUBPAGE: TAMPILAN
             // ============================================================
-            function validateChatId(id) {
-                return /^\d{5}$/.test(id);
-            }
-
-            function showChatLoginError(msg) {
-                chatLoginError.textContent = msg;
-            }
-
-            function clearChatLoginError() {
-                chatLoginError.textContent = '';
-                chatLoginName.classList.remove('error');
-                chatLoginId.classList.remove('error');
-            }
-
-            chatLoginName.addEventListener('input', function() {
-                clearChatLoginError();
-            });
-            chatLoginId.addEventListener('input', function() {
-                clearChatLoginError();
-                // Hanya angka
-                this.value = this.value.replace(/\D/g, '');
-                if (this.value.length > 5) this.value = this.value.slice(0, 5);
+            displayNavCard.addEventListener('click', function() {
+                settingsMainContent.style.display = 'none';
+                settingsDisplaySubpage.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            chatLoginBtn.addEventListener('click', function() {
-                const name = chatLoginName.value.trim();
-                const id = chatLoginId.value.trim();
-
-                if (!name) {
-                    showChatLoginError('Masukkan nama kamu.');
-                    chatLoginName.classList.add('error');
-                    return;
-                }
-                if (!validateChatId(id)) {
-                    showChatLoginError('ID harus 5 digit angka (contoh: 10542).');
-                    chatLoginId.classList.add('error');
-                    return;
-                }
-
-                // Simpan
-                chatUser = { name: name, id: id };
-                localStorage.setItem('ixf_chat_user', JSON.stringify(chatUser));
-
-                chatLoginOverlay.classList.remove('active');
-                clearChatLoginError();
-                updateChatUI();
-
-                // Reset chat state
-                chatRoomId = null;
-                chatContactId = null;
-                chatContactInput.value = '';
-                chatMessages.innerHTML =
-                    `<div class="empty-chat"><span class="emoji">💬</span>Masukkan ID teman untuk mulai chatting</div>`;
-                chatContactLabel.textContent = 'Belum ada kontak';
-                chatStatus.textContent = '⏸ offline';
-                chatStatus.className = 'chat-status';
-                chatMsgInput.disabled = true;
-                chatSendBtn.disabled = true;
-
-                console.log('✅ Chat login sebagai:', chatUser);
-            });
-
-            // Enter key pada login
-            chatLoginId.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    chatLoginBtn.click();
-                }
-            });
-            chatLoginName.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    chatLoginId.focus();
-                }
+            displayBackBtn.addEventListener('click', function() {
+                settingsDisplaySubpage.classList.remove('active');
+                settingsMainContent.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
             // ============================================================
-            // 12. CHAT — KONEK KE KONTAK
-            // ============================================================
-            chatContactInput.addEventListener('input', function() {
-                this.value = this.value.replace(/\D/g, '');
-                if (this.value.length > 5) this.value = this.value.slice(0, 5);
-                chatContactError.textContent = '';
-                this.classList.remove('error');
-            });
-
-            chatConnectBtn.addEventListener('click', function() {
-                connectToContact();
-            });
-
-            chatContactInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    connectToContact();
-                }
-            });
-
-            function connectToContact() {
-                if (!chatUser) {
-                    chatLoginOverlay.classList.add('active');
-                    return;
-                }
-                if (!firebaseInitialized || !database) {
-                    chatContactError.textContent = '⚠️ Firebase tidak terhubung. Periksa konfigurasi.';
-                    return;
-                }
-
-                const contactId = chatContactInput.value.trim();
-
-                if (!validateChatId(contactId)) {
-                    chatContactError.textContent = 'ID teman harus 5 digit angka.';
-                    chatContactInput.classList.add('error');
-                    return;
-                }
-
-                if (contactId === chatUser.id) {
-                    chatContactError.textContent = 'Kamu tidak bisa chat dengan diri sendiri.';
-                    chatContactInput.classList.add('error');
-                    return;
-                }
-
-                chatContactError.textContent = '';
-                chatContactInput.classList.remove('error');
-
-                // Buat room ID: gabungan dua ID yang di-sort
-                const ids = [chatUser.id, contactId].sort();
-                const roomId = ids[0] + '_' + ids[1];
-
-                chatRoomId = roomId;
-                chatContactId = contactId;
-
-                // Update UI
-                chatContactLabel.textContent = 'Chat dengan ID ' + contactId;
-                chatStatus.textContent = '🟢 online';
-                chatStatus.className = 'chat-status online';
-                chatMsgInput.disabled = false;
-                chatSendBtn.disabled = false;
-                chatMsgInput.focus();
-
-                // Hentikan listener lama
-                if (chatListener) {
-                    database.ref('chats/' + chatRoomId + '/messages').off();
-                    chatListener = null;
-                }
-
-                // Mulai listen
-                listenMessages(roomId);
-
-                console.log('🔗 Terhubung ke room:', roomId);
-            }
-
-            // ============================================================
-            // 13. CHAT — LISTEN & SEND MESSAGES
-            // ============================================================
-            function listenMessages(roomId) {
-                if (!database) return;
-
-                const messagesRef = database.ref('chats/' + roomId + '/messages');
-
-                // Hentikan listener lama
-                if (chatListener) {
-                    messagesRef.off();
-                    chatListener = null;
-                }
-
-                chatListener = messagesRef.orderByChild('timestamp').limitToLast(100);
-
-                chatListener.on('value', function(snapshot) {
-                    const data = snapshot.val();
-                    renderMessages(data);
-                }, function(error) {
-                    console.warn('⚠️ Gagal listen messages:', error);
-                });
-
-                console.log('📡 Listening to room:', roomId);
-            }
-
-            function renderMessages(data) {
-                if (!data) {
-                    chatMessages.innerHTML =
-                        `<div class="empty-chat"><span class="emoji">💬</span>Belum ada pesan. Kirim pesan pertama!</div>`;
-                    return;
-                }
-
-                const keys = Object.keys(data);
-                if (keys.length === 0) {
-                    chatMessages.innerHTML =
-                        `<div class="empty-chat"><span class="emoji">💬</span>Belum ada pesan. Kirim pesan pertama!</div>`;
-                    return;
-                }
-
-                // Sort by timestamp
-                const sorted = keys.map(key => ({ key, ...data[key] }))
-                    .filter(msg => msg.text && msg.text.trim() !== '')
-                    .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-
-                if (sorted.length === 0) {
-                    chatMessages.innerHTML =
-                        `<div class="empty-chat"><span class="emoji">💬</span>Belum ada pesan. Kirim pesan pertama!</div>`;
-                    return;
-                }
-
-                let html = '';
-                for (let msg of sorted) {
-                    const isOwn = (msg.senderId === chatUser.id);
-                    const senderName = msg.senderName || 'Teman';
-                    const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('id-ID', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    }) : '';
-
-                    html += `<div class="chat-msg ${isOwn ? 'own' : 'other'}">`;
-                    if (!isOwn) {
-                        html += `<div class="msg-sender">${senderName}</div>`;
-                    }
-                    html += `<div class="msg-text">${escapeHtml(msg.text)}</div>`;
-                    if (time) {
-                        html += `<div class="msg-time">${time}</div>`;
-                    }
-                    html += `</div>`;
-                }
-
-                chatMessages.innerHTML = html;
-                // Scroll ke bawah
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            // Kirim pesan
-            chatSendBtn.addEventListener('click', function() {
-                sendMessage();
-            });
-
-            chatMsgInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-
-            function sendMessage() {
-                if (!chatUser || !chatRoomId || !database) {
-                    if (!chatUser) chatLoginOverlay.classList.add('active');
-                    return;
-                }
-
-                const text = chatMsgInput.value.trim();
-                if (!text) return;
-
-                // Disable tombol sementara
-                chatSendBtn.disabled = true;
-
-                const messagesRef = database.ref('chats/' + chatRoomId + '/messages');
-                const newMsg = {
-                    senderId: chatUser.id,
-                    senderName: chatUser.name,
-                    text: text,
-                    timestamp: Date.now()
-                };
-
-                messagesRef.push(newMsg)
-                    .then(() => {
-                        chatMsgInput.value = '';
-                        chatSendBtn.disabled = false;
-                        chatMsgInput.focus();
-                        // Scroll ke bawah akan otomatis lewat listener
-                    })
-                    .catch((err) => {
-                        console.error('❌ Gagal kirim pesan:', err);
-                        chatSendBtn.disabled = false;
-                        alert('Gagal mengirim pesan. Periksa koneksi internet.');
-                    });
-            }
-
-            // ============================================================
-            // 14. CHAT — UPDATE UI
-            // ============================================================
-            function updateChatUI() {
-                if (chatUser) {
-                    chatContactLabel.textContent = chatUser.name + ' (ID: ' + chatUser.id + ')';
-                    // Jika ada room aktif, tampilkan
-                    if (chatRoomId && chatContactId) {
-                        chatContactLabel.textContent = 'Chat dengan ID ' + chatContactId;
-                        chatStatus.textContent = '🟢 online';
-                        chatStatus.className = 'chat-status online';
-                        chatMsgInput.disabled = false;
-                        chatSendBtn.disabled = false;
-                    } else {
-                        chatStatus.textContent = '⏸ offline';
-                        chatStatus.className = 'chat-status';
-                        chatMsgInput.disabled = true;
-                        chatSendBtn.disabled = true;
-                    }
-                } else {
-                    chatContactLabel.textContent = 'Belum login';
-                    chatStatus.textContent = '⏸ offline';
-                    chatStatus.className = 'chat-status';
-                    chatMsgInput.disabled = true;
-                    chatSendBtn.disabled = true;
-                }
-            }
-
-            // ============================================================
-            // 15. CHAT — LOGOUT
-            // ============================================================
-            chatLogoutBtn.addEventListener('click', function() {
-                if (confirm('Yakin ingin logout dari chat?')) {
-                    // Hentikan listener
-                    if (chatListener && database && chatRoomId) {
-                        database.ref('chats/' + chatRoomId + '/messages').off();
-                        chatListener = null;
-                    }
-                    localStorage.removeItem('ixf_chat_user');
-                    chatUser = null;
-                    chatRoomId = null;
-                    chatContactId = null;
-                    chatContactInput.value = '';
-                    chatMessages.innerHTML =
-                        `<div class="empty-chat"><span class="emoji">💬</span>Masukkan ID teman untuk mulai chatting</div>`;
-                    chatContactLabel.textContent = 'Belum ada kontak';
-                    chatStatus.textContent = '⏸ offline';
-                    chatStatus.className = 'chat-status';
-                    chatMsgInput.disabled = true;
-                    chatSendBtn.disabled = true;
-                    chatLoginOverlay.classList.add('active');
-                    chatLoginName.value = '';
-                    chatLoginId.value = '';
-                    console.log('🔴 Chat logout');
-                }
-            });
-
-            // ============================================================
-            // 16. CHAT — OVERLAY OTOMATIS
-            // ============================================================
-            // Jika klik chat tapi belum login, tampilkan overlay
-            document.querySelector('[data-page="chat"]').addEventListener('click', function() {
-                if (!chatUser) {
-                    setTimeout(() => {
-                        chatLoginOverlay.classList.add('active');
-                    }, 200);
-                }
-            });
-
-            // Tutup overlay jika klik di luar card
-            chatLoginOverlay.addEventListener('click', function(e) {
-                if (e.target === this && chatUser) {
-                    this.classList.remove('active');
-                }
-            });
-
-            // ============================================================
-            // 17. REPORT / LAPORAN BUG
+            // LAPORAN BUG
             // ============================================================
             function openReportModal() {
                 reportModal.classList.add('active');
@@ -3362,7 +4061,7 @@
                 document.body.style.overflow = '';
             }
 
-            reportBtn.addEventListener('click', openReportModal);
+            reportBtnSettings.addEventListener('click', openReportModal);
             reportModalClose.addEventListener('click', closeReportModal);
 
             reportModal.addEventListener('click', function(e) {
@@ -3378,7 +4077,7 @@
             });
 
             // ============================================================
-            // 18. UPDATE JADWAL PERIODIK
+            // UPDATE JADWAL PERIODIK
             // ============================================================
             setInterval(() => {
                 if (document.getElementById('page-schedule').classList.contains('active')) {
@@ -3387,69 +4086,7 @@
                 updateNowText();
             }, 30000);
 
-            console.log('✅ IXF SPA dengan Chat & Firebase siap!');
-
-            // ============================================================
-            // 19. CEK FIREBASE INIT
-            // ============================================================
-            if (!firebaseInitialized) {
-                console.warn('⚠️ Firebase tidak terinisialisasi. Chat tidak akan berfungsi.');
-                // Tampilkan pesan di chat
-                setTimeout(() => {
-                    const chatPage = document.getElementById('page-chat');
-                    if (chatPage) {
-                        const wrapper = chatPage.querySelector('.page-chat-wrapper');
-                        if (wrapper) {
-                            const warn = document.createElement('div');
-                            warn.style.cssText =
-                                'background:#fff3cd;color:#856404;padding:12px 16px;border-radius:12px;margin-bottom:12px;font-size:0.9rem;border:1px solid #ffc107;';
-                            warn.textContent =
-                                '⚠️ Firebase belum dikonfigurasi. Chat tidak akan berfungsi. Edit firebaseConfig di bagian atas script.';
-                            wrapper.prepend(warn);
-                        }
-                    }
-                }, 1000);
-            }
-
-            // ============================================================
-            // 20. PANDUAN PEMBERSIHAN KODE LAMA (di console)
-            // ============================================================
-            console.log(`
-        ═══════════════════════════════════════════════════════════════
-        🧹  PANDUAN PEMBERSIHAN KODE LAMA (Notifikasi & Firefox)
-        ═══════════════════════════════════════════════════════════════
-
-        HAPUS bagian-bagian berikut dari file index.html:
-
-        1.  ELEMEN HTML:
-            - .settings-group yang berisi notifikasi (input time, tombol)
-            - .firefox-promo (seluruh div)
-            - #firefoxModal (seluruh modal)
-
-        2.  CSS:
-            - Aturan untuk .firefox-promo, .promo-*, .modal-content (kecuali report-modal)
-            - Aturan untuk .settings-group .notif-* (jika ada)
-
-        3.  JAVASCRIPT:
-            - requestNotifPermission()
-            - sendNotification()
-            - sendNotificationViaSW()
-            - checkNotificationTime()
-            - startNotificationChecker()
-            - stopNotificationChecker()
-            - activateNotification()
-            - deactivateNotification()
-            - updateNotifUI()
-            - Event listener notifikasi (notifActivateNow, etc)
-            - Variabel notifInterval, lastNotifDate
-            - Kode yang memanggil fungsi-fungsi di atas
-
-        4.  MANIFEST / SW (opsional):
-            - Jika tidak pakai notifikasi, hapus periodic sync di sw.js
-            - Atau biarkan saja, tidak mengganggu
-
-        ═══════════════════════════════════════════════════════════════
-        `);
+            console.log('✅ IXF SPA siap!');
         });
     </script>
 </body>
