@@ -917,7 +917,7 @@
             .success-img-wrapper { width: 130px; height: 130px; }
         }
         /* ===== GAYA INPUT JAM NOTIFIKASI ===== */
-        .notif-time-input { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 10px; font-size: 0.9rem; font-family: var(--global-font); flex-shrink: 0; cursor: pointer; }
+        .notif-time-input { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 10px; font-size: 0.9rem; font-family: var(--global-font); flex-shrink: 0; cursor: pointer; min-width: 110px; }
         .notif-time-input::-webkit-calendar-picker-indicator { filter: var(--time-icon-filter, none); cursor: pointer; }
     </style>
 </head>
@@ -1379,7 +1379,6 @@
             let searchCollapseTimer = null;
             let headerCollapseTimer = null;
             let searchHasResults = false;
-            // ✅ AUTO-COLLAPSE SUDAH DIHAPUS — Search bar tidak akan hilang otomatis
             const AD_DURATION_SECONDS = 244;
             const AD_REWARD = 0.6;
             const AD_DAILY_LIMIT = 6;
@@ -1436,14 +1435,8 @@
 
             function expandSearchBar() { if (searchBarEl.classList.contains('expanded')) return; if (headerCollapseTimer) { clearTimeout(headerCollapseTimer); headerCollapseTimer = null; } searchHeader.classList.remove('search-collapsing'); searchBarEl.classList.add('expanded'); searchHeader.classList.add('search-expanded'); setTimeout(() => { try { globalSearchInput.focus(); } catch(e) {} }, 200); resetSearchCollapseTimer(); if (!globalSearchInput.value.trim()) renderPopularSearches(); }
             function collapseSearchBar() { if (!searchBarEl.classList.contains('expanded')) return; clearSearchCollapseTimer(); searchBarEl.classList.remove('expanded'); if (searchHeader.classList.contains('search-expanded')) { searchHeader.classList.add('search-collapsing'); if (headerCollapseTimer) clearTimeout(headerCollapseTimer); headerCollapseTimer = setTimeout(function () { searchHeader.classList.remove('search-expanded', 'search-collapsing'); headerCollapseTimer = null; }, 320); } searchClear.classList.remove('visible'); closeDropdown(); globalSearchInput.value = ''; try { globalSearchInput.blur(); } catch(e) {} }
-            
-            // ✅ FUNGSI DIUBAH: tidak ada lagi setTimeout auto-collapse
-            function resetSearchCollapseTimer() { 
-                // Auto-collapse dihapus — search bar tidak akan hilang sendiri
-                clearSearchCollapseTimer(); 
-            }
+            function resetSearchCollapseTimer() { clearSearchCollapseTimer(); }
             function clearSearchCollapseTimer() { if (searchCollapseTimer) { clearTimeout(searchCollapseTimer); searchCollapseTimer = null; } }
-            
             searchBarEl.addEventListener('click', function(e) { if (!searchBarEl.classList.contains('expanded')) { e.preventDefault(); e.stopPropagation(); expandSearchBar(); } else { resetSearchCollapseTimer(); } });
             globalSearchInput.addEventListener('input', function() { resetSearchCollapseTimer(); });
             globalSearchInput.addEventListener('focus', function() { if (!searchBarEl.classList.contains('expanded')) { searchBarEl.classList.add('expanded'); searchHeader.classList.add('search-expanded'); } resetSearchCollapseTimer(); if (!this.value.trim()) renderPopularSearches(); });
@@ -2445,6 +2438,198 @@
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && codeModalOverlay && codeModalOverlay.classList.contains('active')) closeCodeModal();
             });
+
+            /* ========================================================= */
+            /* ============== FITUR NOTIFIKASI JADWAL PELAJARAN ======== */
+            /* ========================================================= */
+            const NOTIF_ENABLED_KEY = 'ixf_notif_enabled';
+            const NOTIF_TIME_KEY = 'ixf_notif_time';
+            const NOTIF_LAST_FIRED_KEY = 'ixf_notif_last_fired';
+
+            const notifToggle = document.getElementById('notifToggle');
+            const notifTimeOption = document.getElementById('notifTimeOption');
+            const notifTimeInput = document.getElementById('notifTimeInput');
+
+            let notifCheckInterval = null;
+
+            // Simpan preferensi & tampilkan opsi jam bila aktif
+            function applyNotifSetting(enabled) {
+                if (notifToggle) notifToggle.classList.toggle('on', enabled);
+                if (notifTimeOption) notifTimeOption.style.display = enabled ? 'flex' : 'none';
+                localStorage.setItem(NOTIF_ENABLED_KEY, enabled ? 'true' : 'false');
+                if (enabled) startNotifChecker();
+                else stopNotifChecker();
+            }
+
+            // Minta izin notifikasi ke browser
+            async function requestNotifPermission() {
+                if (!('Notification' in window)) {
+                    showToast('❌ Browser tidak mendukung notifikasi');
+                    return false;
+                }
+                // Bila sudah granted, langsung return true (browser tidak akan tanya lagi)
+                if (Notification.permission === 'granted') return true;
+                if (Notification.permission === 'denied') {
+                    showToast('❌ Izin ditolak. Aktifkan manual di pengaturan browser.');
+                    return false;
+                }
+                try {
+                    const perm = await Notification.requestPermission();
+                    if (perm === 'granted') return true;
+                    if (perm === 'denied') {
+                        showToast('❌ Izin ditolak. Aktifkan manual di pengaturan browser.');
+                        return false;
+                    }
+                    // default (user close popup)
+                    return false;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            async function toggleNotif() {
+                const current = notifToggle.classList.contains('on');
+                if (!current) {
+                    // Aktifkan -> minta izin dulu
+                    const granted = await requestNotifPermission();
+                    if (!granted) {
+                        // Gagal izin, toggle tetap OFF
+                        applyNotifSetting(false);
+                        return;
+                    }
+                    applyNotifSetting(true);
+                    showToast('🔔 Notifikasi jadwal pelajaran diaktifkan');
+                } else {
+                    applyNotifSetting(false);
+                    showToast('🔕 Notifikasi jadwal pelajaran dinonaktifkan');
+                }
+            }
+
+            function getNotifTime() {
+                return localStorage.getItem(NOTIF_TIME_KEY) || '19:00';
+            }
+            function setNotifTime(val) { localStorage.setItem(NOTIF_TIME_KEY, val); }
+
+            // Validasi jam 01.00 - 14.00 dilarang (60 - 840 menit)
+            function validateNotifTime(val) {
+                if (!val) return false;
+                const parts = val.split(':');
+                const total = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+                if (total >= 60 && total <= 840) return false;
+                return true;
+            }
+
+            // Bangun pesan notifikasi dinamis sesuai kondisi besok
+            function buildNotifMessage() {
+                const userName = localStorage.getItem('ixf_user_name') || 'kamu';
+                const now = new Date();
+                const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                const tomorrowDayIdx = tomorrow.getDay();
+                const dayIdxToName = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+                const tomorrowName = dayIdxToName[tomorrowDayIdx];
+
+                // Besok Minggu
+                if (tomorrowDayIdx === 0) {
+                    return {
+                        title: 'Yeyy 🥳',
+                        body: `Yeyy 🥳, besok minggu ${userName}, mau liburan kemana besok?, sebelum senin lagi yakan..😎`
+                    };
+                }
+
+                const lessons = scheduleData[tomorrowName] || [];
+                const mapelList = lessons
+                    .filter(l => l.mapel && l.mapel !== 'kokulikuler')
+                    .map(l => l.mapel)
+                    .join(', ');
+
+                if (!mapelList) {
+                    return {
+                        title: 'Jadwal Besok',
+                        body: `Hai ${userName}, besok tidak ada pelajaran. Santai dulu ya!`
+                    };
+                }
+
+                // Cek ada Matematika?
+                const adaMTK = lessons.some(l =>
+                    l.mapel && l.mapel.toLowerCase().includes('matematika')
+                );
+
+                if (adaMTK) {
+                    return {
+                        title: 'Hmm besok ada MTK 😩🤯',
+                        body: `hmm besok pelajaran ${mapelList}, lah MTK 😩🤯`
+                    };
+                }
+
+                return {
+                    title: 'Jadwal Pelajaran Besok',
+                    body: `Hai ${userName} besok pelajaran ${mapelList} siapkan diri kamu untuk belajar dan siapkan buku mu juga`
+                };
+            }
+
+            // Tampilkan notifikasi
+            function fireNotification() {
+                if (!('Notification' in window)) return;
+                if (Notification.permission !== 'granted') return;
+                const msg = buildNotifMessage();
+                try {
+                    const notif = new Notification(msg.title, {
+                        body: msg.body,
+                        icon: 'logokelas.png',
+                        badge: 'logokelas.png',
+                        tag: 'jadwal-pelajaran'
+                    });
+                    notif.onclick = function() { window.focus(); notif.close(); };
+                } catch (e) { console.warn('Gagal notifikasi:', e); }
+            }
+
+            // Cek apakah sudah waktunya (dipanggil tiap 30 detik)
+            function checkAndFireNotif() {
+                if (localStorage.getItem(NOTIF_ENABLED_KEY) !== 'true') return;
+                const now = new Date();
+                const todayKey = now.getFullYear() + '-' + pad2(now.getMonth()+1) + '-' + pad2(now.getDate());
+                const currentTime = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+                const targetTime = getNotifTime();
+                const lastFired = localStorage.getItem(NOTIF_LAST_FIRED_KEY) || '';
+                if (currentTime === targetTime && lastFired !== todayKey) {
+                    fireNotification();
+                    localStorage.setItem(NOTIF_LAST_FIRED_KEY, todayKey);
+                }
+            }
+
+            function startNotifChecker() {
+                if (notifCheckInterval) clearInterval(notifCheckInterval);
+                notifCheckInterval = setInterval(checkAndFireNotif, 30000);
+                checkAndFireNotif();
+            }
+            function stopNotifChecker() {
+                if (notifCheckInterval) { clearInterval(notifCheckInterval); notifCheckInterval = null; }
+            }
+
+            // ===== INISIALISASI NOTIFIKASI =====
+            if (notifTimeInput) notifTimeInput.value = getNotifTime();
+            applyNotifSetting(localStorage.getItem(NOTIF_ENABLED_KEY) === 'true');
+
+            if (notifToggle) {
+                notifToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleNotif();
+                });
+            }
+
+            if (notifTimeInput) {
+                notifTimeInput.addEventListener('change', function() {
+                    const val = this.value;
+                    if (!validateNotifTime(val)) {
+                        showToast('❌ Jam 01.00–14.00 dilarang (masih jam sekolah)');
+                        this.value = getNotifTime();
+                        return;
+                    }
+                    setNotifTime(val);
+                    showToast('⏰ Jam notifikasi diatur ke ' + val);
+                });
+            }
+            /* ================= END NOTIFIKASI ================= */
 
             applyLanguage(currentLanguage, false);
             populateThemeSelect();
