@@ -2467,7 +2467,6 @@
                     showToast('❌ Browser tidak mendukung notifikasi');
                     return false;
                 }
-                // Bila sudah granted, langsung return true (browser tidak akan tanya lagi)
                 if (Notification.permission === 'granted') return true;
                 if (Notification.permission === 'denied') {
                     showToast('❌ Izin ditolak. Aktifkan manual di pengaturan browser.');
@@ -2480,7 +2479,6 @@
                         showToast('❌ Izin ditolak. Aktifkan manual di pengaturan browser.');
                         return false;
                     }
-                    // default (user close popup)
                     return false;
                 } catch (e) {
                     return false;
@@ -2490,10 +2488,8 @@
             async function toggleNotif() {
                 const current = notifToggle.classList.contains('on');
                 if (!current) {
-                    // Aktifkan -> minta izin dulu
                     const granted = await requestNotifPermission();
                     if (!granted) {
-                        // Gagal izin, toggle tetap OFF
                         applyNotifSetting(false);
                         return;
                     }
@@ -2556,7 +2552,7 @@
 
                 if (adaMTK) {
                     return {
-                        title: 'Hmm besok ada MTK 😩🤯',
+                        title: 'besok peljaran apa ya..?',
                         body: `hmm besok pelajaran ${mapelList}, lah MTK 😩🤯`
                     };
                 }
@@ -2583,19 +2579,36 @@
                 } catch (e) { console.warn('Gagal notifikasi:', e); }
             }
 
-            // Cek apakah sudah waktunya (dipanggil tiap 30 detik)
+            /* ========================================================= */
+            /* ========== FIX: CEK NOTIF PAKAI SLOT (TANGGAL|JAM) ====== */
+            /* ========================================================= */
+            // Kunci per-slot (tanggal + jam target), bukan per-hari.
+            // Supaya:
+            //  - Ganti jam → slot baru → bisa kirim lagi (fix bug).
+            //  - Besok tetap otomatis di jam yang sama → slot baru → kirim lagi.
+            //  - Sudah kirim di slot itu → tidak dobel.
             function checkAndFireNotif() {
                 if (localStorage.getItem(NOTIF_ENABLED_KEY) !== 'true') return;
                 const now = new Date();
                 const todayKey = now.getFullYear() + '-' + pad2(now.getMonth()+1) + '-' + pad2(now.getDate());
-                const currentTime = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+                const nowMinutes = now.getHours() * 60 + now.getMinutes();
                 const targetTime = getNotifTime();
-                const lastFired = localStorage.getItem(NOTIF_LAST_FIRED_KEY) || '';
-                if (currentTime === targetTime && lastFired !== todayKey) {
+                const parts = targetTime.split(':');
+                const targetMinutes = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+
+                const slotKey = todayKey + '|' + targetTime;
+                const lastFiredSlot = localStorage.getItem(NOTIF_LAST_FIRED_KEY) || '';
+
+                // Sudah pernah kirim untuk slot ini? Skip.
+                if (lastFiredSlot === slotKey) return;
+
+                // Sekarang sudah lewat / sama dengan target? Kirim + tandai slot ini.
+                if (nowMinutes >= targetMinutes) {
                     fireNotification();
-                    localStorage.setItem(NOTIF_LAST_FIRED_KEY, todayKey);
+                    localStorage.setItem(NOTIF_LAST_FIRED_KEY, slotKey);
                 }
             }
+            /* ================= END FIX ================= */
 
             function startNotifChecker() {
                 if (notifCheckInterval) clearInterval(notifCheckInterval);
@@ -2627,6 +2640,9 @@
                     }
                     setNotifTime(val);
                     showToast('⏰ Jam notifikasi diatur ke ' + val);
+                    // Reset slot agar jam baru bisa langsung dicek ulang
+                    // (kalau hari ini sudah lewat, langsung kirim)
+                    checkAndFireNotif();
                 });
             }
             /* ================= END NOTIFIKASI ================= */
