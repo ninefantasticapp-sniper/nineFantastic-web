@@ -213,7 +213,7 @@
         @keyframes batteryWidgetIn { from { opacity: 0; transform: translateY(-20px) scale(0.85); } to { opacity: 1; transform: translateY(0) scale(1); } }
         html.no-animations .battery-widget-top { animation: none; }
         html.hide-clock-battery .status-widget, html.hide-clock-battery .battery-widget-top { display: none !important; }
-        .header-actions { pointer-events: auto; display: flex; align-items: center; background: var(--header-actions-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: 999px; border: 1px solid var(--header-actions-border); box-shadow: 0 4px 30px var(--shadow-color); padding: 4px 6px; flex-shrink: 0; transition: background 0.2s, box-shadow 0.2s; min-height: 44px; gap: 2px; }
+        .header-actions { pointer-events: auto; display: flex; align-items: center; background: var(--header-actions-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: 999px; border: 1px solid var(--header-actions-border); box-shadow: 0 4px 30px var(--shadow-color); padding: 4px 6px; flex-shrink: 0; transition: background 0.2s, box-shadow 0.2s; min-height: 44px; gap: 2px; position: relative; }
         .header-actions:hover { background: var(--search-focus); box-shadow: 0 4px 30px var(--shadow-strong); }
         .header-actions .header-action-btn { background: none; border: none; width: 40px; height: 40px; border-radius: 999px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, transform 0.15s; color: var(--text-primary); padding: 0; flex-shrink: 0; }
         .header-actions .header-action-btn:hover { background: var(--bg-hover); }
@@ -727,7 +727,6 @@
             box-shadow: 0 4px 16px var(--shadow-color);
             transition: border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* Logo jadi bulat saat proses instal & setelah selesai */
         .app-logo-wrapper.installing .app-logo-img,
         .app-logo-wrapper.complete .app-logo-img {
             border-radius: 50%;
@@ -844,7 +843,6 @@
             .app-screenshots .screenshot { width: 86px; height: 126px; }
         }
 
-        /* Halaman kosong/app store: sembunyikan hanya banner, logo top, copyright */
         body.blank-page .top-banner,
         body.blank-page .logo-top-btn,
         body.blank-page .copyright-footer { display: none !important; }
@@ -916,12 +914,294 @@
             .premium-sheet-title { font-size: 1.1rem; letter-spacing: 2px; } .premium-sheet-row .sheet-label { font-size: 0.8rem; } .premium-sheet-row .sheet-value { font-size: 0.88rem; }
             .success-img-wrapper { width: 130px; height: 130px; }
         }
-        /* ===== GAYA INPUT JAM NOTIFIKASI ===== */
         .notif-time-input { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 10px; font-size: 0.9rem; font-family: var(--global-font); flex-shrink: 0; cursor: pointer; min-width: 110px; }
         .notif-time-input::-webkit-calendar-picker-indicator { filter: var(--time-icon-filter, none); cursor: pointer; }
+
+        /* ===== FLOATING BLUE ORB (MAC) ===== */
+        .floating-mac-orb {
+            position: fixed;
+            right: 16px;
+            bottom: 150px;
+            z-index: 160;
+            pointer-events: none;
+            transition: top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .floating-mac-orb.dragging {
+            transition: none !important;
+        }
+
+        .floating-mac-orb.expanded {
+            top: 50% !important;
+            left: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 9999;
+        }
+        
+        .floating-mac-orb.expanded .mac-orb-sphere {
+            animation: none;
+            transform: scale(3.5) !important;
+            cursor: pointer;
+        }
+        
+        .floating-mac-orb.expanded .mac-orb-glow-bg {
+            transform: scale(3.5) !important;
+        }
+
+        .mac-orb-glow-bg {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(65, 105, 225, 0.4) 0%, rgba(65, 105, 225, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .mac-orb-sphere {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #5c85ff 0%, #1b3cb8 60%, #0d1c6b 100%);
+            position: relative;
+            z-index: 2;
+            box-shadow: 
+                inset -3px -3px 6px rgba(0, 0, 0, 0.6), 
+                inset 3px 3px 6px rgba(255, 255, 255, 0.3),
+                0 0 15px 4px rgba(74, 120, 255, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            pointer-events: auto;
+            cursor: pointer;
+            touch-action: none;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: floatOrbFloat 3s ease-in-out infinite;
+        }
+        
+        body.search-is-open .mac-orb-sphere {
+            cursor: grab;
+        }
+        body.search-is-open .mac-orb-sphere:active {
+            cursor: grabbing;
+        }
+
+        .mac-orb-eye {
+            width: 4px;
+            height: 8px;
+            background-color: #ffffff;
+            border-radius: 4px;
+            box-shadow: 
+                0 0 8px 2px rgba(255, 255, 255, 0.95), 
+                0 0 15px 5px rgba(130, 170, 255, 0.85);
+            z-index: 3;
+            pointer-events: none;
+            transition: transform 0.15s ease-out;
+            transform-origin: center;
+            animation: blinkEyes 4s infinite;
+        }
+
+        @keyframes blinkEyes {
+            0%, 96%, 100% { transform: scaleY(1); }
+            98% { transform: scaleY(0.1); }
+        }
+
+        @keyframes floatOrbFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .mac-orb-sphere.dizzy .mac-orb-eye {
+            animation: dizzyWobble 0.4s ease-in-out infinite alternate !important;
+        }
+
+        @keyframes dizzyWobble {
+            0% { transform: translate(-3px, 2px) scaleY(0.8); }
+            50% { transform: translate(3px, -2px) scaleY(1.2); }
+            100% { transform: translate(-3px, 2px) scaleY(0.8); }
+        }
+
+        .dark-mode .mac-orb-glow-bg {
+            background: radial-gradient(circle, rgba(65, 105, 225, 0.25) 0%, rgba(65, 105, 225, 0) 70%);
+        }
+
+        /* ===== MAINTENANCE PAGE ===== */
+        body.maintenance-active { overflow: hidden; }
+        body.maintenance-active .bottom-nav,
+        body.maintenance-active .top-banner,
+        body.maintenance-active .logo-top-btn,
+        body.maintenance-active .copyright-footer,
+        body.maintenance-active .status-widget,
+        body.maintenance-active .battery-widget-top,
+        body.maintenance-active .floating-mac-orb,
+        body.maintenance-active #search-header { display: none !important; }
+
+        #maintenance-page {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background: #ffffff;
+            color: #1a1a1a;
+            z-index: 9999999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 24px 40px;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            font-family: 'Roboto', sans-serif;
+        }
+        #maintenance-page.active { display: flex; }
+
+        .maintenance-img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            display: block;
+            margin-bottom: 26px;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .maintenance-title {
+            font-size: 1.22rem;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 22px;
+            max-width: 520px;
+            color: #1a1a1a;
+            padding: 0 6px;
+        }
+
+        .maintenance-desc {
+            width: 100%;
+            max-width: 520px;
+            font-size: 0.94rem;
+            line-height: 1.7;
+            color: #444444;
+            text-align: left;
+            margin-bottom: 30px;
+            padding: 14px 16px;
+            background: #f5f5f5;
+            border-left: 3px solid #a67c52;
+            border-radius: 8px;
+        }
+
+        .maintenance-countdown-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: #888888;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .maintenance-countdown {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .mc-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 66px;
+            padding: 12px 10px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .mc-num {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.1;
+        }
+        .mc-label {
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #999999;
+            margin-top: 5px;
+        }
+        .mc-sep {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #cccccc;
+            padding: 0 2px;
+            margin-bottom: 20px;
+            line-height: 1;
+        }
+
+        @media (max-width: 480px) {
+            #maintenance-page { padding: 36px 18px 30px; }
+            .maintenance-img { width: 120px; height: 120px; margin-bottom: 20px; }
+            .maintenance-title { font-size: 1.08rem; margin-bottom: 18px; }
+            .maintenance-desc { font-size: 0.88rem; padding: 12px 14px; margin-bottom: 26px; }
+            .mc-box { min-width: 58px; padding: 10px 8px; }
+            .mc-num { font-size: 1.4rem; }
+            .mc-label { font-size: 0.56rem; }
+            .mc-sep { font-size: 1.15rem; }
+        }
     </style>
 </head>
 <body>
+    <!-- ================= MAINTENANCE PAGE ================= -->
+    <div id="maintenance-page">
+        <img src="d23c4bf6699b5c5601a104a3f3e88c4a.jpg" alt="Maintenance" class="maintenance-img" draggable="false" oncontextmenu="return false;" />
+        <h1 class="maintenance-title">Kami mengalami kendala, Pengembang sedang bekerja keras</h1>
+        <p class="maintenance-desc">Kami sedang mengalami kendala kemungkinan website di buka dengan waktu tidak di tentukan ini bukan kesalahan dari mu...!</p>
+        <div class="maintenance-countdown-label">Prediksi waktu pemulihan</div>
+        <div class="maintenance-countdown" id="maintenanceCountdown">
+            <div class="mc-box"><span class="mc-num" id="mcDays">00</span><span class="mc-label">Hari</span></div>
+            <div class="mc-sep">:</div>
+            <div class="mc-box"><span class="mc-num" id="mcHours">00</span><span class="mc-label">Jam</span></div>
+            <div class="mc-sep">:</div>
+            <div class="mc-box"><span class="mc-num" id="mcMinutes">00</span><span class="mc-label">Menit</span></div>
+            <div class="mc-sep">:</div>
+            <div class="mc-box"><span class="mc-num" id="mcSeconds">00</span><span class="mc-label">Detik</span></div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ====== KONFIGURASI MAINTENANCE - ATUR DI SINI ============== -->
+    <!-- ============================================================ -->
+    <script>
+        window.MAINTENANCE_ENABLED = true;                    // Set false untuk mematikan eror nya true/false
+        window.MAINTENANCE_END_TIME = '2026-10-29T23:59:59';  // Waktu pemulihan selesai
+    </script>
+
+    <script>
+        // Aktifkan maintenance ASAP (sebelum DOMContentLoaded) agar tidak ada flash
+        (function () {
+            if (!window.MAINTENANCE_ENABLED) return;
+            const endTime = new Date(window.MAINTENANCE_END_TIME).getTime();
+            if (!isNaN(endTime) && Date.now() < endTime) {
+                const page = document.getElementById('maintenance-page');
+                if (page) page.classList.add('active');
+                document.body.classList.add('maintenance-active');
+            }
+        })();
+    </script>
+    <!-- ================= END MAINTENANCE PAGE ================= -->
+
     <div id="loading-screen"><div class="center-content"><img src="logokelas.png" alt="Logo" class="logo-img" /><div class="loading-bottom"><div class="loading-text-from">from</div><div class="loading-text-brand">FSTIC</div><div class="version-text" data-i18n="version">Versi 26.2</div></div></div></div>
 
     <div id="updatePopup" class="update-popup" role="dialog" aria-modal="true">
@@ -967,6 +1247,17 @@
                 <span class="battery-percent" id="batteryPercent">--%</span>
             </div>
         </div>
+        
+        <!-- ===== FLOATING MAC ORB ===== -->
+        <div class="floating-mac-orb" id="floatingMacOrb">
+            <div class="mac-orb-glow-bg"></div>
+            <div class="mac-orb-sphere" id="macOrbSphere">
+                <div class="mac-orb-eye" id="macEyeLeft"></div>
+                <div class="mac-orb-eye" id="macEyeRight"></div>
+            </div>
+        </div>
+        <!-- ===== END FLOATING MAC ORB ===== -->
+
         <div class="search-scrim" id="searchScrim"></div>
         <div id="search-header">
             <div class="search-bar" id="searchBar"><span class="search-icon">🔍</span><input type="text" id="globalSearch" placeholder="Cari nama siswa atau jadwal..." autocomplete="off" data-i18n-placeholder="searchPlaceholder" /><button class="search-clear" id="searchClear">✕</button><div class="search-dropdown" id="searchDropdown"></div></div>
@@ -1034,6 +1325,7 @@
             <div id="page-music" class="page-content"><div class="page-music-wrapper"><div class="music-title" data-i18n="musicTitle">🎵 Putar Lagu favorit mereka</div><div class="music-embed-container"><iframe src="https://open.spotify.com/embed/playlist/48eLfrEugCjf4wF6hpzYRA?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div></div></div>
             <div id="page-gallery" class="page-content"><div class="gallery-container" id="galleryContainer"><div class="gallery-slider" id="gallerySlider"></div><div class="gallery-indicator" id="galleryIndicator"></div><button class="gallery-nav-btn prev" id="galleryPrev">‹</button><button class="gallery-nav-btn next" id="galleryNext">›</button></div></div>
             <div id="page-settings" class="page-content">
+                
                 <div style="margin-bottom:12px;"><h2 style="display:none;">Pengaturan</h2></div>
                 <div class="settings-subpage" id="settingsDisplaySubpage">
                     <div class="subpage-header"><button class="back-btn" id="displayBackBtn">‹</button><span class="subpage-title" data-i18n="displayTitle">Tampilan</span></div>
@@ -1052,10 +1344,8 @@
                     <div class="display-option" id="bannerToggleOption"><div class="option-left"><span class="option-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" /><line x1="8" y1="2" x2="8" y2="22" /><line x1="16" y1="2" x2="16" y2="22" /><line x1="2" y1="8" x2="22" y2="8" /><line x1="2" y1="16" x2="22" y2="16" /></svg></span><div><div class="option-label" data-i18n="bannerLabel">Banner hiasan</div><div class="option-desc" data-i18n="bannerDesc">Tampilkan gambar banner di bagian atas</div></div></div><button class="toggle-switch" id="bannerToggle" aria-label="Toggle banner"><span class="thumb"></span></button></div>
                     <div class="display-option" id="animationsToggleOption"><div class="option-left"><span class="option-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg></span><div><div class="option-label" data-i18n="animLabel">Animasi UI</div><div class="option-desc" data-i18n="animDesc">Aktifkan efek animasi pada tampilan</div></div></div><button class="toggle-switch" id="animationsToggle" aria-label="Toggle UI animations"><span class="thumb"></span></button></div>
                     <div class="display-option" id="clockBatteryToggleOption"><div class="option-left"><span class="option-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/><line x1="18" y1="4" x2="21" y2="1"/><line x1="22" y1="6" x2="22.01" y2="6"/></svg></span><div><div class="option-label" data-i18n="clockBatteryLabel">Navbar Jam &amp; Baterai</div><div class="option-desc" data-i18n="clockBatteryDesc">Tampilkan jam dan baterai di pojok kanan atas</div></div></div><button class="toggle-switch" id="clockBatteryToggle" aria-label="Toggle clock and battery"><span class="thumb"></span></button></div>
-                    <!-- ===== FITUR BARU: NOTIFIKASI JADWAL PELAJARAN ===== -->
                     <div class="display-option" id="notifToggleOption"><div class="option-left"><span class="option-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span><div><div class="option-label" data-i18n="notifLabel">Notifikasi jadwal pelajaran</div><div class="option-desc" data-i18n="notifDesc">Kirim notifikasi jadwal pelajaran besok ke HP</div></div></div><button class="toggle-switch" id="notifToggle" aria-label="Toggle notifikasi jadwal pelajaran"><span class="thumb"></span></button></div>
                     <div class="display-option" id="notifTimeOption" style="display:none;"><div class="option-left"><span class="option-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></span><div><div class="option-label" data-i18n="notifTimeLabel">Jam notifikasi</div><div class="option-desc" data-i18n="notifTimeDesc">Pilih jam munculnya notifikasi (jam 01.00–14.00 dilarang)</div></div></div><input type="time" id="notifTimeInput" class="notif-time-input" value="19:00" step="60" /></div>
-                    <!-- ===== END FITUR BARU ===== -->
                     <div class="display-option" id="keepFantasticPayOption"><div class="option-left"><span class="option-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></span><div><div class="option-label">Pertahankan Fantastic Pay</div><div class="option-desc">Simpan saldo Fantastic Pay meskipun aplikasi di-restart</div></div></div><button class="toggle-switch" id="keepFantasticPayToggle" aria-label="Toggle keep fantastic pay"><span class="thumb"></span></button></div>
                 </div>
                 <div id="settingsMainContent">
@@ -1117,7 +1407,6 @@
                 </div>
             </div>
 
-            <!-- ===== HALAMAN APP STORE / DOWNLOAD APLIKASI ===== -->
             <div id="page-empty">
                 <div class="app-store-page">
                     <div class="app-store-header">
@@ -1245,6 +1534,68 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
+            // ============================================================
+            // ===== MAINTENANCE COUNTDOWN SETUP ==========================
+            // ============================================================
+            (function setupMaintenanceCountdown() {
+                if (!window.MAINTENANCE_ENABLED) return;
+                const endTime = new Date(window.MAINTENANCE_END_TIME).getTime();
+                if (isNaN(endTime)) return;
+
+                const maintenancePage = document.getElementById('maintenance-page');
+                if (!maintenancePage) return;
+
+                // Kalau waktu sudah lewat saat load → langsung matikan
+                if (Date.now() >= endTime) {
+                    maintenancePage.classList.remove('active');
+                    document.body.classList.remove('maintenance-active');
+                    return;
+                }
+
+                const pad = n => n < 10 ? '0' + n : String(n);
+                const elDays    = document.getElementById('mcDays');
+                const elHours   = document.getElementById('mcHours');
+                const elMinutes = document.getElementById('mcMinutes');
+                const elSeconds = document.getElementById('mcSeconds');
+                if (!elDays) return;
+
+                let timer = null;
+
+                function tick() {
+                    const diff = endTime - Date.now();
+
+                    // Waktu habis → sembunyikan maintenance, website terbuka normal
+                    if (diff <= 0) {
+                        elDays.textContent = '00';
+                        elHours.textContent = '00';
+                        elMinutes.textContent = '00';
+                        elSeconds.textContent = '00';
+                        if (timer) { clearInterval(timer); timer = null; }
+                        setTimeout(() => {
+                            maintenancePage.classList.remove('active');
+                            document.body.classList.remove('maintenance-active');
+                        }, 2000);
+                        return;
+                    }
+
+                    const days    = Math.floor(diff / 86400000);
+                    const hours   = Math.floor((diff % 86400000) / 3600000);
+                    const minutes = Math.floor((diff % 3600000) / 60000);
+                    const seconds = Math.floor((diff % 60000) / 1000);
+
+                    elDays.textContent    = pad(days);
+                    elHours.textContent   = pad(hours);
+                    elMinutes.textContent = pad(minutes);
+                    elSeconds.textContent = pad(seconds);
+                }
+
+                tick();
+                timer = setInterval(tick, 1000);
+            })();
+            // ============================================================
+            // ===== END MAINTENANCE COUNTDOWN SETUP ======================
+            // ============================================================
+
             // --- SERVICE WORKER REGISTRATION (PWA) ---
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
@@ -1433,13 +1784,283 @@
             const initialTheme = localStorage.getItem('ixf_theme') || 'normal'; applyTheme(initialTheme);
             const initialColor = localStorage.getItem('ixf_theme_color') || 'default'; applyThemeColor(initialColor);
 
-            function expandSearchBar() { if (searchBarEl.classList.contains('expanded')) return; if (headerCollapseTimer) { clearTimeout(headerCollapseTimer); headerCollapseTimer = null; } searchHeader.classList.remove('search-collapsing'); searchBarEl.classList.add('expanded'); searchHeader.classList.add('search-expanded'); setTimeout(() => { try { globalSearchInput.focus(); } catch(e) {} }, 200); resetSearchCollapseTimer(); if (!globalSearchInput.value.trim()) renderPopularSearches(); }
-            function collapseSearchBar() { if (!searchBarEl.classList.contains('expanded')) return; clearSearchCollapseTimer(); searchBarEl.classList.remove('expanded'); if (searchHeader.classList.contains('search-expanded')) { searchHeader.classList.add('search-collapsing'); if (headerCollapseTimer) clearTimeout(headerCollapseTimer); headerCollapseTimer = setTimeout(function () { searchHeader.classList.remove('search-expanded', 'search-collapsing'); headerCollapseTimer = null; }, 320); } searchClear.classList.remove('visible'); closeDropdown(); globalSearchInput.value = ''; try { globalSearchInput.blur(); } catch(e) {} }
+            /* ============================================== */
+            /* ====== FITUR BARU: EYE TRACKING, DIZZY, & CLICK ====== */
+            /* ============================================== */
+            const floatingOrb = document.getElementById('floatingMacOrb');
+            const orbSphere = document.getElementById('macOrbSphere');
+            const eyes = document.querySelectorAll('.mac-orb-eye');
+            
+            let isDizzy = false;
+            let dizzyTimer = null;
+            let isOrbExpanded = false;
+
+            function toggleOrbExpand() {
+                if (!isOrbExpanded) {
+                    isOrbExpanded = true;
+                    const rect = floatingOrb.getBoundingClientRect();
+                    floatingOrb.style.top = rect.top + 'px';
+                    floatingOrb.style.left = rect.left + 'px';
+                    floatingOrb.style.right = 'auto';
+                    floatingOrb.style.bottom = 'auto';
+                    void floatingOrb.offsetWidth;
+                    floatingOrb.classList.add('expanded');
+                    floatingOrb.classList.remove('dragging');
+                    resetEyes();
+                    if (isDizzy) {
+                        isDizzy = false;
+                        orbSphere.classList.remove('dizzy');
+                        if(dizzyTimer) clearTimeout(dizzyTimer);
+                    }
+                } else {
+                    isOrbExpanded = false;
+                    floatingOrb.classList.remove('expanded');
+                }
+            }
+
+            let isTracking = false;
+            function handleEyeTrack(clientX, clientY) {
+                if (!orbSphere || isDizzy) return;
+                const rect = orbSphere.getBoundingClientRect();
+                const orbX = rect.left + rect.width / 2;
+                const orbY = rect.top + rect.height / 2;
+                const dx = clientX - orbX;
+                const dy = clientY - orbY;
+                const dist = Math.hypot(dx, dy);
+                const maxMove = isOrbExpanded ? 15 : 4; 
+                let moveX = 0;
+                let moveY = 0;
+                if (dist > 0) {
+                    moveX = (dx / dist) * maxMove;
+                    moveY = (dy / dist) * maxMove;
+                }
+                eyes.forEach(eye => {
+                    eye.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                });
+            }
+
+            function resetEyes() {
+                if (!orbSphere || isDizzy) return;
+                eyes.forEach(eye => {
+                    eye.style.transform = `translate(0px, 0px)`;
+                });
+            }
+
+            document.addEventListener('pointerdown', (e) => {
+                if (e.target.closest('.floating-mac-orb')) return;
+                isTracking = true;
+                handleEyeTrack(e.clientX, e.clientY);
+            });
+
+            document.addEventListener('pointermove', (e) => {
+                if (!isTracking) return;
+                if (e.target.closest('.floating-mac-orb')) return;
+                handleEyeTrack(e.clientX, e.clientY);
+            });
+
+            document.addEventListener('pointerup', () => {
+                isTracking = false;
+                resetEyes();
+            });
+            
+            document.addEventListener('pointercancel', () => {
+                isTracking = false;
+                resetEyes();
+            });
+
+            function triggerDizzy() {
+                if (isDizzy || !orbSphere) return;
+                isDizzy = true;
+                orbSphere.classList.add('dizzy');
+                resetEyes();
+                if (dizzyTimer) clearTimeout(dizzyTimer);
+                dizzyTimer = setTimeout(() => {
+                    isDizzy = false;
+                    orbSphere.classList.remove('dizzy');
+                    resetEyes();
+                }, 6000);
+            }
+
+            let lastShakeTime = 0;
+            function handleMotion(event) {
+                const acc = event.accelerationIncludingGravity;
+                if (!acc) return;
+                const x = acc.x || 0;
+                const y = acc.y || 0;
+                const z = acc.z || 0;
+                const magnitude = Math.sqrt(x*x + y*y + z*z);
+                const now = Date.now();
+                if (magnitude > 25 && now - lastShakeTime > 2000) {
+                    lastShakeTime = now;
+                    triggerDizzy();
+                }
+            }
+
+            let motionPermissionGranted = false;
+            function requestMotionPermission() {
+                if (motionPermissionGranted) return;
+                if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                    DeviceMotionEvent.requestPermission()
+                        .then(permissionState => {
+                            if (permissionState === 'granted') {
+                                motionPermissionGranted = true;
+                                window.addEventListener('devicemotion', handleMotion);
+                            }
+                        })
+                        .catch(console.error);
+                } else {
+                    motionPermissionGranted = true;
+                    window.addEventListener('devicemotion', handleMotion);
+                }
+            }
+            document.addEventListener('click', requestMotionPermission, { once: true });
+            document.addEventListener('touchstart', requestMotionPermission, { once: true });
+
+            /* ===== FITUR DRAG & DROP MAC ORB ===== */
+            if (floatingOrb) {
+                let isDragging = false;
+                let hasDragged = false;
+                let startX, startY, initialLeft, initialTop;
+
+                floatingOrb.addEventListener('pointerdown', (e) => {
+                    hasDragged = false;
+                    if (isOrbExpanded) return;
+                    if (!searchBarEl.classList.contains('expanded')) return;
+                    if (e.button !== 0 && e.pointerType === 'mouse') return;
+                    if (!e.target.closest('.mac-orb-sphere')) return;
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    const rect = floatingOrb.getBoundingClientRect();
+                    initialLeft = rect.left;
+                    initialTop = rect.top;
+                    floatingOrb.style.transition = 'none';
+                    floatingOrb.style.right = 'auto';
+                    floatingOrb.style.bottom = 'auto';
+                    floatingOrb.style.left = initialLeft + 'px';
+                    floatingOrb.style.top = initialTop + 'px';
+                    floatingOrb.classList.add('dragging');
+                    floatingOrb.setPointerCapture(e.pointerId);
+                });
+
+                floatingOrb.addEventListener('pointermove', (e) => {
+                    if (!isDragging) return;
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) hasDragged = true;
+                    let newLeft = initialLeft + dx;
+                    let newTop = initialTop + dy;
+                    const settingsBtn = document.getElementById('settingsHeaderBtn');
+                    const orbWidth = floatingOrb.offsetWidth;
+                    const orbHeight = floatingOrb.offsetHeight;
+                    const padding = 10;
+                    newTop = initialTop;
+                    if (settingsBtn) {
+                        const sRect = settingsBtn.getBoundingClientRect();
+                        const maxRight = sRect.left - orbWidth - 15;
+                        newLeft = Math.max(padding, Math.min(maxRight, newLeft));
+                    } else {
+                        newLeft = Math.max(padding, Math.min(window.innerWidth - orbWidth - padding, newLeft));
+                    }
+                    floatingOrb.style.left = newLeft + 'px';
+                    floatingOrb.style.top = newTop + 'px';
+                });
+
+                floatingOrb.addEventListener('pointerup', (e) => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    floatingOrb.classList.remove('dragging');
+                    floatingOrb.releasePointerCapture(e.pointerId);
+                });
+                
+                floatingOrb.addEventListener('pointercancel', (e) => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    floatingOrb.classList.remove('dragging');
+                    floatingOrb.releasePointerCapture(e.pointerId);
+                });
+
+                floatingOrb.addEventListener('click', function(e) {
+                    if (hasDragged || isDragging) {
+                        return; 
+                    }
+                    toggleOrbExpand();
+                });
+            }
+            /* ===== END DRAG & DROP ===== */
+
+            function expandSearchBar() { 
+                if (searchBarEl.classList.contains('expanded')) return; 
+                if (headerCollapseTimer) { clearTimeout(headerCollapseTimer); headerCollapseTimer = null; } 
+                searchHeader.classList.remove('search-collapsing'); 
+                searchBarEl.classList.add('expanded'); 
+                searchHeader.classList.add('search-expanded'); 
+                document.body.classList.add('search-is-open');
+                setTimeout(() => { try { globalSearchInput.focus(); } catch(e) {} }, 200); 
+                resetSearchCollapseTimer(); 
+                if (!globalSearchInput.value.trim()) renderPopularSearches(); 
+                
+                if (floatingOrb && !isOrbExpanded) {
+                    const headerActions = document.querySelector('.header-actions');
+                    if (headerActions) {
+                        const actionsRect = headerActions.getBoundingClientRect();
+                        const centerYFromBottom = window.innerHeight - (actionsRect.top + actionsRect.height / 2);
+                        floatingOrb.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                        floatingOrb.style.right = 'auto';
+                        floatingOrb.style.top = 'auto';
+                        floatingOrb.style.left = '20px';
+                        floatingOrb.style.bottom = (centerYFromBottom - 17) + 'px';
+                    }
+                }
+            }
+            
+            function collapseSearchBar() { 
+                if (!searchBarEl.classList.contains('expanded')) return; 
+                clearSearchCollapseTimer(); 
+                searchBarEl.classList.remove('expanded'); 
+                document.body.classList.remove('search-is-open');
+                if (searchHeader.classList.contains('search-expanded')) { 
+                    searchHeader.classList.add('search-collapsing'); 
+                    if (headerCollapseTimer) clearTimeout(headerCollapseTimer); 
+                    headerCollapseTimer = setTimeout(function () { 
+                        searchHeader.classList.remove('search-expanded', 'search-collapsing'); 
+                        headerCollapseTimer = null; 
+                    }, 320); 
+                } 
+                searchClear.classList.remove('visible'); 
+                closeDropdown(); 
+                globalSearchInput.value = ''; 
+                try { globalSearchInput.blur(); } catch(e) {} 
+                
+                if (floatingOrb && !isOrbExpanded) {
+                    floatingOrb.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    floatingOrb.style.right = '16px';
+                    floatingOrb.style.bottom = '150px';
+                    floatingOrb.style.left = 'auto';
+                    floatingOrb.style.top = 'auto';
+                }
+            }
+            
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => {
+                    if (searchBarEl.classList.contains('expanded') && floatingOrb && !floatingOrb.classList.contains('dragging') && !isOrbExpanded) {
+                        const headerActions = document.querySelector('.header-actions');
+                        if (headerActions) {
+                            const actionsRect = headerActions.getBoundingClientRect();
+                            const centerYFromBottom = window.visualViewport.height - (actionsRect.top + actionsRect.height / 2);
+                            floatingOrb.style.transition = 'none'; 
+                            floatingOrb.style.bottom = (centerYFromBottom - 17) + 'px';
+                            setTimeout(() => { if(floatingOrb) floatingOrb.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'; }, 50);
+                        }
+                    }
+                });
+            }
+            
             function resetSearchCollapseTimer() { clearSearchCollapseTimer(); }
             function clearSearchCollapseTimer() { if (searchCollapseTimer) { clearTimeout(searchCollapseTimer); searchCollapseTimer = null; } }
             searchBarEl.addEventListener('click', function(e) { if (!searchBarEl.classList.contains('expanded')) { e.preventDefault(); e.stopPropagation(); expandSearchBar(); } else { resetSearchCollapseTimer(); } });
             globalSearchInput.addEventListener('input', function() { resetSearchCollapseTimer(); });
-            globalSearchInput.addEventListener('focus', function() { if (!searchBarEl.classList.contains('expanded')) { searchBarEl.classList.add('expanded'); searchHeader.classList.add('search-expanded'); } resetSearchCollapseTimer(); if (!this.value.trim()) renderPopularSearches(); });
+            globalSearchInput.addEventListener('focus', function() { if (!searchBarEl.classList.contains('expanded')) { searchBarEl.classList.add('expanded'); searchHeader.classList.add('search-expanded'); document.body.classList.add('search-is-open'); } resetSearchCollapseTimer(); if (!this.value.trim()) renderPopularSearches(); });
 
             const BATTERY_RING_CIRCUMFERENCE = 2 * Math.PI * 15;
             function updateBatteryUI(level, charging) { const percent = Math.round(level*100); const remaining = 100 - percent; if (charging && percent < 100) { batteryPercent.textContent = remaining + ''; batteryPercent.classList.add('charging-to-full'); } else { batteryPercent.textContent = percent + '%'; batteryPercent.classList.remove('charging-to-full'); } const offset = BATTERY_RING_CIRCUMFERENCE - (percent/100)*BATTERY_RING_CIRCUMFERENCE; batteryRing.style.strokeDashoffset = offset; let color = '#4ade80'; if (percent <= 20) color = '#ef4444'; else if (percent <= 50) color = '#fbbf24'; if (charging) { color = '#4ade80'; batteryRing.classList.add('charging'); } else { batteryRing.classList.remove('charging'); } batteryRing.style.stroke = color; }
@@ -1591,9 +2212,7 @@
                 });
             }
 
-            /* ============================================== */
-            /* ====== LOGIKA INSTAL APLIKASI (APP STORE) ==== */
-            /* ============================================== */
+            /* ===== LOGIKA INSTAL APLIKASI (APP STORE) ===== */
             const APP_RING_RADIUS = 46;
             const APP_RING_CIRCUMFERENCE = 2 * Math.PI * APP_RING_RADIUS;
             const appInstallBtn = document.getElementById('appInstallBtn');
@@ -2439,9 +3058,7 @@
                 if (e.key === 'Escape' && codeModalOverlay && codeModalOverlay.classList.contains('active')) closeCodeModal();
             });
 
-            /* ========================================================= */
-            /* ============== FITUR NOTIFIKASI JADWAL PELAJARAN ======== */
-            /* ========================================================= */
+            /* ===== FITUR NOTIFIKASI JADWAL PELAJARAN ===== */
             const NOTIF_ENABLED_KEY = 'ixf_notif_enabled';
             const NOTIF_TIME_KEY = 'ixf_notif_time';
             const NOTIF_LAST_FIRED_KEY = 'ixf_notif_last_fired';
@@ -2452,7 +3069,6 @@
 
             let notifCheckInterval = null;
 
-            // Simpan preferensi & tampilkan opsi jam bila aktif
             function applyNotifSetting(enabled) {
                 if (notifToggle) notifToggle.classList.toggle('on', enabled);
                 if (notifTimeOption) notifTimeOption.style.display = enabled ? 'flex' : 'none';
@@ -2461,7 +3077,6 @@
                 else stopNotifChecker();
             }
 
-            // Minta izin notifikasi ke browser
             async function requestNotifPermission() {
                 if (!('Notification' in window)) {
                     showToast('❌ Browser tidak mendukung notifikasi');
@@ -2506,7 +3121,6 @@
             }
             function setNotifTime(val) { localStorage.setItem(NOTIF_TIME_KEY, val); }
 
-            // Validasi jam 01.00 - 14.00 dilarang (60 - 840 menit)
             function validateNotifTime(val) {
                 if (!val) return false;
                 const parts = val.split(':');
@@ -2515,7 +3129,6 @@
                 return true;
             }
 
-            // Bangun pesan notifikasi dinamis sesuai kondisi besok
             function buildNotifMessage() {
                 const userName = localStorage.getItem('ixf_user_name') || 'kamu';
                 const now = new Date();
@@ -2524,7 +3137,6 @@
                 const dayIdxToName = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
                 const tomorrowName = dayIdxToName[tomorrowDayIdx];
 
-                // Besok Minggu
                 if (tomorrowDayIdx === 0) {
                     return {
                         title: 'Yeyy 🥳',
@@ -2545,7 +3157,6 @@
                     };
                 }
 
-                // Cek ada Matematika?
                 const adaMTK = lessons.some(l =>
                     l.mapel && l.mapel.toLowerCase().includes('matematika')
                 );
@@ -2563,7 +3174,6 @@
                 };
             }
 
-            // Tampilkan notifikasi
             function fireNotification() {
                 if (!('Notification' in window)) return;
                 if (Notification.permission !== 'granted') return;
@@ -2579,14 +3189,6 @@
                 } catch (e) { console.warn('Gagal notifikasi:', e); }
             }
 
-            /* ========================================================= */
-            /* ========== FIX: CEK NOTIF PAKAI SLOT (TANGGAL|JAM) ====== */
-            /* ========================================================= */
-            // Kunci per-slot (tanggal + jam target), bukan per-hari.
-            // Supaya:
-            //  - Ganti jam → slot baru → bisa kirim lagi (fix bug).
-            //  - Besok tetap otomatis di jam yang sama → slot baru → kirim lagi.
-            //  - Sudah kirim di slot itu → tidak dobel.
             function checkAndFireNotif() {
                 if (localStorage.getItem(NOTIF_ENABLED_KEY) !== 'true') return;
                 const now = new Date();
@@ -2599,16 +3201,12 @@
                 const slotKey = todayKey + '|' + targetTime;
                 const lastFiredSlot = localStorage.getItem(NOTIF_LAST_FIRED_KEY) || '';
 
-                // Sudah pernah kirim untuk slot ini? Skip.
                 if (lastFiredSlot === slotKey) return;
-
-                // Sekarang sudah lewat / sama dengan target? Kirim + tandai slot ini.
                 if (nowMinutes >= targetMinutes) {
                     fireNotification();
                     localStorage.setItem(NOTIF_LAST_FIRED_KEY, slotKey);
                 }
             }
-            /* ================= END FIX ================= */
 
             function startNotifChecker() {
                 if (notifCheckInterval) clearInterval(notifCheckInterval);
@@ -2619,7 +3217,6 @@
                 if (notifCheckInterval) { clearInterval(notifCheckInterval); notifCheckInterval = null; }
             }
 
-            // ===== INISIALISASI NOTIFIKASI =====
             if (notifTimeInput) notifTimeInput.value = getNotifTime();
             applyNotifSetting(localStorage.getItem(NOTIF_ENABLED_KEY) === 'true');
 
@@ -2640,12 +3237,9 @@
                     }
                     setNotifTime(val);
                     showToast('⏰ Jam notifikasi diatur ke ' + val);
-                    // Reset slot agar jam baru bisa langsung dicek ulang
-                    // (kalau hari ini sudah lewat, langsung kirim)
                     checkAndFireNotif();
                 });
             }
-            /* ================= END NOTIFIKASI ================= */
 
             applyLanguage(currentLanguage, false);
             populateThemeSelect();
